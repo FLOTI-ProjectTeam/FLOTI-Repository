@@ -1,0 +1,13 @@
+### React Native ###
+frontend/flotiApp/node_modules/
+frontend/flotiApp/.expo/
+
+### Spring Boot ###
+backend/floti-api/.gradle/
+backend/floti-api/.idea/
+backend/floti-api/build/
+backend/floti-api/gradle/
+backend/floti-api/src/main/resources/application.properties
+
+### Else ###
+*.log
