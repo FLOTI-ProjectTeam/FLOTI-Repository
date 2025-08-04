@@ -9,5 +9,9 @@ backend/floti-api/build/
 backend/floti-api/gradle/
 backend/floti-api/src/main/resources/application.properties
 
+### Docker ENV ###
+backend/.env
+
 ### Else ###
 *.log
+.idea/
