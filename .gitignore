@@ -7,7 +7,7 @@ backend/floti-api/.gradle/
 backend/floti-api/.idea/
 backend/floti-api/build/
 backend/floti-api/gradle/
-backend/floti-api/src/main/resources/application.properties
+backend/floti-api/src/main/resources/application.yml
 
 ### Docker ENV ###
 backend/.env
