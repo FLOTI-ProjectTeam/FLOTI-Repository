@@ -1,4 +1,4 @@
-package com.floti.config;
+package com.floti.api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

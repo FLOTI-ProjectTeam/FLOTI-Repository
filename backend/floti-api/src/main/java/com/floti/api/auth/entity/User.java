@@ -1,4 +1,4 @@
-package com.floti.auth.entity;
+package com.floti.api.auth.entity;
 
 import jakarta.persistence.*; // JPA 어노테이션
 import lombok.*;             // Lombok 자동 생성기능

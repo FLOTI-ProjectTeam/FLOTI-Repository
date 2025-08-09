@@ -1,6 +1,6 @@
-package com.floti.auth.repository;
+package com.floti.api.auth.repository;
 
-import com.floti.auth.entity.User;
+import com.floti.api.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

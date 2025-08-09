@@ -1,8 +1,8 @@
-package com.floti.auth.service;
+package com.floti.api.auth.service;
 
-import com.floti.auth.dto.SignUpRequestDto;
-import com.floti.auth.entity.User;
-import com.floti.auth.repository.UserRepository;
+import com.floti.api.auth.dto.SignUpRequestDto;
+import com.floti.api.auth.entity.User;
+import com.floti.api.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
