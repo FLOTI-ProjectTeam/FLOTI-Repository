@@ -1,0 +1,70 @@
+package com.floti.api.domain.board.controller;
+
+import com.floti.api.domain.board.dto.TipPostCreateRequest;
+import com.floti.api.domain.board.dto.TipPostResponse;
+import com.floti.api.domain.board.dto.TipPostUpdateRequest;
+import com.floti.api.domain.board.entity.TipPosts;
+import com.floti.api.domain.board.service.TipPostService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/community/tip")
+public class TipBoardController {
+    private final TipPostService tipPostService;
+
+    /* 1. 조회 & 검색 */
+    @GetMapping
+    public Page<TipPostResponse> getTipPosts(@RequestParam(defaultValue = "latest") String sort,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "20") int size,
+                                             @RequestParam(required = false) String search) {
+        Pageable pageable;
+        if ("registered".equalsIgnoreCase(sort)) {
+            pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        }
+        return tipPostService.getTipPosts(search, pageable);
+    }
+
+    /* 2. 상세 조회 */
+    @GetMapping("/{id}")
+    public ResponseEntity<TipPostResponse> getTipPost(@PathVariable Long id) {
+        return ResponseEntity.ok(tipPostService.getTipPost(id));
+    }
+
+    /* 3. 등록 */
+    @PostMapping("/create")
+    public ResponseEntity<TipPostResponse> createTipPost(@Validated @RequestPart TipPostCreateRequest post,
+                                                         @RequestPart(required = false) MultipartFile thumbnail) {
+        TipPostResponse response = tipPostService.createTipPost(post.getAuthorId(), post, thumbnail);
+        return ResponseEntity.status(CREATED).body(response); // 201 Created
+    }
+
+    /* 4. 수정 */
+    @PutMapping("/update")
+    public ResponseEntity<TipPostResponse> updateTipPost(@Validated TipPostUpdateRequest post) {
+        TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), post);
+        return ResponseEntity.ok(response); // 200 Ok
+    }
+
+    /* 5. 삭제 */
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<TipPostResponse> deleteTipPost(@RequestParam Long userId, //임시
+                                                         @PathVariable Long id) {
+        tipPostService.deleteTipPost(userId, id);
+        return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
+    }
+}
