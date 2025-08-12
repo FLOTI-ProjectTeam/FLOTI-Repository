@@ -2,9 +2,11 @@ package com.floti.api.domain.board.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.floti.api.domain.board.entity.TipPosts;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter //테스트용
 public class TipPostResponse {
     private Long id;
     private String authorNickname;

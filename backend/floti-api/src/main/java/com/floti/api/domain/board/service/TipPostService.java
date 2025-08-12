@@ -36,16 +36,16 @@ public class TipPostService {
 
     public TipPostResponse getTipPost(Long id) {
         TipPosts tipPost = tipPostRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
         return new TipPostResponse(tipPost);
     }
 
     public TipPostResponse createTipPost(Long userId, TipPostCreateRequest post, MultipartFile thumbnail) {
-        if (userRepository.existsById(userId))
-            throw new NoSuchElementException("사용자 정보를 찾을 수 없습니다.");
+        Users author = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("사용자 정보를 찾을 수 없습니다."));
 
         TipPosts tipPost = TipPosts.builder()
-                .author(Users.builder().id(userId).build())
+                .author(author)
                 .title(post.getTitle())
                 .content(post.getContent())
                 .build();
@@ -59,12 +59,16 @@ public class TipPostService {
         }
 
         TipPosts tipPost = tipPostRepository.findById(post.getId())
-                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        tipPost.setTitle(post.getTitle());
-        tipPost.setContent(post.getContent());
+        if (userId.equals(tipPost.getAuthor().getId())) {
+            tipPost.setTitle(post.getTitle());
+            tipPost.setContent(post.getContent());
 
-        return new TipPostResponse(tipPostRepository.save(tipPost));
+            return new TipPostResponse(tipPostRepository.save(tipPost));
+        } else {
+            throw new AccessDeniedException("게시글을 수정할 권한이 없습니다.");
+        }
     }
 
     public void deleteTipPost(Long userId, Long id) {
@@ -72,12 +76,12 @@ public class TipPostService {
             throw new NoSuchElementException("사용자 정보를 찾을 수 없습니다.");
 
         TipPosts tipPost = tipPostRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         if (userId.equals(tipPost.getAuthor().getId())) {
             tipPostRepository.delete(tipPost);
         } else {
-            throw new AccessDeniedException("해당 게시글을 삭제할 권한이 없습니다.");
+            throw new AccessDeniedException("게시글을 삭제할 권한이 없습니다.");
         }
     }
 }

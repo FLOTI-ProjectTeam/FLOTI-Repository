@@ -3,7 +3,6 @@ package com.floti.api.domain.board.controller;
 import com.floti.api.domain.board.dto.TipPostCreateRequest;
 import com.floti.api.domain.board.dto.TipPostResponse;
 import com.floti.api.domain.board.dto.TipPostUpdateRequest;
-import com.floti.api.domain.board.entity.TipPosts;
 import com.floti.api.domain.board.service.TipPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
