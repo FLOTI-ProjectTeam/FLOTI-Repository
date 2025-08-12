@@ -1,27 +1,28 @@
 package com.floti.api.domain.board.service;
 
-import com.floti.api.domain.board.dto.TipPostCreateRequest;
-import com.floti.api.domain.board.dto.TipPostResponse;
-import com.floti.api.domain.board.dto.TipPostUpdateRequest;
-import com.floti.api.domain.board.entity.TipPosts;
-import com.floti.api.domain.board.repository.TipPostRepository;
-import com.floti.api.temp.entity.Users;
-import com.floti.api.temp.repository.UserRepository;
+import com.floti.api.domain.board.common.dto.PostCreateRequest;
+import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.tip.dto.TipPostResponse;
+import com.floti.api.domain.board.tip.entity.TipPosts;
+import com.floti.api.domain.board.tip.repository.TipPostRepository;
+import com.floti.api.domain.board.tip.service.TipPostService;
+import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test") //application-test.yml 사용
@@ -39,7 +40,7 @@ public class TipPostServiceTest {
     private Long testUserId;
     private Long testPostId;
 
-    @BeforeEach // 테스트용 데이터 생성 및 저장
+    @BeforeEach //테스트용 데이터 생성 및 저장
     void setUp() {
         Users user = Users.builder()
                 .email("test01@gmail.com")
@@ -60,8 +61,8 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 조회")
-    void getTipPosts_withoutSearch_returnsAll() {
+    @DisplayName("getTipPosts: 게시글 조회")
+    void getTipPosts_withoutSearch() {
         String search = "";
         Pageable pageable = PageRequest.of(0, 20);
 
@@ -79,8 +80,8 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 검색")
-    void getTipPosts_withSearch_returnsFilteredPage() {
+    @DisplayName("getTipPosts: 게시글 검색")
+    void getTipPosts_withSearch() {
         String search = "테스트";
         Pageable pageable = PageRequest.of(0, 20);
 
@@ -98,7 +99,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 상세 조회")
+    @DisplayName("getTipPost: 게시글 상세 조회")
     void getTipPost_success() {
         TipPostResponse response = tipPostService.getTipPost(testPostId);
 
@@ -107,7 +108,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 상세 조회 실패")
+    @DisplayName("getTipPost: 게시글 상세 조회 [게시글 없음]")
     void getTipPost_fail_postNotFound() {
         Long invalidPostId = 9999L;
 
@@ -121,7 +122,7 @@ public class TipPostServiceTest {
     @Test
     @DisplayName("createTipPost: 게시글 등록")
     void createTipPost_success() {
-        TipPostCreateRequest request = new TipPostCreateRequest();
+        PostCreateRequest request = new PostCreateRequest();
         request.setTitle("테스트 제목");
         request.setContent("테스트 내용");
 
@@ -135,7 +136,7 @@ public class TipPostServiceTest {
     @Test
     @DisplayName("createTipPost: 게시글 등록 [사용자 없음]")
     void createTipPost_fail_userNotFound() {
-        TipPostCreateRequest request = new TipPostCreateRequest();
+        PostCreateRequest request = new PostCreateRequest();
         request.setTitle("테스트 제목");
         request.setContent("테스트 내용");
 
@@ -149,9 +150,9 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 수정")
+    @DisplayName("updateTipPost: 게시글 수정")
     void updateTipPost_success() {
-        TipPostUpdateRequest updateRequest = new TipPostUpdateRequest();
+        PostUpdateRequest updateRequest = new PostUpdateRequest();
         updateRequest.setId(testPostId);
         updateRequest.setTitle("수정된 제목");
         updateRequest.setContent("수정된 내용");
@@ -163,9 +164,9 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 수정 실패 [게시글 없음]")
+    @DisplayName("updateTipPost: 게시글 수정 [게시글 없음]")
     void updateTipPost_fail_postNotFound() {
-        TipPostUpdateRequest updateRequest = new TipPostUpdateRequest();
+        PostUpdateRequest updateRequest = new PostUpdateRequest();
         updateRequest.setId(9999L);
         updateRequest.setTitle("변경된 제목");
         updateRequest.setContent("변경된 내용");
@@ -178,9 +179,9 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 수정 실패 [사용자 없음]")
+    @DisplayName("updateTipPost: 게시글 수정 [사용자 없음]")
     void updateTipPost_fail_userNotFound() {
-        TipPostUpdateRequest updateRequest = new TipPostUpdateRequest();
+        PostUpdateRequest updateRequest = new PostUpdateRequest();
         updateRequest.setId(testPostId);
         updateRequest.setTitle("변경된 제목");
         updateRequest.setContent("변경된 내용");
@@ -195,7 +196,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 수정 실패 [작성자 불일치]")
+    @DisplayName("updateTipPost: 게시글 수정 [작성자 불일치]")
     void updateTipPost_fail_authorMismatch() {
         Users user = Users.builder()
                 .email("test02@gmail.com")
@@ -205,7 +206,7 @@ public class TipPostServiceTest {
                 .build();
         userRepository.save(user);
 
-        TipPostUpdateRequest updateRequest = new TipPostUpdateRequest();
+        PostUpdateRequest updateRequest = new PostUpdateRequest();
         updateRequest.setId(testPostId);
         updateRequest.setTitle("변경된 제목");
         updateRequest.setContent("변경된 내용");
@@ -218,7 +219,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 삭제")
+    @DisplayName("deleteTipPost: 게시글 삭제")
     void deleteTipPost_success() {
         tipPostService.deleteTipPost(testUserId, testPostId);
 
@@ -226,7 +227,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 삭제 실패 [게시글 없음]")
+    @DisplayName("deleteTipPost: 게시글 삭제 [게시글 없음]")
     void deleteTipPost_fail_postNotFound() {
         Long invalidPostId = 9999L;
 
@@ -238,7 +239,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 삭제 실패 [사용자 없음]")
+    @DisplayName("deleteTipPost: 게시글 삭제 [사용자 없음]")
     void deleteTipPost_fail_userNotFound() {
         Long invalidUserId = 9999L;
 
@@ -250,7 +251,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 삭제 실패 [작성자 불일치]")
+    @DisplayName("deleteTipPost: 게시글 삭제 [작성자 불일치]")
     void deleteTipPost_fail_authorMismatch() {
         Users user = Users.builder()
                 .email("test02@gmail.com")

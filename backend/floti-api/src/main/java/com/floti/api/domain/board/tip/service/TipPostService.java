@@ -1,12 +1,12 @@
-package com.floti.api.domain.board.service;
+package com.floti.api.domain.board.tip.service;
 
-import com.floti.api.domain.board.dto.TipPostCreateRequest;
-import com.floti.api.domain.board.dto.TipPostResponse;
-import com.floti.api.domain.board.dto.TipPostUpdateRequest;
-import com.floti.api.domain.board.entity.TipPosts;
-import com.floti.api.domain.board.repository.TipPostRepository;
-import com.floti.api.temp.entity.Users;
-import com.floti.api.temp.repository.UserRepository;
+import com.floti.api.domain.board.common.dto.PostCreateRequest;
+import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.tip.dto.TipPostResponse;
+import com.floti.api.domain.board.tip.entity.TipPosts;
+import com.floti.api.domain.board.tip.repository.TipPostRepository;
+import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +40,7 @@ public class TipPostService {
         return new TipPostResponse(tipPost);
     }
 
-    public TipPostResponse createTipPost(Long userId, TipPostCreateRequest post, MultipartFile thumbnail) {
+    public TipPostResponse createTipPost(Long userId, PostCreateRequest post, MultipartFile file) {
         Users author = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("사용자 정보를 찾을 수 없습니다."));
 
@@ -53,18 +53,15 @@ public class TipPostService {
         return new TipPostResponse(tipPostRepository.save(tipPost));
     }
 
-    public TipPostResponse updateTipPost(Long userId, TipPostUpdateRequest post) {
-        if (!userRepository.existsById(userId)) {
+    public TipPostResponse updateTipPost(Long userId, PostUpdateRequest post) {
+        if (!userRepository.existsById(userId))
             throw new NoSuchElementException("사용자 정보를 찾을 수 없습니다.");
-        }
 
         TipPosts tipPost = tipPostRepository.findById(post.getId())
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         if (userId.equals(tipPost.getAuthor().getId())) {
-            tipPost.setTitle(post.getTitle());
-            tipPost.setContent(post.getContent());
-
+            tipPost.update(post);
             return new TipPostResponse(tipPostRepository.save(tipPost));
         } else {
             throw new AccessDeniedException("게시글을 수정할 권한이 없습니다.");

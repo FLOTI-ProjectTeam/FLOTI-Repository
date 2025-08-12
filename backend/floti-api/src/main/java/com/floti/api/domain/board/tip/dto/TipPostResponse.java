@@ -1,7 +1,7 @@
-package com.floti.api.domain.board.dto;
+package com.floti.api.domain.board.tip.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.floti.api.domain.board.entity.TipPosts;
+import com.floti.api.domain.board.tip.entity.TipPosts;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

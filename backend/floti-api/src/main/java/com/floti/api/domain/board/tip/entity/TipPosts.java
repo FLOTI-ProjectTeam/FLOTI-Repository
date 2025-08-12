@@ -1,6 +1,7 @@
-package com.floti.api.domain.board.entity;
+package com.floti.api.domain.board.tip.entity;
 
-import com.floti.api.temp.entity.Users;
+import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.board.common.dto.PostUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,15 +19,12 @@ public class TipPosts {
     @JoinColumn(name = "author_id", nullable = false)
     private Users author;
 
-    @Setter
     @Column(nullable = false, length = 100)
     private String title;
 
-    @Setter
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Setter
     @Column(length = 65)
     private String thumbnail; //경로: tip/thumbnail/날짜_UUID.확장자
 
@@ -45,6 +43,11 @@ public class TipPosts {
         this.title = title;
         this.content = content;
         this.thumbnail = thumbnail;
+    }
+
+    public void update(PostUpdateRequest post) {
+        this.title = post.getTitle();
+        this.content = post.getContent();
     }
 
     public void incrementCommentCount() {
