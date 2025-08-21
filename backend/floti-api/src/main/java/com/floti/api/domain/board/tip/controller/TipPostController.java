@@ -1,10 +1,9 @@
-package com.floti.api.domain.board.qna.controller;
+package com.floti.api.domain.board.tip.controller;
 
 import com.floti.api.domain.board.common.dto.PostCreateRequest;
 import com.floti.api.domain.board.common.dto.PostUpdateRequest;
-import com.floti.api.domain.board.qna.dto.QnaPostResponse;
-import com.floti.api.domain.board.qna.service.QnaPostService;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
+import com.floti.api.domain.board.tip.service.TipPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,19 +12,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/community/qna")
-public class QnaBoardController {
-    private final QnaPostService qnaPostService;
+@RequestMapping("/community/tip/posts")
+public class TipPostController {
+    private final TipPostService tipPostService;
 
     /* 1. 조회 & 검색 */
     @GetMapping
-    public Page<QnaPostResponse> getQnaPosts(@RequestParam(defaultValue = "latest") String sort,
+    public Page<TipPostResponse> getTipPosts(@RequestParam(defaultValue = "latest") String sort,
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "20") int size,
                                              @RequestParam(required = false) String search) {
@@ -35,27 +35,28 @@ public class QnaBoardController {
         } else {
             pageable = PageRequest.of(page, size, Sort.by("id").descending());
         }
-        return qnaPostService.getQnaPosts(search, pageable);
+        return tipPostService.getTipPosts(search, pageable);
     }
 
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<QnaPostResponse> getTipPost(@PathVariable Long id) {
-        QnaPostResponse response = qnaPostService.getQnaPost(id);
+    public ResponseEntity<TipPostResponse> getTipPost(@PathVariable Long id) {
+        TipPostResponse response = tipPostService.getTipPost(id);
         return ResponseEntity.ok(response);
     }
 
     /* 3. 등록 */
     @PostMapping
-    public ResponseEntity<QnaPostResponse> createTipPost(@Validated PostCreateRequest post) {
-        QnaPostResponse response = qnaPostService.createQnaPost(post.getAuthorId(), post);
+    public ResponseEntity<TipPostResponse> createTipPost(@Validated @RequestPart PostCreateRequest post,
+                                                         @RequestPart(required = false) MultipartFile file) {
+        TipPostResponse response = tipPostService.createTipPost(post.getAuthorId(), post, file);
         return ResponseEntity.status(CREATED).body(response); // 201 Created
     }
 
     /* 4. 수정 */
     @PutMapping
-    public ResponseEntity<QnaPostResponse> updateTipPost(@Validated PostUpdateRequest post) {
-        QnaPostResponse response = qnaPostService.updateQnaPost(post.getAuthorId(), post);
+    public ResponseEntity<TipPostResponse> updateTipPost(@Validated PostUpdateRequest post) {
+        TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), post);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
@@ -63,7 +64,7 @@ public class QnaBoardController {
     @DeleteMapping("/{id}")
     public ResponseEntity<TipPostResponse> deleteTipPost(@RequestParam Long userId, //임시
                                                          @PathVariable Long id) {
-        qnaPostService.deleteQnaPost(userId, id);
+        tipPostService.deleteTipPost(userId, id);
         return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
     }
 }

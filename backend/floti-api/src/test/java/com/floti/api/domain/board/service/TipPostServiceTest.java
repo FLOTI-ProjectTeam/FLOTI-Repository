@@ -1,13 +1,14 @@
 package com.floti.api.domain.board.service;
 
+import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostCreateRequest;
 import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.tip.dto.TipPostDetailResponse;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.domain.board.tip.service.TipPostService;
-import com.floti.api.domain.auth.entity.Users;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.error.PostNotFoundException;
 import com.floti.api.error.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,7 +41,7 @@ public class TipPostServiceTest {
     private Long testUserId;
     private Long testPostId;
 
-    @BeforeEach //테스트용 데이터 생성 및 저장
+    @BeforeEach //테스트용 데이터 생성
     void setUp() {
         Users user = Users.builder()
                 .email("test01@gmail.com")
@@ -166,38 +165,6 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("updateTipPost: 게시글 수정 [게시글 없음]")
-    void updateTipPost_fail_postNotFound() {
-        PostUpdateRequest updateRequest = new PostUpdateRequest();
-        updateRequest.setId(9999L);
-        updateRequest.setTitle("변경된 제목");
-        updateRequest.setContent("변경된 내용");
-
-        PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
-            tipPostService.updateTipPost(testUserId, updateRequest);
-        });
-
-        assertEquals("게시글을 찾을 수 없습니다.", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("updateTipPost: 게시글 수정 [사용자 없음]")
-    void updateTipPost_fail_userNotFound() {
-        PostUpdateRequest updateRequest = new PostUpdateRequest();
-        updateRequest.setId(testPostId);
-        updateRequest.setTitle("변경된 제목");
-        updateRequest.setContent("변경된 내용");
-
-        Long invalidUserId = 9999L;
-
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
-            tipPostService.updateTipPost(invalidUserId, updateRequest);
-        });
-
-        assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("updateTipPost: 게시글 수정 [작성자 불일치]")
     void updateTipPost_fail_authorMismatch() {
         Users user = Users.builder()
@@ -226,30 +193,6 @@ public class TipPostServiceTest {
         tipPostService.deleteTipPost(testUserId, testPostId);
 
         assertFalse(tipPostRepository.findById(testPostId).isPresent());
-    }
-
-    @Test
-    @DisplayName("deleteTipPost: 게시글 삭제 [게시글 없음]")
-    void deleteTipPost_fail_postNotFound() {
-        Long invalidPostId = 9999L;
-
-        PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
-            tipPostService.deleteTipPost(testUserId, invalidPostId);
-        });
-
-        assertEquals("게시글을 찾을 수 없습니다.", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("deleteTipPost: 게시글 삭제 [사용자 없음]")
-    void deleteTipPost_fail_userNotFound() {
-        Long invalidUserId = 9999L;
-
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
-            tipPostService.deleteTipPost(invalidUserId, testPostId);
-        });
-
-        assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test

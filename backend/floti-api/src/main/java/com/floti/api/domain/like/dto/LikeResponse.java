@@ -1,4 +1,4 @@
-package com.floti.api.domain.board.common.dto;
+package com.floti.api.domain.like.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

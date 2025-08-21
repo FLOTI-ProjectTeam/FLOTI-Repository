@@ -2,14 +2,10 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.common.dto.LikeResponse;
 import com.floti.api.domain.board.common.dto.PostCreateRequest;
 import com.floti.api.domain.board.common.dto.PostUpdateRequest;
-import com.floti.api.domain.board.common.entity.UserPostId;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
-import com.floti.api.domain.board.tip.entity.LikeTipPosts;
 import com.floti.api.domain.board.tip.entity.TipPosts;
-import com.floti.api.domain.board.tip.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.ExceptionMessage;
 import com.floti.api.error.PostNotFoundException;
@@ -27,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class TipPostService {
     private final TipPostRepository tipPostRepository;
     private final UserRepository userRepository;
-    private final LikeTipPostRepository likeTipPostRepository;
 
     /* 1. 조회 & 검색 */
     public Page<TipPostResponse> getTipPosts(String search, Pageable pageable) {
@@ -89,27 +84,5 @@ public class TipPostService {
             throw new AccessDeniedException(ExceptionMessage.POST_DELETE_DENIED);
 
         tipPostRepository.delete(tipPost);
-    }
-
-    /* 6. 좋아요 처리 */
-    @Transactional
-    public LikeResponse toggleLike(Long userId, Long id) {
-        if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
-
-        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
-
-        LikeTipPosts likeTipPost = likeTipPostRepository.findById(new UserPostId(userId, id)).orElse(null);
-        boolean liked = (likeTipPost == null);
-
-        if (liked) {
-            likeTipPostRepository.save(new LikeTipPosts(userId, id));
-            tipPost.incrementLikeCount();
-        } else {
-            likeTipPostRepository.delete(likeTipPost);
-            tipPost.decrementLikeCount();
-        }
-
-        return new LikeResponse(liked, tipPost.getLikeCount());
     }
 }
