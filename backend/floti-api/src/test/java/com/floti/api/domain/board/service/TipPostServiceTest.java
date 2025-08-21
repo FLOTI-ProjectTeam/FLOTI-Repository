@@ -8,6 +8,8 @@ import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.domain.board.tip.service.TipPostService;
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
+import com.floti.api.error.PostNotFoundException;
+import com.floti.api.error.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,7 +114,7 @@ public class TipPostServiceTest {
     void getTipPost_fail_postNotFound() {
         Long invalidPostId = 9999L;
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+        PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
             tipPostService.getTipPost(invalidPostId);
         });
 
@@ -142,11 +144,11 @@ public class TipPostServiceTest {
 
         Long invalidUserId = 9999L;
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
             tipPostService.createTipPost(invalidUserId, request, null);
         });
 
-        assertEquals("사용자 정보를 찾을 수 없습니다.", exception.getMessage());
+        assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test
@@ -171,7 +173,7 @@ public class TipPostServiceTest {
         updateRequest.setTitle("변경된 제목");
         updateRequest.setContent("변경된 내용");
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+        PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
             tipPostService.updateTipPost(testUserId, updateRequest);
         });
 
@@ -188,11 +190,11 @@ public class TipPostServiceTest {
 
         Long invalidUserId = 9999L;
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
             tipPostService.updateTipPost(invalidUserId, updateRequest);
         });
 
-        assertEquals("사용자 정보를 찾을 수 없습니다.", exception.getMessage());
+        assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test
@@ -231,7 +233,7 @@ public class TipPostServiceTest {
     void deleteTipPost_fail_postNotFound() {
         Long invalidPostId = 9999L;
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+        PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
             tipPostService.deleteTipPost(testUserId, invalidPostId);
         });
 
@@ -243,11 +245,11 @@ public class TipPostServiceTest {
     void deleteTipPost_fail_userNotFound() {
         Long invalidUserId = 9999L;
 
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
             tipPostService.deleteTipPost(invalidUserId, testPostId);
         });
 
-        assertEquals("사용자 정보를 찾을 수 없습니다.", exception.getMessage());
+        assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test

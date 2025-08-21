@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 
 @Getter //테스트용
 public class TipPostResponse {
-    private Long id;
-    private String authorNickname;
-    private String title;
-    private String content;
-    private String thumbnail; //경로: tip/thumbnail/날짜_UUID.확장자
-    private Integer commentCount;
-    private Integer likeCount;
+    private final Long id;
+    private final String authorNickname;
+    private final String title;
+    private final String content;
+    private final String thumbnail; //경로: tip/thumbnail/날짜_UUID.확장자
+    private final Integer commentCount;
+    private final Integer likeCount;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public TipPostResponse(TipPosts tipPost) {
         this.id = tipPost.getId();

@@ -1,12 +1,20 @@
 package com.floti.api.domain.board.tip.service;
 
-import com.floti.api.domain.board.common.dto.PostCreateRequest;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
-import com.floti.api.domain.board.tip.dto.TipPostResponse;
-import com.floti.api.domain.board.tip.entity.TipPosts;
-import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
+import com.floti.api.domain.board.common.dto.LikeResponse;
+import com.floti.api.domain.board.common.dto.PostCreateRequest;
+import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.common.entity.UserPostId;
+import com.floti.api.domain.board.tip.dto.TipPostResponse;
+import com.floti.api.domain.board.tip.entity.LikeTipPosts;
+import com.floti.api.domain.board.tip.entity.TipPosts;
+import com.floti.api.domain.board.tip.repository.LikeTipPostRepository;
+import com.floti.api.domain.board.tip.repository.TipPostRepository;
+import com.floti.api.error.ExceptionMessage;
+import com.floti.api.error.PostNotFoundException;
+import com.floti.api.error.UserNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +22,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.NoSuchElementException;
-
 @Service
 @RequiredArgsConstructor
 public class TipPostService {
     private final TipPostRepository tipPostRepository;
     private final UserRepository userRepository;
+    private final LikeTipPostRepository likeTipPostRepository;
 
+    /* 1. 조회 & 검색 */
     public Page<TipPostResponse> getTipPosts(String search, Pageable pageable) {
         Page<TipPosts> tipPostPage;
 
@@ -34,15 +42,16 @@ public class TipPostService {
         return tipPostPage.map(TipPostResponse::new);
     }
 
+    /* 2. 상세 조회 */
     public TipPostResponse getTipPost(Long id) {
-        TipPosts tipPost = tipPostRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
+        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
         return new TipPostResponse(tipPost);
     }
 
+    /* 3. 등록 */
+    @Transactional
     public TipPostResponse createTipPost(Long userId, PostCreateRequest post, MultipartFile file) {
-        Users author = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("사용자 정보를 찾을 수 없습니다."));
+        Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         TipPosts tipPost = TipPosts.builder()
                 .author(author)
@@ -53,32 +62,54 @@ public class TipPostService {
         return new TipPostResponse(tipPostRepository.save(tipPost));
     }
 
+    /* 4. 수정 */
+    @Transactional
     public TipPostResponse updateTipPost(Long userId, PostUpdateRequest post) {
         if (!userRepository.existsById(userId))
-            throw new NoSuchElementException("사용자 정보를 찾을 수 없습니다.");
+            throw new UserNotFoundException();
 
-        TipPosts tipPost = tipPostRepository.findById(post.getId())
-                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
+        TipPosts tipPost = tipPostRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
 
-        if (userId.equals(tipPost.getAuthor().getId())) {
-            tipPost.update(post);
-            return new TipPostResponse(tipPostRepository.save(tipPost));
-        } else {
-            throw new AccessDeniedException("게시글을 수정할 권한이 없습니다.");
-        }
+        if (!userId.equals(tipPost.getAuthor().getId()))
+            throw new AccessDeniedException(ExceptionMessage.POST_UPDATE_DENIED);
+
+        tipPost.update(post);
+        return new TipPostResponse(tipPostRepository.save(tipPost));
     }
 
+    /* 5. 삭제 */
+    @Transactional
     public void deleteTipPost(Long userId, Long id) {
         if (!userRepository.existsById(userId))
-            throw new NoSuchElementException("사용자 정보를 찾을 수 없습니다.");
+            throw new UserNotFoundException();
 
-        TipPosts tipPost = tipPostRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
+        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
-        if (userId.equals(tipPost.getAuthor().getId())) {
-            tipPostRepository.delete(tipPost);
+        if (!userId.equals(tipPost.getAuthor().getId()))
+            throw new AccessDeniedException(ExceptionMessage.POST_DELETE_DENIED);
+
+        tipPostRepository.delete(tipPost);
+    }
+
+    /* 6. 좋아요 처리 */
+    @Transactional
+    public LikeResponse toggleLike(Long userId, Long id) {
+        if (!userRepository.existsById(userId))
+            throw new UserNotFoundException();
+
+        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
+
+        LikeTipPosts likeTipPost = likeTipPostRepository.findById(new UserPostId(userId, id)).orElse(null);
+        boolean liked = (likeTipPost == null);
+
+        if (liked) {
+            likeTipPostRepository.save(new LikeTipPosts(userId, id));
+            tipPost.incrementLikeCount();
         } else {
-            throw new AccessDeniedException("게시글을 삭제할 권한이 없습니다.");
+            likeTipPostRepository.delete(likeTipPost);
+            tipPost.decrementLikeCount();
         }
+
+        return new LikeResponse(liked, tipPost.getLikeCount());
     }
 }

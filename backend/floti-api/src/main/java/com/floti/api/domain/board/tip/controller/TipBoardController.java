@@ -1,5 +1,6 @@
 package com.floti.api.domain.board.tip.controller;
 
+import com.floti.api.domain.board.common.dto.LikeResponse;
 import com.floti.api.domain.board.common.dto.PostCreateRequest;
 import com.floti.api.domain.board.common.dto.PostUpdateRequest;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
@@ -41,11 +42,12 @@ public class TipBoardController {
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
     public ResponseEntity<TipPostResponse> getTipPost(@PathVariable Long id) {
-        return ResponseEntity.ok(tipPostService.getTipPost(id));
+        TipPostResponse response = tipPostService.getTipPost(id);
+        return ResponseEntity.ok(response);
     }
 
     /* 3. 등록 */
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<TipPostResponse> createTipPost(@Validated @RequestPart PostCreateRequest post,
                                                          @RequestPart(required = false) MultipartFile file) {
         TipPostResponse response = tipPostService.createTipPost(post.getAuthorId(), post, file);
@@ -53,17 +55,25 @@ public class TipBoardController {
     }
 
     /* 4. 수정 */
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<TipPostResponse> updateTipPost(@Validated PostUpdateRequest post) {
         TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), post);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 5. 삭제 */
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<TipPostResponse> deleteTipPost(@RequestParam Long userId, //임시
                                                          @PathVariable Long id) {
         tipPostService.deleteTipPost(userId, id);
         return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
+    }
+
+    /* 6. 좋아요 처리 */
+    @PostMapping("/{id}/like")
+    public ResponseEntity<LikeResponse> toggleLike(@RequestParam Long userId, //임시
+                                                   @PathVariable Long id) {
+        LikeResponse response = tipPostService.toggleLike(userId, id);
+        return ResponseEntity.ok(response); // 200 Ok
     }
 }

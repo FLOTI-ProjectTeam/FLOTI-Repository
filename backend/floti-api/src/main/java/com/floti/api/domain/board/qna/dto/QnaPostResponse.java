@@ -8,15 +8,15 @@ import java.time.LocalDateTime;
 
 @Getter //테스트용
 public class QnaPostResponse {
-    private Long id;
-    private String authorNickname;
-    private String title;
-    private String content;
-    private Integer answerCount;
-    private boolean completed;
+    private final Long id;
+    private final String authorNickname;
+    private final String title;
+    private final String content;
+    private final Integer answerCount;
+    private final boolean completed;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public QnaPostResponse(QnaPosts qnaPost) {
         this.id = qnaPost.getId();
