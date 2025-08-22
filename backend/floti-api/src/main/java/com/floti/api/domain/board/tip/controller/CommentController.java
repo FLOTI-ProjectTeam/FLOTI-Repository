@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,6 +45,6 @@ public class CommentController {
     public ResponseEntity<Void> deleteComment(@RequestParam Long userId, //임시
                                               @PathVariable Long id) {
         commentService.deleteComment(userId, id);
-        return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 }

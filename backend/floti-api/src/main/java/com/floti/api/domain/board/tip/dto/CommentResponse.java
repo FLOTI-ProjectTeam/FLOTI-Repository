@@ -14,24 +14,27 @@ public class CommentResponse {
     private final Long id;
     private final Long postId;
     private final Long parentId; //하위 댓글 전용
-    private final AuthorResponse author;
-    private final String content;
-    private final Integer likeCount;
+    private AuthorResponse author;
+    private String content;
+    private Integer likeCount;
     private final boolean deleted; //상위 댓글 전용
     private final List<CommentResponse> replies; //상위 댓글 전용
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
-    private final LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     public CommentResponse(Comments comment) {
         this.id = comment.getId();
         this.postId = comment.getPostId();
         this.parentId = comment.getParentId();
-        this.author = new AuthorResponse(comment.getAuthor());
-        this.content = comment.getContent();
-        this.likeCount = comment.getLikeCount();
         this.deleted = comment.isDeleted();
         this.replies = new ArrayList<>();
-        this.createdAt = comment.getCreatedAt();
+
+        if (!deleted) {
+            this.author = new AuthorResponse(comment.getAuthor());
+            this.content = comment.getContent();
+            this.likeCount = comment.getLikeCount();
+            this.createdAt = comment.getCreatedAt();
+        }
     }
 }

@@ -25,7 +25,7 @@ public class Comments {
     private Long parentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "author_id")
     private Users author;
 
     @Column(nullable = false)
@@ -50,5 +50,9 @@ public class Comments {
 
     public void update(CommentRequest comment) {
         this.content = comment.getContent();
+    }
+
+    public void softDelete() {
+        this.deleted = true;
     }
 }

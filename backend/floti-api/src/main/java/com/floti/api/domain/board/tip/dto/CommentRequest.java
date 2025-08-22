@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.tip.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,8 +9,6 @@ import lombok.Setter;
 @Setter //테스트용
 public class CommentRequest {
     private Long parentId;
-
-    @NotNull
     private Long authorId; //임시
 
     @NotBlank

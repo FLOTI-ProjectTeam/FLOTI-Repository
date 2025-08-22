@@ -70,7 +70,6 @@ public class QnaPostService {
         return new QnaPostResponse(qnaPost);
     }
 
-
     /* 5. 삭제 */
     @Transactional
     public void deleteQnaPost(Long userId, Long id) {

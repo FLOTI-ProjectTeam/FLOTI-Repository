@@ -2,23 +2,22 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.error.ExceptionMessage;
-import com.floti.api.error.PostNotFoundException;
-import com.floti.api.error.CommentNotFoundException;
-import com.floti.api.error.UserNotFoundException;
+import com.floti.api.error.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,17 +57,32 @@ public class CommentService {
     public CommentResponse createComment(Long userId, Long postId, CommentRequest commentRequest) {
         Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if (!tipPostRepository.existsById(postId))
-            throw new PostNotFoundException();
+        TipPosts tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+
+        Long parentId = commentRequest.getParentId();
+
+        if (parentId != null) {
+            Comments parentComment = commentRepository.findByIdAndPostId(parentId, postId)
+                    .orElseThrow(CommentNotFoundException::new);
+
+            if (parentComment.getParentId() != null)
+                throw new ReplyDepthExceededException();
+
+            if (parentComment.isDeleted())
+                throw new DeletedCommentException();
+        }
 
         Comments comment = Comments.builder()
                 .postId(postId)
-                .parentId(commentRequest.getParentId())
+                .parentId(parentId)
                 .author(author)
                 .content(commentRequest.getContent())
                 .build();
 
-        return new CommentResponse(commentRepository.save(comment));
+        commentRepository.save(comment);
+        tipPost.incrementCommentCount();
+
+        return new CommentResponse(comment);
     }
 
     /* 3. 수정 */
@@ -92,11 +106,18 @@ public class CommentService {
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException();
 
-        Comments comment = commentRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        Comments comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        TipPosts tipPost = tipPostRepository.getReferenceById(comment.getPostId());
 
-        if (!userId.equals(comment.getAuthor().getId()))
+        if (comment.getAuthor() == null || !userId.equals(comment.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.COMMENT_DELETE_DENIED);
 
-        commentRepository.delete(comment);
+        if (comment.getParentId() == null) {
+            comment.softDelete();
+        } else {
+            commentRepository.delete(comment);
+        }
+
+        tipPost.decrementCommentCount();
     }
 }

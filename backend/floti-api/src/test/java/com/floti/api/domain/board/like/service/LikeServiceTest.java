@@ -1,11 +1,10 @@
-package com.floti.api.domain.like.service;
+package com.floti.api.domain.board.like.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.like.service.LikeService;
+import com.floti.api.domain.board.like.dto.LikeResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.domain.board.like.dto.LikeResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,7 @@ public class LikeServiceTest {
     private Long testUserId;
     private Long testPostId;
 
-    @BeforeEach //테스트용 데이터 생성 및 저장
+    @BeforeEach //테스트용 데이터 생성
     void setUp() {
         Users user = Users.builder()
                 .email("test01@gmail.com")
@@ -44,7 +43,7 @@ public class LikeServiceTest {
         testUserId = user.getId();
 
         TipPosts tipPost = TipPosts.builder()
-                .author(userRepository.findById(testUserId).get())
+                .author(user)
                 .title("원본 제목")
                 .content("원본 내용")
                 .build();
@@ -53,8 +52,8 @@ public class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("toggleLikeTipPost: 게시글 추천 추가")
-    void toggleLikeTipPost_add() {
+    @DisplayName("toggleLikeTipPost: 게시글 추천")
+    void toggleLikeTipPost_like() {
         LikeResponse response = likeService.toggleLikeTipPost(testUserId, testPostId);
 
         assertEquals(1, response.getLikeCount());
@@ -63,7 +62,7 @@ public class LikeServiceTest {
 
     @Test
     @DisplayName("toggleLikeTipPost: 게시글 추천 취소")
-    void toggleLikeTipPost_cancel() {
+    void toggleLikeTipPost_unlike() {
         likeService.toggleLikeTipPost(testUserId, testPostId);
         LikeResponse response = likeService.toggleLikeTipPost(testUserId, testPostId);
 

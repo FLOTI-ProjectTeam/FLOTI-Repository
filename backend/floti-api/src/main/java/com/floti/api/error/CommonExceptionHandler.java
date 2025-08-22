@@ -23,8 +23,19 @@ public class CommonExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
     }
 
+    /* 댓글 관련 예외 */
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<String> handleCommentNotFoundException(CommentNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
+    }
+
+    @ExceptionHandler(ReplyDepthExceededException.class)
+    public ResponseEntity<String> handleReplyDepthExceededException(ReplyDepthExceededException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400 Bad Request
+    }
+
+    @ExceptionHandler(DeletedCommentException.class)
+    public ResponseEntity<String> handleDeletedCommentException(DeletedCommentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400 Bad Request
     }
 }
