@@ -1,9 +1,12 @@
 package com.floti.api.domain.board.tip.entity;
 
 import com.floti.api.domain.auth.entity.Users;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.common.dto.PostRequest;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -45,7 +48,7 @@ public class TipPosts {
         this.thumbnail = thumbnail;
     }
 
-    public void update(PostUpdateRequest post) {
+    public void update(PostRequest post) {
         this.title = post.getTitle();
         this.content = post.getContent();
     }

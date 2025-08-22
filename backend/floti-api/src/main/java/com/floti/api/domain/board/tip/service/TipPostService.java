@@ -2,8 +2,8 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.common.dto.PostCreateRequest;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.common.dto.PostRequest;
+import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TipPostService {
     private final TipPostRepository tipPostRepository;
     private final UserRepository userRepository;
+    private final LikeTipPostRepository likeTipPostRepository;
 
     /* 1. 조회 & 검색 */
     public Page<TipPostResponse> getTipPosts(String search, Pageable pageable) {
@@ -38,20 +39,21 @@ public class TipPostService {
     }
 
     /* 2. 상세 조회 */
-    public TipPostResponse getTipPost(Long id) {
+    public TipPostResponse getTipPost(Long userId, Long id) {
         TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
-        return new TipPostResponse(tipPost);
+        boolean liked = likeTipPostRepository.existsByUserIdAndPostId(userId, id);
+        return new TipPostResponse(tipPost, liked);
     }
 
     /* 3. 등록 */
     @Transactional
-    public TipPostResponse createTipPost(Long userId, PostCreateRequest post, MultipartFile file) {
+    public TipPostResponse createTipPost(Long userId, PostRequest postRequest, MultipartFile file) {
         Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         TipPosts tipPost = TipPosts.builder()
                 .author(author)
-                .title(post.getTitle())
-                .content(post.getContent())
+                .title(postRequest.getTitle())
+                .content(postRequest.getContent())
                 .build();
 
         return new TipPostResponse(tipPostRepository.save(tipPost));
@@ -59,17 +61,17 @@ public class TipPostService {
 
     /* 4. 수정 */
     @Transactional
-    public TipPostResponse updateTipPost(Long userId, PostUpdateRequest post) {
+    public TipPostResponse updateTipPost(Long userId, Long id, PostRequest postRequest) {
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException();
 
-        TipPosts tipPost = tipPostRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
+        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
         if (!userId.equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.POST_UPDATE_DENIED);
 
-        tipPost.update(post);
-        return new TipPostResponse(tipPostRepository.save(tipPost));
+        tipPost.update(postRequest);
+        return new TipPostResponse(tipPost);
     }
 
     /* 5. 삭제 */

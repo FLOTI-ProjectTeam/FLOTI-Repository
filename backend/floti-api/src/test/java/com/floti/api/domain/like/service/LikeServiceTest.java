@@ -2,9 +2,10 @@ package com.floti.api.domain.like.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
+import com.floti.api.domain.board.like.service.LikeService;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.domain.like.dto.LikeResponse;
+import com.floti.api.domain.board.like.dto.LikeResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

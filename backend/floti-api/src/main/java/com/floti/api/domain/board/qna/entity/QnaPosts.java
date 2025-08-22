@@ -1,7 +1,7 @@
 package com.floti.api.domain.board.qna.entity;
 
 import com.floti.api.domain.auth.entity.Users;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.common.dto.PostRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,7 +45,7 @@ public class QnaPosts {
         this.completed = completed;
     }
 
-    public void update(PostUpdateRequest post) {
+    public void update(PostRequest post) {
         this.title = post.getTitle();
         this.content = post.getContent();
     }

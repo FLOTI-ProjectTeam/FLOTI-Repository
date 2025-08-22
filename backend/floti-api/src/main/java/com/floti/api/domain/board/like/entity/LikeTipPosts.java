@@ -1,4 +1,4 @@
-package com.floti.api.domain.like.entity;
+package com.floti.api.domain.board.like.entity;
 
 import com.floti.api.domain.board.common.entity.UserPostId;
 import jakarta.persistence.Entity;

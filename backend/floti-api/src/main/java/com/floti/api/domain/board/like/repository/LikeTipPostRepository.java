@@ -1,8 +1,9 @@
-package com.floti.api.domain.like.repository;
+package com.floti.api.domain.board.like.repository;
 
 import com.floti.api.domain.board.common.entity.UserPostId;
-import com.floti.api.domain.like.entity.LikeTipPosts;
+import com.floti.api.domain.board.like.entity.LikeTipPosts;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikeTipPostRepository extends JpaRepository<LikeTipPosts, UserPostId> {
+    boolean existsByUserIdAndPostId(Long userId, Long id);
 }

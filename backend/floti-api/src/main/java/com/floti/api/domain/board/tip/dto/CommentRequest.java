@@ -1,4 +1,4 @@
-package com.floti.api.domain.board.common.dto;
+package com.floti.api.domain.board.tip.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,17 +8,13 @@ import lombok.Setter;
 
 @Getter
 @Setter //테스트용
-public class PostUpdateRequest {
-    @NotNull
-    private Long id;
+public class CommentRequest {
+    private Long parentId;
 
     @NotNull
     private Long authorId; //임시
 
     @NotBlank
-    @Size(max = 100)
-    private String title;
-
-    @NotBlank
+    @Size(max = 255)
     private String content;
 }

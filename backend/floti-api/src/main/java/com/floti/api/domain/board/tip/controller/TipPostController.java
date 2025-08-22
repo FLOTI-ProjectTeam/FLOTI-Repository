@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.tip.controller;
 
-import com.floti.api.domain.board.common.dto.PostCreateRequest;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.service.TipPostService;
 import lombok.RequiredArgsConstructor;
@@ -40,30 +39,32 @@ public class TipPostController {
 
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<TipPostResponse> getTipPost(@PathVariable Long id) {
-        TipPostResponse response = tipPostService.getTipPost(id);
+    public ResponseEntity<TipPostResponse> getTipPost(@RequestParam Long userId, //임시,
+                                                      @PathVariable Long id) {
+        TipPostResponse response = tipPostService.getTipPost(userId, id);
         return ResponseEntity.ok(response);
     }
 
     /* 3. 등록 */
     @PostMapping
-    public ResponseEntity<TipPostResponse> createTipPost(@Validated @RequestPart PostCreateRequest post,
+    public ResponseEntity<TipPostResponse> createTipPost(@Validated @RequestPart PostRequest post,
                                                          @RequestPart(required = false) MultipartFile file) {
         TipPostResponse response = tipPostService.createTipPost(post.getAuthorId(), post, file);
         return ResponseEntity.status(CREATED).body(response); // 201 Created
     }
 
     /* 4. 수정 */
-    @PutMapping
-    public ResponseEntity<TipPostResponse> updateTipPost(@Validated PostUpdateRequest post) {
-        TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), post);
+    @PutMapping("/{id}")
+    public ResponseEntity<TipPostResponse> updateTipPost(@Validated @RequestBody PostRequest post,
+                                                         @PathVariable Long id) {
+        TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), id, post);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 5. 삭제 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<TipPostResponse> deleteTipPost(@RequestParam Long userId, //임시
-                                                         @PathVariable Long id) {
+    public ResponseEntity<Void> deleteTipPost(@RequestParam Long userId, //임시
+                                              @PathVariable Long id) {
         tipPostService.deleteTipPost(userId, id);
         return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
     }

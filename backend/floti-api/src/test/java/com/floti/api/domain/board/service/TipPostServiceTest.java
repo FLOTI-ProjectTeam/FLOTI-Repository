@@ -2,9 +2,7 @@ package com.floti.api.domain.board.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.common.dto.PostCreateRequest;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
-import com.floti.api.domain.board.tip.dto.TipPostDetailResponse;
+import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
@@ -102,10 +100,11 @@ public class TipPostServiceTest {
     @Test
     @DisplayName("getTipPost: 게시글 상세 조회")
     void getTipPost_success() {
-        TipPostResponse response = tipPostService.getTipPost(testPostId);
+        TipPostResponse response = tipPostService.getTipPost(testUserId, testPostId);
 
         assertEquals("원본 제목", response.getTitle());
         assertEquals("원본 내용", response.getContent());
+        assertFalse(response.isLiked());
     }
 
     @Test
@@ -114,7 +113,7 @@ public class TipPostServiceTest {
         Long invalidPostId = 9999L;
 
         PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
-            tipPostService.getTipPost(invalidPostId);
+            tipPostService.getTipPost(testUserId, invalidPostId);
         });
 
         assertEquals("게시글을 찾을 수 없습니다.", exception.getMessage());
@@ -123,7 +122,7 @@ public class TipPostServiceTest {
     @Test
     @DisplayName("createTipPost: 게시글 등록")
     void createTipPost_success() {
-        PostCreateRequest request = new PostCreateRequest();
+        PostRequest request = new PostRequest();
         request.setTitle("테스트 제목");
         request.setContent("테스트 내용");
 
@@ -131,13 +130,13 @@ public class TipPostServiceTest {
 
         assertNotNull(response.getId());
         assertEquals("테스트 제목", response.getTitle());
-        assertEquals("테스터01", response.getAuthorNickname());
+        assertEquals("테스터01", response.getAuthor().getNickname());
     }
 
     @Test
     @DisplayName("createTipPost: 게시글 등록 [사용자 없음]")
     void createTipPost_fail_userNotFound() {
-        PostCreateRequest request = new PostCreateRequest();
+        PostRequest request = new PostRequest();
         request.setTitle("테스트 제목");
         request.setContent("테스트 내용");
 
@@ -153,12 +152,11 @@ public class TipPostServiceTest {
     @Test
     @DisplayName("updateTipPost: 게시글 수정")
     void updateTipPost_success() {
-        PostUpdateRequest updateRequest = new PostUpdateRequest();
-        updateRequest.setId(testPostId);
+        PostRequest updateRequest = new PostRequest();
         updateRequest.setTitle("수정된 제목");
         updateRequest.setContent("수정된 내용");
 
-        TipPostResponse response = tipPostService.updateTipPost(testUserId, updateRequest);
+        TipPostResponse response = tipPostService.updateTipPost(testUserId, testPostId, updateRequest);
 
         assertEquals("수정된 제목", response.getTitle());
         assertEquals("수정된 내용", response.getContent());
@@ -175,13 +173,12 @@ public class TipPostServiceTest {
                 .build();
         userRepository.save(user);
 
-        PostUpdateRequest updateRequest = new PostUpdateRequest();
-        updateRequest.setId(testPostId);
+        PostRequest updateRequest = new PostRequest();
         updateRequest.setTitle("변경된 제목");
         updateRequest.setContent("변경된 내용");
 
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            tipPostService.updateTipPost(user.getId(), updateRequest);
+            tipPostService.updateTipPost(user.getId(), testPostId, updateRequest);
         });
 
         assertEquals("게시글을 수정할 권한이 없습니다.", exception.getMessage());

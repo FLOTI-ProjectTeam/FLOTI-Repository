@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.qna.controller;
 
-import com.floti.api.domain.board.common.dto.PostCreateRequest;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.service.QnaPostService;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
@@ -47,22 +46,23 @@ public class QnaPostController {
 
     /* 3. 등록 */
     @PostMapping
-    public ResponseEntity<QnaPostResponse> createTipPost(@Validated PostCreateRequest post) {
+    public ResponseEntity<QnaPostResponse> createTipPost(@Validated @RequestBody PostRequest post) {
         QnaPostResponse response = qnaPostService.createQnaPost(post.getAuthorId(), post);
         return ResponseEntity.status(CREATED).body(response); // 201 Created
     }
 
     /* 4. 수정 */
-    @PutMapping
-    public ResponseEntity<QnaPostResponse> updateTipPost(@Validated PostUpdateRequest post) {
-        QnaPostResponse response = qnaPostService.updateQnaPost(post.getAuthorId(), post);
+    @PutMapping("/{id}")
+    public ResponseEntity<QnaPostResponse> updateTipPost(@Validated @RequestBody PostRequest post,
+                                                         @PathVariable Long id) {
+        QnaPostResponse response = qnaPostService.updateQnaPost(post.getAuthorId(), id, post);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 5. 삭제 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<TipPostResponse> deleteTipPost(@RequestParam Long userId, //임시
-                                                         @PathVariable Long id) {
+    public ResponseEntity<Void> deleteTipPost(@RequestParam Long userId, //임시
+                                              @PathVariable Long id) {
         qnaPostService.deleteQnaPost(userId, id);
         return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
     }

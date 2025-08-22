@@ -2,8 +2,7 @@ package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.common.dto.PostCreateRequest;
-import com.floti.api.domain.board.common.dto.PostUpdateRequest;
+import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
@@ -44,13 +43,13 @@ public class QnaPostService {
 
     /* 3. 등록 */
     @Transactional
-    public QnaPostResponse createQnaPost(Long userId, PostCreateRequest post) {
+    public QnaPostResponse createQnaPost(Long userId, PostRequest postRequest) {
         Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         QnaPosts qnaPost = QnaPosts.builder()
                 .author(author)
-                .title(post.getTitle())
-                .content(post.getContent())
+                .title(postRequest.getTitle())
+                .content(postRequest.getContent())
                 .build();
 
         return new QnaPostResponse(qnaPostRepository.save(qnaPost));
@@ -58,17 +57,17 @@ public class QnaPostService {
 
     /* 4. 수정 */
     @Transactional
-    public QnaPostResponse updateQnaPost(Long userId, PostUpdateRequest post) {
+    public QnaPostResponse updateQnaPost(Long userId, Long id, PostRequest postRequest) {
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException();
 
-        QnaPosts qnaPost = qnaPostRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
+        QnaPosts qnaPost = qnaPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
         if (!userId.equals(qnaPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.POST_UPDATE_DENIED);
 
-        qnaPost.update(post);
-        return new QnaPostResponse(qnaPostRepository.save(qnaPost));
+        qnaPost.update(postRequest);
+        return new QnaPostResponse(qnaPost);
     }
 
 

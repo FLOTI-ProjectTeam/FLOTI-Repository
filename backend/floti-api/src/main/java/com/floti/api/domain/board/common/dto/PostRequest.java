@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter //테스트용
-public class PostCreateRequest {
+public class PostRequest {
     @NotNull
     private Long authorId; //임시
 
