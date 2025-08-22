@@ -22,7 +22,7 @@ public class User {
     private String email; // 이메일
 
     @Column(nullable = false, unique = true, length = 10)
-    private String username; // 사용자 이름
+    private String username; // 아이디
 
     @Column(nullable = false, length = 60)
     private String password; // 비밀번호

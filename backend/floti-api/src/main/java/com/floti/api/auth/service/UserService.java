@@ -25,7 +25,7 @@ public class UserService {
 
         // 2. 사용자 이름 중복 검사
         if (userRepository.existsByUsername(requestDto.getUsername())) {
-            throw new IllegalArgumentException("이미 사용 중인 사용자 이름입니다.");
+            throw new IllegalArgumentException("이미 사용 중인 사용자 아이디입니다.");
         }
 
         // 3. 비밀번호 암호화

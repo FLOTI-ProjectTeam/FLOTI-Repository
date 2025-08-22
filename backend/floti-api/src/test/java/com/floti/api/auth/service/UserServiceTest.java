@@ -113,7 +113,7 @@ public class UserServiceTest {
         // when & then
         assertThatThrownBy(() -> userService.signup(dto))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이미 사용 중인 사용자 이름입니다.");
+                .hasMessage("이미 사용 중인 사용자 아이디입니다.");
 
         // 이후 인코딩/저장 호출 금지
         verify(passwordEncoder, never()).encode(anyString());

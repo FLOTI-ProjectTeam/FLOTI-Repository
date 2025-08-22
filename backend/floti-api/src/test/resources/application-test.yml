@@ -12,4 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        order_inserts: false  # insert 순서 보장 -> 중복 제약 즉시 발생
+        order_inserts: false
+jwt:
+  secret: ${JWT_SECRET:TEST-ONLY-DO-NOT-USE-IN-PROD-1234567890123456789012}
+  exp-minutes: 5
