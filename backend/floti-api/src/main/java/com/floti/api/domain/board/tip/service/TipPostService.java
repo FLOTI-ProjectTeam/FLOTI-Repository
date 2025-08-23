@@ -68,7 +68,7 @@ public class TipPostService {
         TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
         if (!userId.equals(tipPost.getAuthor().getId()))
-            throw new AccessDeniedException(ExceptionMessage.POST_UPDATE_DENIED);
+            throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
         tipPost.update(postRequest);
         return new TipPostResponse(tipPost);
@@ -83,7 +83,7 @@ public class TipPostService {
         TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
         if (!userId.equals(tipPost.getAuthor().getId()))
-            throw new AccessDeniedException(ExceptionMessage.POST_DELETE_DENIED);
+            throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
 
         tipPostRepository.delete(tipPost);
     }

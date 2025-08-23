@@ -180,7 +180,7 @@ public class TipPostServiceTest {
             tipPostService.updateTipPost(user.getId(), testPostId, request);
         });
 
-        assertEquals("게시글을 수정할 권한이 없습니다.", exception.getMessage());
+        assertEquals("수정할 권한이 없습니다.", exception.getMessage());
     }
 
     @Test
@@ -206,6 +206,6 @@ public class TipPostServiceTest {
             tipPostService.deleteTipPost(user.getId(), testPostId);
         });
 
-        assertEquals("게시글을 삭제할 권한이 없습니다.", exception.getMessage());
+        assertEquals("삭제할 권한이 없습니다.", exception.getMessage());
     }
 }

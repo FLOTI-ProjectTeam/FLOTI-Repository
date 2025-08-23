@@ -30,7 +30,7 @@ public class CommentResponse {
         this.deleted = comment.isDeleted();
         this.replies = new ArrayList<>();
 
-        if (!deleted) {
+        if (!this.deleted) {
             this.author = new AuthorResponse(comment.getAuthor());
             this.content = comment.getContent();
             this.likeCount = comment.getLikeCount();

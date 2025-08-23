@@ -27,7 +27,6 @@ public class LikeService {
             throw new UserNotFoundException();
 
         TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
-
         LikeTipPosts likeTipPost = likeTipPostRepository.findById(new UserPostId(userId, id)).orElse(null);
         boolean liked = (likeTipPost == null);
 

@@ -10,7 +10,7 @@ import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.CommentNotFoundException;
 import com.floti.api.error.DeletedCommentException;
-import com.floti.api.error.ReplyDepthExceededException;
+import com.floti.api.error.ReplyNotAllowedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -164,7 +164,7 @@ public class CommentServiceTest {
         request.setParentId(testReplyId);
         request.setContent("등록된 내용");
 
-        ReplyDepthExceededException exception = assertThrows(ReplyDepthExceededException.class, () -> {
+        ReplyNotAllowedException exception = assertThrows(ReplyNotAllowedException.class, () -> {
             commentService.createComment(testUserId, testPostId, request);
         });
 
@@ -200,7 +200,7 @@ public class CommentServiceTest {
             commentService.updateComment(user.getId(), testCommentId, request);
         });
 
-        assertEquals("댓글을 수정할 권한이 없습니다.", exception.getMessage());
+        assertEquals("수정할 권한이 없습니다.", exception.getMessage());
     }
 
     @Test
@@ -244,7 +244,7 @@ public class CommentServiceTest {
             commentService.deleteComment(user.getId(), testReplyId);
         });
 
-        assertEquals("댓글을 삭제할 권한이 없습니다.", exception.getMessage());
+        assertEquals("삭제할 권한이 없습니다.", exception.getMessage());
     }
 
     @Test

@@ -4,7 +4,9 @@ import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
+import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
+import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
 import com.floti.api.error.ExceptionMessage;
 import com.floti.api.error.PostNotFoundException;
@@ -16,10 +18,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class QnaPostService {
     private final QnaPostRepository qnaPostRepository;
+    private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
 
     /* 1. 조회 & 검색 */
@@ -38,7 +43,8 @@ public class QnaPostService {
     /* 2. 상세 조회 */
     public QnaPostResponse getQnaPost(Long id) {
         QnaPosts qnaPost = qnaPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
-        return new QnaPostResponse(qnaPost);
+        List<Answers> answers = answerRepository.findByPostId(id);
+        return new QnaPostResponse(qnaPost, answers);
     }
 
     /* 3. 등록 */
@@ -64,7 +70,7 @@ public class QnaPostService {
         QnaPosts qnaPost = qnaPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
         if (!userId.equals(qnaPost.getAuthor().getId()))
-            throw new AccessDeniedException(ExceptionMessage.POST_UPDATE_DENIED);
+            throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
         qnaPost.update(postRequest);
         return new QnaPostResponse(qnaPost);
@@ -79,7 +85,7 @@ public class QnaPostService {
         QnaPosts qnaPost = qnaPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
         if (!userId.equals(qnaPost.getAuthor().getId()))
-            throw new AccessDeniedException(ExceptionMessage.POST_DELETE_DENIED);
+            throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
 
         qnaPostRepository.delete(qnaPost);
     }

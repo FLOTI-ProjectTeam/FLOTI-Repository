@@ -56,9 +56,7 @@ public class CommentService {
     @Transactional
     public CommentResponse createComment(Long userId, Long postId, CommentRequest commentRequest) {
         Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-
         TipPosts tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-
         Long parentId = commentRequest.getParentId();
 
         if (parentId != null) {
@@ -66,7 +64,7 @@ public class CommentService {
                     .orElseThrow(CommentNotFoundException::new);
 
             if (parentComment.getParentId() != null)
-                throw new ReplyDepthExceededException();
+                throw new ReplyNotAllowedException();
 
             if (parentComment.isDeleted())
                 throw new DeletedCommentException();
@@ -94,7 +92,7 @@ public class CommentService {
         Comments comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
 
         if (!userId.equals(comment.getAuthor().getId()))
-            throw new AccessDeniedException(ExceptionMessage.COMMENT_UPDATE_DENIED);
+            throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
         comment.update(commentRequest);
         return new CommentResponse(comment);
@@ -107,10 +105,9 @@ public class CommentService {
             throw new UserNotFoundException();
 
         Comments comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
-        TipPosts tipPost = tipPostRepository.getReferenceById(comment.getPostId());
 
         if (comment.getAuthor() == null || !userId.equals(comment.getAuthor().getId()))
-            throw new AccessDeniedException(ExceptionMessage.COMMENT_DELETE_DENIED);
+            throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
 
         if (comment.getParentId() == null) {
             comment.softDelete();
@@ -118,6 +115,7 @@ public class CommentService {
             commentRepository.delete(comment);
         }
 
+        TipPosts tipPost = tipPostRepository.getReferenceById(comment.getPostId());
         tipPost.decrementCommentCount();
     }
 }

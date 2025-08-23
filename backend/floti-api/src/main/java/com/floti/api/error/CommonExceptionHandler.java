@@ -29,13 +29,29 @@ public class CommonExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
     }
 
-    @ExceptionHandler(ReplyDepthExceededException.class)
-    public ResponseEntity<String> handleReplyDepthExceededException(ReplyDepthExceededException e) {
+    @ExceptionHandler(ReplyNotAllowedException.class)
+    public ResponseEntity<String> handleReplyDepthExceededException(ReplyNotAllowedException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400 Bad Request
     }
 
     @ExceptionHandler(DeletedCommentException.class)
     public ResponseEntity<String> handleDeletedCommentException(DeletedCommentException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // 400 Bad Request
+    }
+
+    /* 답변 관련 예외 */
+    @ExceptionHandler(AnswerNotFoundException.class)
+    public ResponseEntity<String> handleAnswerNotFoundException(AnswerNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
+    }
+
+    @ExceptionHandler(AcceptedAnswerException.class)
+    public ResponseEntity<String> handleAcceptedAnswerException(AcceptedAnswerException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Not Found
+    }
+
+    @ExceptionHandler(AcceptedPostException.class)
+    public ResponseEntity<String> handleAcceptedPostException(AcceptedPostException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Not Found
     }
 }
