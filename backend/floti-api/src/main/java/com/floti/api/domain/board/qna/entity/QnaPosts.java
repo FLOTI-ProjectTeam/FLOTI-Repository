@@ -39,11 +39,10 @@ public class QnaPosts {
     private LocalDateTime createdAt;
 
     @Builder
-    public QnaPosts(Users author, String title, String content, Boolean accepted) {
+    public QnaPosts(Users author, String title, String content) {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.accepted = accepted;
     }
 
     public void update(PostRequest post) {
