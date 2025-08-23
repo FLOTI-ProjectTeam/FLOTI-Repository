@@ -2,7 +2,7 @@ package com.floti.api.domain.board.qna.entity;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.board.common.dto.PostRequest;
-import com.floti.api.error.AcceptedPostException;
+import com.floti.api.error.PostAlreadyAcceptedException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -52,7 +52,7 @@ public class QnaPosts {
 
     public void accept(Answers answer) {
         if (this.accepted)
-            throw new AcceptedPostException();
+            throw new PostAlreadyAcceptedException();
 
         answer.accept();
         this.accepted = true;

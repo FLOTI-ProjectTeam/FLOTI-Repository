@@ -63,11 +63,11 @@ public class CommentService {
             Comments parentComment = commentRepository.findByIdAndPostId(parentId, postId)
                     .orElseThrow(CommentNotFoundException::new);
 
+            if (parentComment.isDeleted())
+                throw new CommentNotFoundException();
+
             if (parentComment.getParentId() != null)
                 throw new ReplyNotAllowedException();
-
-            if (parentComment.isDeleted())
-                throw new DeletedCommentException();
         }
 
         Comments comment = Comments.builder()

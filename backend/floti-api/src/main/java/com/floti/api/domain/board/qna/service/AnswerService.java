@@ -27,6 +27,9 @@ public class AnswerService {
         Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         QnaPosts qnaPost = qnaPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
 
+        if (qnaPost.isAccepted())
+            throw new PostAlreadyClosedException();
+
         Answers answer = Answers.builder()
                 .postId(postId)
                 .author(author)
@@ -50,6 +53,9 @@ public class AnswerService {
         if (!userId.equals(answer.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
+        if (answer.isAccepted())
+            throw new AcceptedAnswerUpdateException();
+
         answer.update(answerRequest);
         return new AnswerResponse(answer);
     }
@@ -66,7 +72,7 @@ public class AnswerService {
             throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
 
         if (answer.isAccepted()) {
-            throw new AcceptedAnswerException();
+            throw new AcceptedAnswerDeletionException();
         } else {
             QnaPosts qnaPost = qnaPostRepository.getReferenceById(answer.getPostId());
             answerRepository.delete(answer);

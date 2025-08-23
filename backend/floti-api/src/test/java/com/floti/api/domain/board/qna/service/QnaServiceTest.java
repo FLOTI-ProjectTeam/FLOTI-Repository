@@ -7,9 +7,6 @@ import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
-import com.floti.api.domain.board.tip.dto.TipPostResponse;
-import com.floti.api.domain.board.tip.entity.Comments;
-import com.floti.api.domain.board.tip.entity.TipPosts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,7 +36,6 @@ public class QnaServiceTest {
 
     private Long testUserId;
     private Long testPostId;
-    private Long testAnswerId;
 
     @BeforeEach
         //테스트용 데이터 생성
@@ -68,7 +64,6 @@ public class QnaServiceTest {
                 .build();
         answerRepository.save(answer);
         qnaPost.incrementAnswerCount();
-        testAnswerId = answer.getId();
     }
 
     @Test

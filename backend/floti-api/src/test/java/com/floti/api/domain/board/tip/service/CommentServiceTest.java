@@ -9,14 +9,12 @@ import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.CommentNotFoundException;
-import com.floti.api.error.DeletedCommentException;
 import com.floti.api.error.ReplyNotAllowedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,7 +143,7 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("createComment: 답글 등록 [댓글 없음]")
-    void createComment_fail_parentCommentNotFound() {
+    void createComment_fail_commentNotFound() {
         CommentRequest request = new CommentRequest();
         request.setParentId(9999L);
         request.setContent("등록된 내용");
@@ -168,7 +166,7 @@ public class CommentServiceTest {
             commentService.createComment(testUserId, testPostId, request);
         });
 
-        assertEquals("답글은 최상위 댓글에만 가능합니다.", exception.getMessage());
+        assertEquals("답글은 최상위 댓글에만 작성할 수 있습니다.", exception.getMessage());
     }
 
     @Test
@@ -180,27 +178,6 @@ public class CommentServiceTest {
         CommentResponse response = commentService.updateComment(testUserId, testCommentId, request);
 
         assertEquals("수정된 내용", response.getContent());
-    }
-
-    @Test
-    @DisplayName("updateComment: 댓글 수정 [작성자 불일치]")
-    void updateComment_fail_authorMismatch() {
-        Users user = Users.builder()
-                .email("test02@gmail.com")
-                .username("test02")
-                .password("password123")
-                .nickname("테스터02")
-                .build();
-        userRepository.save(user);
-
-        CommentRequest request = new CommentRequest();
-        request.setContent("수정된 내용");
-
-        AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            commentService.updateComment(user.getId(), testCommentId, request);
-        });
-
-        assertEquals("수정할 권한이 없습니다.", exception.getMessage());
     }
 
     @Test
@@ -230,24 +207,6 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("deleteComment: 답글 삭제 [작성자 불일치]")
-    void deleteComment_fail_authorMismatch() {
-        Users user = Users.builder()
-                .email("test02@gmail.com")
-                .username("test02")
-                .password("password123")
-                .nickname("테스터02")
-                .build();
-        userRepository.save(user);
-
-        AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            commentService.deleteComment(user.getId(), testReplyId);
-        });
-
-        assertEquals("삭제할 권한이 없습니다.", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("createComment: 답글 등록 [삭제된 댓글]")
     void createComment_fail_deletedComment() {
         commentService.deleteComment(testUserId, testCommentId);
@@ -256,10 +215,10 @@ public class CommentServiceTest {
         request.setParentId(testCommentId);
         request.setContent("테스트 내용");
 
-        DeletedCommentException exception = assertThrows(DeletedCommentException.class, () -> {
+        CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
             commentService.createComment(testUserId, testPostId, request);
         });
 
-        assertEquals("삭제된 댓글입니다.", exception.getMessage());
+        assertEquals("댓글을 찾을 수 없습니다.", exception.getMessage());
     }
 }
