@@ -3,209 +3,219 @@ package com.floti.api.domain.board.tip.service;
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
+import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.PostNotFoundException;
 import com.floti.api.error.UserNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ActiveProfiles("test") //application-test.yml 사용
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class TipPostServiceTest {
-    @Autowired
+    @InjectMocks
     private TipPostService tipPostService;
 
-    @Autowired
+    @Mock
     private TipPostRepository tipPostRepository;
 
-    @Autowired
+    @Mock
+    private LikeTipPostRepository likeTipPostRepository;
+
+    @Mock
     private UserRepository userRepository;
 
-    private Long testUserId;
-    private Long testPostId;
+    private static final Long VALID_ID = 1L;
+    private static final Long INVALID_ID = 9999L;
 
-    @BeforeEach //테스트용 데이터 생성
-    void setUp() {
-        Users user = Users.builder()
-                .email("test01@gmail.com")
-                .username("test01")
-                .password("password123")
-                .nickname("테스터01")
-                .build();
-        userRepository.save(user);
-        testUserId = user.getId();
-
-        TipPosts tipPost = TipPosts.builder()
-                .author(user)
-                .title("원본 제목")
-                .content("원본 내용")
-                .build();
-        tipPostRepository.save(tipPost);
-        testPostId = tipPost.getId();
-    }
+    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final TipPosts testPost = TipPosts.builder()
+            .author(testUser).title("테스트 제목").content("테스트 내용").build();
 
     @Test
-    @DisplayName("getTipPosts: 게시글 조회")
+    @DisplayName("getTipPosts: 검색어 없음 - 전체 게시글 조회")
     void getTipPosts_noSearch() {
-        String search = "";
+        //given
         Pageable pageable = PageRequest.of(0, 20);
+        Page<TipPosts> page = new PageImpl<>(List.of(testPost));
 
-        Page<TipPostResponse> responses = tipPostService.getTipPosts(search, pageable);
+        when(tipPostRepository.findAll(pageable)).thenReturn(page);
 
-        assertEquals(1, responses.getTotalElements());
-        assertEquals("원본 제목", responses.getContent().get(0).getTitle());
-    }
+        //when
+        Page<TipPostResponse> responses = tipPostService.getTipPosts("", pageable);
 
-    @Test
-    @DisplayName("getTipPosts: 게시글 검색")
-    void getTipPosts_search() {
-        String search = "테스트";
-        Pageable pageable = PageRequest.of(0, 20);
-
-        TipPosts tipPost = TipPosts.builder()
-                .title("테스트 제목")
-                .content("테스트 내용")
-                .author(userRepository.findById(testUserId).get())
-                .build();
-        tipPostRepository.save(tipPost);
-
-        Page<TipPostResponse> responses = tipPostService.getTipPosts(search, pageable);
-
+        //then
         assertEquals(1, responses.getTotalElements());
         assertEquals("테스트 제목", responses.getContent().get(0).getTitle());
     }
 
     @Test
-    @DisplayName("getTipPosts: 게시글 검색 결과 없음")
-    void getTipPosts_empty() {
-        String search = "없음";
+    @DisplayName("getTipPosts: 검색어 있음 - 게시글 조회")
+    void getTipPosts_search() {
+        //given
         Pageable pageable = PageRequest.of(0, 20);
+        Page<TipPosts> page = new PageImpl<>(List.of(testPost));
 
-        Page<TipPostResponse> responses = tipPostService.getTipPosts(search, pageable);
+        when(tipPostRepository.findByTitleContainingIgnoreCase(pageable, "테스트")).thenReturn(page);
 
-        assertTrue(responses.isEmpty());
+        //when
+        Page<TipPostResponse> responses = tipPostService.getTipPosts("테스트", pageable);
+
+        //then
+        assertEquals(1, responses.getTotalElements());
+        assertEquals("테스트 제목", responses.getContent().get(0).getTitle());
     }
 
     @Test
-    @DisplayName("getTipPost: 게시글 상세 조회")
+    @DisplayName("getTipPost: 게시글 있음 - 게시글 상세 반환")
     void getTipPost_success() {
-        TipPostResponse response = tipPostService.getTipPost(testUserId, testPostId);
+        //given
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(likeTipPostRepository.existsByUserIdAndPostId(VALID_ID, VALID_ID)).thenReturn(false);
 
-        assertEquals("원본 제목", response.getTitle());
-        assertEquals("원본 내용", response.getContent());
+        //when
+        TipPostResponse response = tipPostService.getTipPost(VALID_ID, VALID_ID);
+
+        //then
+        assertEquals("테스트 제목", response.getTitle());
+        assertEquals("테스트 내용", response.getContent());
     }
 
     @Test
-    @DisplayName("getTipPost: 게시글 상세 조회 [게시글 없음]")
+    @DisplayName("getTipPost: 게시글 없음 - PostNotFoundException")
     void getTipPost_fail_postNotFound() {
+        //given
+        when(tipPostRepository.findById(INVALID_ID)).thenReturn(Optional.empty());
+
+        //when
         PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
-            tipPostService.getTipPost(testUserId, 9999L);
+            tipPostService.getTipPost(VALID_ID, INVALID_ID);
         });
 
+        //then
         assertEquals("게시글을 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 등록")
+    @DisplayName("createTipPost: 사용자 있음 - 게시글 등록")
     void createTipPost_success() {
+        //given
         PostRequest request = new PostRequest();
         request.setTitle("등록된 제목");
         request.setContent("등록된 내용");
 
-        TipPostResponse response = tipPostService.createTipPost(testUserId, request, null);
+        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.save(any(TipPosts.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertNotNull(response.getId());
+        //when
+        TipPostResponse response = tipPostService.createTipPost(VALID_ID, request, null);
+
+        //then
         assertEquals("등록된 제목", response.getTitle());
         assertEquals("등록된 내용", response.getContent());
         assertEquals("테스터01", response.getAuthor().getNickname());
     }
 
     @Test
-    @DisplayName("createTipPost: 게시글 등록 [사용자 없음]")
+    @DisplayName("createTipPost: 사용자 없음 - UserNotFoundException")
     void createTipPost_fail_userNotFound() {
+        //given
         PostRequest request = new PostRequest();
-        request.setTitle("등록된 제목");
-        request.setContent("등록된 내용");
 
+        when(userRepository.findById(INVALID_ID)).thenReturn(Optional.empty());
+
+        //when
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
-            tipPostService.createTipPost(9999L, request, null);
+            tipPostService.createTipPost(INVALID_ID, request, null);
         });
 
+        //then
         assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test
-    @DisplayName("updateTipPost: 게시글 수정")
+    @DisplayName("updateTipPost: 작성자 맞음 - 게시글 수정")
     void updateTipPost_success() {
+        //given
         PostRequest request = new PostRequest();
         request.setTitle("수정된 제목");
         request.setContent("수정된 내용");
 
-        TipPostResponse response = tipPostService.updateTipPost(testUserId, testPostId, request);
+        when(userRepository.existsById(VALID_ID)).thenReturn(true);
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
 
+        //when
+        TipPostResponse response = tipPostService.updateTipPost(VALID_ID, VALID_ID, request);
+
+        //then
         assertEquals("수정된 제목", response.getTitle());
         assertEquals("수정된 내용", response.getContent());
     }
 
     @Test
-    @DisplayName("updateTipPost: 게시글 수정 [작성자 불일치]")
+    @DisplayName("updateTipPost: 작성자 아님 - AccessDeniedException")
     void updateTipPost_fail_authorMismatch() {
-        Users user = Users.builder()
-                .email("test02@gmail.com")
-                .username("test02")
-                .password("password123")
-                .nickname("테스터02")
-                .build();
-        userRepository.save(user);
-
+        //given
         PostRequest request = new PostRequest();
-        request.setTitle("수정된 제목");
-        request.setContent("수정된 내용");
 
+        when(userRepository.existsById(INVALID_ID)).thenReturn(true);
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+
+        //when
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            tipPostService.updateTipPost(user.getId(), testPostId, request);
+            tipPostService.updateTipPost(INVALID_ID, VALID_ID, request);
         });
 
+        //then
         assertEquals("수정할 권한이 없습니다.", exception.getMessage());
     }
 
     @Test
-    @DisplayName("deleteTipPost: 게시글 삭제")
+    @DisplayName("deleteTipPost: 작성자 맞음 - 게시글 삭제")
     void deleteTipPost_success() {
-        tipPostService.deleteTipPost(testUserId, testPostId);
+        //given
+        when(userRepository.existsById(VALID_ID)).thenReturn(true);
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
 
-        assertFalse(tipPostRepository.existsById(testPostId));
+        //when
+        tipPostService.deleteTipPost(VALID_ID, VALID_ID);
+
+        //then
+        verify(tipPostRepository).delete(testPost);
     }
 
     @Test
-    @DisplayName("deleteTipPost: 게시글 삭제 [작성자 불일치]")
+    @DisplayName("deleteTipPost: 작성자 아님 - AccessDeniedException")
     void deleteTipPost_fail_authorMismatch() {
-        Users user = Users.builder()
-                .email("test02@gmail.com")
-                .username("test02")
-                .password("password123")
-                .nickname("테스터02")
-                .build();
-        userRepository.save(user);
+        //given
+        when(userRepository.existsById(INVALID_ID)).thenReturn(true);
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
 
+        //when
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            tipPostService.deleteTipPost(user.getId(), testPostId);
+            tipPostService.deleteTipPost(INVALID_ID, VALID_ID);
         });
 
+        //then
         assertEquals("삭제할 권한이 없습니다.", exception.getMessage());
     }
 }

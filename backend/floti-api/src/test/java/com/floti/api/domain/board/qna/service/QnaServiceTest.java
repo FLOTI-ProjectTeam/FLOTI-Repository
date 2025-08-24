@@ -1,96 +1,74 @@
 package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.Users;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ActiveProfiles("test") //application-test.yml 사용
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class QnaServiceTest {
-    @Autowired
+    @InjectMocks
     private QnaPostService qnaPostService;
 
-    @Autowired
+    @Mock
     private QnaPostRepository qnaPostRepository;
 
-    @Autowired
+    @Mock
     private AnswerRepository answerRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private static final Long VALID_ID = 1L;
 
-    private Long testUserId;
-    private Long testPostId;
-
-    @BeforeEach
-        //테스트용 데이터 생성
-    void setUp() {
-        Users user = Users.builder()
-                .email("test01@gmail.com")
-                .username("test01")
-                .password("password123")
-                .nickname("테스터01")
-                .build();
-        userRepository.save(user);
-        testUserId = user.getId();
-
-        QnaPosts qnaPost = QnaPosts.builder()
-                .author(user)
-                .title("원본 제목")
-                .content("원본 내용")
-                .build();
-        qnaPostRepository.save(qnaPost);
-        testPostId = qnaPost.getId();
-
-        Answers answer = Answers.builder()
-                .postId(testPostId)
-                .author(user)
-                .content("답변 내용")
-                .build();
-        answerRepository.save(answer);
-        qnaPost.incrementAnswerCount();
-    }
+    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final QnaPosts testPost = QnaPosts.builder().author(testUser).title("테스트 제목").build();
 
     @Test
-    @DisplayName("getQnaPost: 답변 있는 게시글 상세 조회")
-    void getQnaPost_existAnswer() {
-        QnaPostResponse response = qnaPostService.getQnaPost(testPostId);
+    @DisplayName("getQnaPost: 답변 있음 - 게시글 상세에 답변 포함")
+    void getQnaPost_exist() {
+        //given
+        List<Answers> answers = List.of(
+                Answers.builder().author(testUser).content("첫번째 답변").build()
+        );
 
-        assertEquals("원본 제목", response.getTitle());
-        assertEquals("원본 내용", response.getContent());
-        assertEquals(1, response.getAnswers().size());
-        assertEquals("답변 내용", response.getAnswers().get(0).getContent());
-    }
+        when(qnaPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(answerRepository.findByPostId(VALID_ID)).thenReturn(answers);
 
-    @Test
-    @DisplayName("getQnaPost: 답변 없는 게시글 상세 조회")
-    void getQnaPost_emptyAnswer() {
-        QnaPosts qnaPost = QnaPosts.builder()
-                .author(userRepository.findById(testUserId).get())
-                .title("테스트 제목")
-                .content("테스트 내용")
-                .build();
-        qnaPostRepository.save(qnaPost);
+        //when
+        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID);
 
-        QnaPostResponse response = qnaPostService.getQnaPost(qnaPost.getId());
-
+        //then
         assertEquals("테스트 제목", response.getTitle());
-        assertEquals("테스트 내용", response.getContent());
+        assertEquals(1, response.getAnswers().size());
+        assertEquals("첫번째 답변", response.getAnswers().get(0).getContent());
+    }
+
+    @Test
+    @DisplayName("getQnaPost: 답변 없음 - 게시글 상세에 빈 리스트 포함")
+    void getQnaPost_empty() {
+        //given
+        when(qnaPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(answerRepository.findByPostId(VALID_ID)).thenReturn(Collections.emptyList());
+
+        //when
+        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID);
+
+        //then
+        assertEquals("테스트 제목", response.getTitle());
         assertTrue(response.getAnswers().isEmpty());
     }
 }

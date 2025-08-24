@@ -13,212 +13,243 @@ import com.floti.api.error.ReplyNotAllowedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ActiveProfiles("test") //application-test.yml 사용
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class CommentServiceTest {
-    @Autowired
+    @InjectMocks
     private CommentService commentService;
 
-    @Autowired
+    @Mock
     private CommentRepository commentRepository;
 
-    @Autowired
+    @Mock
     private TipPostRepository tipPostRepository;
 
-    @Autowired
+    @Mock
     private UserRepository userRepository;
 
-    private Long testUserId;
-    private Long testPostId;
-    private Long testCommentId;
-    private Long testReplyId;
+    private static final Long VALID_ID = 1L;
+    private static final Long INVALID_ID = 9999L;
 
-    @BeforeEach //테스트용 데이터 생성
+    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final TipPosts testPost = TipPosts.builder().author(testUser).build();
+    private final Comments testComment = Comments.builder()
+            .id(VALID_ID).postId(VALID_ID).author(testUser).content("첫번째 댓글").build();
+    private final Comments testReply = Comments.builder()
+            .id(INVALID_ID).postId(VALID_ID).parentId(VALID_ID).author(testUser).content("첫번째 답글").build();
+
+    @BeforeEach
     void setUp() {
-        Users user = Users.builder()
-                .email("test01@gmail.com")
-                .username("test01")
-                .password("password123")
-                .nickname("테스터01")
-                .build();
-        userRepository.save(user);
-        testUserId = user.getId();
-
-        TipPosts tipPost = TipPosts.builder()
-                .author(user)
-                .title("원본 제목")
-                .content("원본 내용")
-                .build();
-        tipPostRepository.save(tipPost);
-        testPostId = tipPost.getId();
-
-        Comments comment = Comments.builder()
-                .postId(testPostId)
-                .author(user)
-                .content("댓글 내용")
-                .build();
-        commentRepository.save(comment);
-        tipPost.incrementCommentCount();
-        testCommentId = comment.getId();
-
-        Comments reply = Comments.builder()
-                .postId(testPostId)
-                .parentId(testCommentId)
-                .author(user)
-                .content("답글 내용")
-                .build();
-        commentRepository.save(reply);
-        tipPost.incrementCommentCount();
-        testReplyId = reply.getId();
+        testPost.incrementCommentCount();
+        testPost.incrementCommentCount();
     }
 
     @Test
-    @DisplayName("getComments: 댓글 조회")
+    @DisplayName("getComments: 댓글 있음 - 댓글 반환")
     void getComments_exist() {
-        List<CommentResponse> responses = commentService.getComments(testPostId);
+        //given
+        List<Comments> comments = List.of(testComment, testReply);
 
+        when(commentRepository.findByPostId(VALID_ID)).thenReturn(comments);
+
+        //when
+        List<CommentResponse> responses = commentService.getComments(VALID_ID);
+
+        //then
         assertEquals(1, responses.size());
-        assertEquals("댓글 내용", responses.get(0).getContent());
-        assertEquals("답글 내용", responses.get(0).getReplies().get(0).getContent());
+        assertEquals("첫번째 댓글", responses.get(0).getContent());
+        assertEquals("첫번째 답글", responses.get(0).getReplies().get(0).getContent());
     }
 
     @Test
-    @DisplayName("getComments: 댓글 조회 결과 없음")
+    @DisplayName("getComments: 댓글 없음 - 빈 리스트 반환")
     void getComments_empty() {
-        TipPosts tipPost = TipPosts.builder()
-                .author(userRepository.findById(testUserId).get())
-                .title("테스트 제목")
-                .content("테스트 내용")
-                .build();
-        tipPostRepository.save(tipPost);
+        //given
+        when(commentRepository.findByPostId(INVALID_ID)).thenReturn(Collections.emptyList());
 
-        List<CommentResponse> responses = commentService.getComments(tipPost.getId());
+        //when
+        List<CommentResponse> responses = commentService.getComments(INVALID_ID);
 
+        //then
         assertTrue(responses.isEmpty());
     }
 
     @Test
     @DisplayName("createComment: 댓글 등록")
     void createComment_noReply() {
+        //given
         CommentRequest request = new CommentRequest();
-        request.setContent("등록된 내용");
+        request.setContent("두번째 댓글");
 
-        CommentResponse response = commentService.createComment(testUserId, testPostId, request);
-        TipPosts tipPost = tipPostRepository.findById(response.getPostId()).get();
+        int previousCommentCount = testPost.getCommentCount();
 
-        assertNotNull(response.getId());
-        assertEquals(testPostId, response.getPostId());
-        assertEquals("등록된 내용", response.getContent());
+        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(commentRepository.save(any(Comments.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        //when
+        CommentResponse response = commentService.createComment(VALID_ID, VALID_ID, request);
+
+        //then
+        assertEquals(VALID_ID, response.getPostId());
+        assertEquals("두번째 댓글", response.getContent());
         assertEquals("테스터01", response.getAuthor().getNickname());
-        assertEquals(3, tipPost.getCommentCount());
+        assertEquals(previousCommentCount + 1, testPost.getCommentCount());
     }
 
     @Test
     @DisplayName("createComment: 답글 등록")
     void createComment_reply() {
+        //given
         CommentRequest request = new CommentRequest();
-        request.setParentId(testCommentId);
-        request.setContent("등록된 내용");
+        request.setParentId(VALID_ID);
+        request.setContent("두번째 답글");
 
-        CommentResponse response = commentService.createComment(testUserId, testPostId, request);
-        TipPosts tipPost = tipPostRepository.findById(response.getPostId()).get();
+        int previousCommentCount = testPost.getCommentCount();
 
-        assertNotNull(response.getId());
-        assertEquals(testPostId, response.getPostId());
-        assertEquals(testCommentId, response.getParentId());
-        assertEquals("등록된 내용", response.getContent());
+        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(VALID_ID, VALID_ID)).thenReturn(Optional.of(testComment));
+        when(commentRepository.save(any(Comments.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        //when
+        CommentResponse response = commentService.createComment(VALID_ID, VALID_ID, request);
+
+        //then
+        assertEquals(VALID_ID, response.getPostId());
+        assertEquals(VALID_ID, response.getParentId());
+        assertEquals("두번째 답글", response.getContent());
         assertEquals("테스터01", response.getAuthor().getNickname());
-        assertEquals(3, tipPost.getCommentCount());
+        assertEquals(previousCommentCount + 1, testPost.getCommentCount());
     }
 
     @Test
-    @DisplayName("createComment: 답글 등록 [댓글 없음]")
+    @DisplayName("createComment: 없는 댓글에 답글 등록 - CommentNotFoundException")
     void createComment_fail_commentNotFound() {
+        //given
         CommentRequest request = new CommentRequest();
-        request.setParentId(9999L);
-        request.setContent("등록된 내용");
+        request.setParentId(INVALID_ID);
 
+        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(INVALID_ID, VALID_ID)).thenReturn(Optional.empty());
+
+        //when
         CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
-            commentService.createComment(testUserId, testPostId, request);
+            commentService.createComment(VALID_ID, VALID_ID, request);
         });
 
+        //then
         assertEquals("댓글을 찾을 수 없습니다.", exception.getMessage());
     }
 
     @Test
-    @DisplayName("createComment: 답글 등록 [댓글 단계 초과]")
-    void createComment_fail_replyDepthExceeded() {
+    @DisplayName("createComment: 삭제된 댓글에 답글 등록 - CommentNotFoundException")
+    void createComment_fail_deletedComment() {
+        //then
         CommentRequest request = new CommentRequest();
-        request.setParentId(testReplyId);
-        request.setContent("등록된 내용");
+        request.setParentId(VALID_ID);
 
-        ReplyNotAllowedException exception = assertThrows(ReplyNotAllowedException.class, () -> {
-            commentService.createComment(testUserId, testPostId, request);
+        testComment.softDelete();
+
+        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(VALID_ID, VALID_ID)).thenReturn(Optional.of(testComment));
+
+        //when
+        CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
+            commentService.createComment(VALID_ID, VALID_ID, request);
         });
 
+        //then
+        assertEquals("댓글을 찾을 수 없습니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("createComment: 답글에 답글 등록 - ReplyNotAllowedException")
+    void createComment_fail_replyToReply() {
+        //given
+        CommentRequest request = new CommentRequest();
+        request.setParentId(INVALID_ID);
+
+        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(INVALID_ID, VALID_ID)).thenReturn(Optional.of(testReply));
+
+        //when
+        ReplyNotAllowedException exception = assertThrows(ReplyNotAllowedException.class, () -> {
+            commentService.createComment(VALID_ID, VALID_ID, request);
+        });
+
+        //then
         assertEquals("답글은 최상위 댓글에만 작성할 수 있습니다.", exception.getMessage());
     }
 
     @Test
     @DisplayName("updateComment: 댓글 수정")
     void updateComment_success() {
+        //given
         CommentRequest request = new CommentRequest();
-        request.setContent("수정된 내용");
+        request.setContent("수정된 댓글");
 
-        CommentResponse response = commentService.updateComment(testUserId, testCommentId, request);
+        when(userRepository.existsById(VALID_ID)).thenReturn(true);
+        when(commentRepository.findById(VALID_ID)).thenReturn(Optional.of(testComment));
 
-        assertEquals("수정된 내용", response.getContent());
+        //when
+        CommentResponse response = commentService.updateComment(VALID_ID, VALID_ID, request);
+
+        //then
+        assertEquals("수정된 댓글", response.getContent());
     }
 
     @Test
     @DisplayName("deleteComment: 댓글 삭제")
     void deleteComment_noReply() {
-        commentService.deleteComment(testUserId, testCommentId);
+        //given
+        int previousCommentCount = testPost.getCommentCount();
 
-        List<CommentResponse> responses = commentService.getComments(testPostId);
-        TipPosts tipPost = tipPostRepository.findById(testPostId).get();
+        when(userRepository.existsById(VALID_ID)).thenReturn(true);
+        when(commentRepository.findById(VALID_ID)).thenReturn(Optional.of(testComment));
+        when(tipPostRepository.getReferenceById(VALID_ID)).thenReturn(testPost);
 
-        assertTrue(responses.get(0).isDeleted());
-        assertNull(responses.get(0).getContent());
-        assertEquals("답글 내용", responses.get(0).getReplies().get(0).getContent());
-        assertEquals(1, tipPost.getCommentCount());
+        //when
+        commentService.deleteComment(VALID_ID, VALID_ID);
+
+        //then
+        assertTrue(testComment.isDeleted());
+        assertEquals(previousCommentCount - 1, testPost.getCommentCount());
     }
 
     @Test
     @DisplayName("deleteComment: 답글 삭제")
     void deleteComment_reply() {
-        commentService.deleteComment(testUserId, testReplyId);
+        //given
+        int previousCommentCount = testPost.getCommentCount();
 
-        List<CommentResponse> responses = commentService.getComments(testPostId);
-        TipPosts tipPost = tipPostRepository.findById(testPostId).get();
+        when(userRepository.existsById(VALID_ID)).thenReturn(true);
+        when(commentRepository.findById(VALID_ID)).thenReturn(Optional.of(testReply));
+        when(tipPostRepository.getReferenceById(VALID_ID)).thenReturn(testPost);
 
-        assertTrue(responses.get(0).getReplies().isEmpty());
-        assertEquals(1, tipPost.getCommentCount());
-    }
+        //when
+        commentService.deleteComment(VALID_ID, VALID_ID);
 
-    @Test
-    @DisplayName("createComment: 답글 등록 [삭제된 댓글]")
-    void createComment_fail_deletedComment() {
-        commentService.deleteComment(testUserId, testCommentId);
-
-        CommentRequest request = new CommentRequest();
-        request.setParentId(testCommentId);
-        request.setContent("테스트 내용");
-
-        CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
-            commentService.createComment(testUserId, testPostId, request);
-        });
-
-        assertEquals("댓글을 찾을 수 없습니다.", exception.getMessage());
+        //then
+        verify(commentRepository).delete(testReply);
+        assertEquals(previousCommentCount - 1, testPost.getCommentCount());
     }
 }

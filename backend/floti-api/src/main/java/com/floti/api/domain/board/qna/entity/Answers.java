@@ -39,7 +39,8 @@ public class Answers {
     private LocalDateTime createdAt;
 
     @Builder
-    public Answers(Long postId, Users author, String content) {
+    public Answers(Long id, Long postId, Users author, String content) {
+        this.id = id; //테스트용
         this.postId = postId;
         this.author = author;
         this.content = content;

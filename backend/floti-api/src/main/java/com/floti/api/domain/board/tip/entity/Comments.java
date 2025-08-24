@@ -41,7 +41,8 @@ public class Comments {
     private LocalDateTime createdAt;
 
     @Builder
-    public Comments(Long postId, Long parentId, Users author, String content) {
+    public Comments(Long id, Long postId, Long parentId, Users author, String content) {
+        this.id = id; //테스트용
         this.postId = postId;
         this.parentId = parentId;
         this.author = author;
