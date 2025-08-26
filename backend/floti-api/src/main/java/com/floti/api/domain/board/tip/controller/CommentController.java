@@ -20,8 +20,9 @@ public class CommentController {
 
     /* 1. 조회 */
     @GetMapping("/posts/{postId}/comments")
-    public List<CommentResponse> getComments(@PathVariable Long postId) {
-        return commentService.getComments(postId);
+    public List<CommentResponse> getComments(@RequestParam Long userId, //임시
+                                             @PathVariable Long postId) {
+        return commentService.getComments(userId, postId);
     }
 
     /* 2. 등록 */

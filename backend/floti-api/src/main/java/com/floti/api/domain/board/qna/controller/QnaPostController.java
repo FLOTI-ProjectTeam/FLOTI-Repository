@@ -37,8 +37,9 @@ public class QnaPostController {
 
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<QnaPostResponse> getQnaPost(@PathVariable Long id) {
-        QnaPostResponse response = qnaPostService.getQnaPost(id);
+    public ResponseEntity<QnaPostResponse> getQnaPost(@RequestParam Long userId, //임시
+                                                      @PathVariable Long id) {
+        QnaPostResponse response = qnaPostService.getQnaPost(userId, id);
         return ResponseEntity.ok(response);
     }
 

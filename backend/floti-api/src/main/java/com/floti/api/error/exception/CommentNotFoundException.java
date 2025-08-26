@@ -1,4 +1,4 @@
-package com.floti.api.error;
+package com.floti.api.error.exception;
 
 public class CommentNotFoundException extends RuntimeException {
     public CommentNotFoundException() {

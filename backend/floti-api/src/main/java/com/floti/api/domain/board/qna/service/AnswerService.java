@@ -9,6 +9,7 @@ import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
 import com.floti.api.error.*;
+import com.floti.api.error.exception.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;

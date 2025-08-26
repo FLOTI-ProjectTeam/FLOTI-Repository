@@ -1,6 +1,7 @@
 package com.floti.api.domain.board.tip.entity;
 
 import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.board.common.entity.LikeableEntity;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comments {
+public class Comments implements LikeableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
@@ -37,7 +38,7 @@ public class Comments {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 
-    @Column(updatable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
@@ -49,11 +50,26 @@ public class Comments {
         this.content = content;
     }
 
+    @PrePersist //테스트용
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
     public void update(CommentRequest comment) {
         this.content = comment.getContent();
     }
 
     public void softDelete() {
         this.deleted = true;
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) this.likeCount--;
     }
 }

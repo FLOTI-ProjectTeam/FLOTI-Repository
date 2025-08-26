@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@IdClass(UserPostId.class)
-public class LikeTipPosts {
+@IdClass(UserCommentId.class)
+public class LikeComments {
     @Id private Long userId;
-    @Id private Long postId;
+    @Id private Long commentId;
 }

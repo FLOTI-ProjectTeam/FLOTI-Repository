@@ -7,8 +7,8 @@ import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.error.PostNotFoundException;
-import com.floti.api.error.UserNotFoundException;
+import com.floti.api.error.exception.PostNotFoundException;
+import com.floti.api.error.exception.UserNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,8 +89,8 @@ public class TipPostServiceTest {
     @DisplayName("getTipPost: 게시글 있음 - 게시글 상세 반환")
     void getTipPost_success() {
         //given
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
-        when(likeTipPostRepository.existsByUserIdAndPostId(VALID_ID, VALID_ID)).thenReturn(false);
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(likeTipPostRepository.existsByUserIdAndPostId(anyLong(), anyLong())).thenReturn(false);
 
         //when
         TipPostResponse response = tipPostService.getTipPost(VALID_ID, VALID_ID);
@@ -103,7 +104,7 @@ public class TipPostServiceTest {
     @DisplayName("getTipPost: 게시글 없음 - PostNotFoundException")
     void getTipPost_fail_postNotFound() {
         //given
-        when(tipPostRepository.findById(INVALID_ID)).thenReturn(Optional.empty());
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when
         PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
@@ -122,7 +123,7 @@ public class TipPostServiceTest {
         request.setTitle("등록된 제목");
         request.setContent("등록된 내용");
 
-        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(tipPostRepository.save(any(TipPosts.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -141,7 +142,7 @@ public class TipPostServiceTest {
         //given
         PostRequest request = new PostRequest();
 
-        when(userRepository.findById(INVALID_ID)).thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
@@ -160,8 +161,8 @@ public class TipPostServiceTest {
         request.setTitle("수정된 제목");
         request.setContent("수정된 내용");
 
-        when(userRepository.existsById(VALID_ID)).thenReturn(true);
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
         TipPostResponse response = tipPostService.updateTipPost(VALID_ID, VALID_ID, request);
@@ -177,8 +178,8 @@ public class TipPostServiceTest {
         //given
         PostRequest request = new PostRequest();
 
-        when(userRepository.existsById(INVALID_ID)).thenReturn(true);
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
@@ -193,8 +194,8 @@ public class TipPostServiceTest {
     @DisplayName("deleteTipPost: 작성자 맞음 - 게시글 삭제")
     void deleteTipPost_success() {
         //given
-        when(userRepository.existsById(VALID_ID)).thenReturn(true);
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
         tipPostService.deleteTipPost(VALID_ID, VALID_ID);
@@ -207,8 +208,8 @@ public class TipPostServiceTest {
     @DisplayName("deleteTipPost: 작성자 아님 - AccessDeniedException")
     void deleteTipPost_fail_authorMismatch() {
         //given
-        when(userRepository.existsById(INVALID_ID)).thenReturn(true);
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {

@@ -2,7 +2,7 @@ package com.floti.api.domain.board.qna.entity;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.board.common.dto.PostRequest;
-import com.floti.api.error.PostAlreadyAcceptedException;
+import com.floti.api.error.exception.PostAlreadyAcceptedException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,7 +35,7 @@ public class QnaPosts {
     @Column(name = "is_accepted", nullable = false)
     private boolean accepted = false;
 
-    @Column(updatable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
@@ -43,6 +43,13 @@ public class QnaPosts {
         this.author = author;
         this.title = title;
         this.content = content;
+    }
+
+    @PrePersist //테스트용
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
 
     public void update(PostRequest post) {

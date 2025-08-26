@@ -2,6 +2,8 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
+import com.floti.api.domain.board.like.entity.LikeComments;
+import com.floti.api.domain.board.like.repository.LikeCommentRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
@@ -9,15 +11,16 @@ import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.*;
+import com.floti.api.error.exception.CommentNotFoundException;
+import com.floti.api.error.exception.PostNotFoundException;
+import com.floti.api.error.exception.ReplyNotAllowedException;
+import com.floti.api.error.exception.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,18 +29,31 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final TipPostRepository tipPostRepository;
     private final UserRepository userRepository;
+    private final LikeCommentRepository likeCommentRepository;
 
     /* 1. 조회 */
-    public List<CommentResponse> getComments(Long postId) {
+    public List<CommentResponse> getComments(Long userId, Long postId) {
         List<Comments> comments = commentRepository.findByPostId(postId);
 
         if (comments.isEmpty())
             return Collections.emptyList();
 
-        Map<Long, CommentResponse> commentMap = comments.stream()
-                .collect(Collectors.toMap(Comments::getId, CommentResponse::new));
-        List<CommentResponse> topComments = new ArrayList<>();
+        /* 댓글별 추천 여부 */
+        // 1. 모든 댓글 ID
+        List<Long> commentIds = comments.stream().map(Comments::getId).toList();
 
+        // 2. 사용자가 추천한 댓글 ID
+        Set<Long> likedCommentIds = likeCommentRepository.findByUserIdAndCommentIdIn(userId, commentIds)
+                .stream()
+                .map(LikeComments::getCommentId)
+                .collect(Collectors.toSet());
+
+        Map<Long, CommentResponse> commentMap = comments.stream()
+                .collect(Collectors.toMap(Comments::getId,
+                        c -> new CommentResponse(c, likedCommentIds.contains(c.getId()))));
+
+        /* 댓글 트리 생성 */
+        List<CommentResponse> topComments = new ArrayList<>();
         for (Comments comment : comments) {
             CommentResponse temp = commentMap.get(comment.getId());
             if (comment.getParentId() == null) {

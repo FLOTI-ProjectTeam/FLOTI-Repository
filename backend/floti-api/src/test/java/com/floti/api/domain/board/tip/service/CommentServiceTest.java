@@ -2,14 +2,15 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
+import com.floti.api.domain.board.like.repository.LikeCommentRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.error.CommentNotFoundException;
-import com.floti.api.error.ReplyNotAllowedException;
+import com.floti.api.error.exception.CommentNotFoundException;
+import com.floti.api.error.exception.ReplyNotAllowedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +38,9 @@ public class CommentServiceTest {
 
     @Mock
     private TipPostRepository tipPostRepository;
+
+    @Mock
+    private LikeCommentRepository likeCommentRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -63,10 +67,11 @@ public class CommentServiceTest {
         //given
         List<Comments> comments = List.of(testComment, testReply);
 
-        when(commentRepository.findByPostId(VALID_ID)).thenReturn(comments);
+        when(commentRepository.findByPostId(anyLong())).thenReturn(comments);
+        when(likeCommentRepository.findByUserIdAndCommentIdIn(anyLong(), anyList())).thenReturn(Collections.emptyList());
 
         //when
-        List<CommentResponse> responses = commentService.getComments(VALID_ID);
+        List<CommentResponse> responses = commentService.getComments(VALID_ID, VALID_ID);
 
         //then
         assertEquals(1, responses.size());
@@ -78,10 +83,10 @@ public class CommentServiceTest {
     @DisplayName("getComments: 댓글 없음 - 빈 리스트 반환")
     void getComments_empty() {
         //given
-        when(commentRepository.findByPostId(INVALID_ID)).thenReturn(Collections.emptyList());
+        when(commentRepository.findByPostId(anyLong())).thenReturn(Collections.emptyList());
 
         //when
-        List<CommentResponse> responses = commentService.getComments(INVALID_ID);
+        List<CommentResponse> responses = commentService.getComments(VALID_ID, INVALID_ID);
 
         //then
         assertTrue(responses.isEmpty());
@@ -96,8 +101,8 @@ public class CommentServiceTest {
 
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(commentRepository.save(any(Comments.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -121,9 +126,9 @@ public class CommentServiceTest {
 
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
-        when(commentRepository.findByIdAndPostId(VALID_ID, VALID_ID)).thenReturn(Optional.of(testComment));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.of(testComment));
         when(commentRepository.save(any(Comments.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -145,9 +150,9 @@ public class CommentServiceTest {
         CommentRequest request = new CommentRequest();
         request.setParentId(INVALID_ID);
 
-        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
-        when(commentRepository.findByIdAndPostId(INVALID_ID, VALID_ID)).thenReturn(Optional.empty());
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
         //when
         CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
@@ -167,9 +172,9 @@ public class CommentServiceTest {
 
         testComment.softDelete();
 
-        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
-        when(commentRepository.findByIdAndPostId(VALID_ID, VALID_ID)).thenReturn(Optional.of(testComment));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.of(testComment));
 
         //when
         CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
@@ -187,9 +192,9 @@ public class CommentServiceTest {
         CommentRequest request = new CommentRequest();
         request.setParentId(INVALID_ID);
 
-        when(userRepository.findById(VALID_ID)).thenReturn(Optional.of(testUser));
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
-        when(commentRepository.findByIdAndPostId(INVALID_ID, VALID_ID)).thenReturn(Optional.of(testReply));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.of(testReply));
 
         //when
         ReplyNotAllowedException exception = assertThrows(ReplyNotAllowedException.class, () -> {
@@ -207,8 +212,8 @@ public class CommentServiceTest {
         CommentRequest request = new CommentRequest();
         request.setContent("수정된 댓글");
 
-        when(userRepository.existsById(VALID_ID)).thenReturn(true);
-        when(commentRepository.findById(VALID_ID)).thenReturn(Optional.of(testComment));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testComment));
 
         //when
         CommentResponse response = commentService.updateComment(VALID_ID, VALID_ID, request);
@@ -223,9 +228,9 @@ public class CommentServiceTest {
         //given
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.existsById(VALID_ID)).thenReturn(true);
-        when(commentRepository.findById(VALID_ID)).thenReturn(Optional.of(testComment));
-        when(tipPostRepository.getReferenceById(VALID_ID)).thenReturn(testPost);
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testComment));
+        when(tipPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 
         //when
         commentService.deleteComment(VALID_ID, VALID_ID);
@@ -241,9 +246,9 @@ public class CommentServiceTest {
         //given
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.existsById(VALID_ID)).thenReturn(true);
-        when(commentRepository.findById(VALID_ID)).thenReturn(Optional.of(testReply));
-        when(tipPostRepository.getReferenceById(VALID_ID)).thenReturn(testPost);
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testReply));
+        when(tipPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 
         //when
         commentService.deleteComment(VALID_ID, VALID_ID);

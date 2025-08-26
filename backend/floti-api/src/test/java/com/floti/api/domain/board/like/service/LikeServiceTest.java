@@ -2,7 +2,7 @@ package com.floti.api.domain.board.like.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.common.entity.UserPostId;
+import com.floti.api.domain.board.like.entity.UserPostId;
 import com.floti.api.domain.board.like.dto.LikeResponse;
 import com.floti.api.domain.board.like.entity.LikeTipPosts;
 import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -45,8 +46,8 @@ public class LikeServiceTest {
     @DisplayName("toggleLikeTipPost: 추천 없음 - 게시글 추천")
     void toggleLikeTipPost_like() {
         //given
-        when(userRepository.existsById(VALID_ID)).thenReturn(true);
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(likeTipPostRepository.findById(new UserPostId(VALID_ID, VALID_ID))).thenReturn(Optional.empty());
         when(likeTipPostRepository.save(any(LikeTipPosts.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -65,8 +66,8 @@ public class LikeServiceTest {
         //given
         LikeTipPosts likeTipPost = new LikeTipPosts(VALID_ID, VALID_ID);
 
-        when(userRepository.existsById(VALID_ID)).thenReturn(true);
-        when(tipPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(likeTipPostRepository.findById(new UserPostId(VALID_ID, VALID_ID))).thenReturn(Optional.of(likeTipPost));
         doNothing().when(likeTipPostRepository).delete(any(LikeTipPosts.class));
 

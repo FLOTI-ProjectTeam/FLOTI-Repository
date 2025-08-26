@@ -1,4 +1,4 @@
-package com.floti.api.domain.board.common.entity;
+package com.floti.api.domain.board.like.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class UserPostId implements Serializable {
+public class UserAnswerId implements Serializable {
     private Long userId;
-    private Long postId;
+    private Long answerId;
 }

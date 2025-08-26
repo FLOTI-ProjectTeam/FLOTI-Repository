@@ -1,6 +1,8 @@
 package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.board.like.repository.LikeAnswerRepository;
+import com.floti.api.domain.board.like.repository.LikeCommentRepository;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
@@ -19,6 +21,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +35,9 @@ public class QnaServiceTest {
 
     @Mock
     private AnswerRepository answerRepository;
+
+    @Mock
+    private LikeAnswerRepository likeAnswerRepository;
 
     private static final Long VALID_ID = 1L;
 
@@ -45,11 +52,12 @@ public class QnaServiceTest {
                 Answers.builder().author(testUser).content("첫번째 답변").build()
         );
 
-        when(qnaPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
-        when(answerRepository.findByPostId(VALID_ID)).thenReturn(answers);
+        when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(answerRepository.findByPostId(anyLong())).thenReturn(answers);
+        when(likeAnswerRepository.findByUserIdAndAnswerIdIn(anyLong(), anyList())).thenReturn(Collections.emptyList());
 
         //when
-        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID);
+        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());
@@ -61,11 +69,12 @@ public class QnaServiceTest {
     @DisplayName("getQnaPost: 답변 없음 - 게시글 상세에 빈 리스트 포함")
     void getQnaPost_empty() {
         //given
-        when(qnaPostRepository.findById(VALID_ID)).thenReturn(Optional.of(testPost));
-        when(answerRepository.findByPostId(VALID_ID)).thenReturn(Collections.emptyList());
+        when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(answerRepository.findByPostId(anyLong())).thenReturn(Collections.emptyList());
+        when(likeAnswerRepository.findByUserIdAndAnswerIdIn(anyLong(), anyList())).thenReturn(Collections.emptyList());
 
         //when
-        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID);
+        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());

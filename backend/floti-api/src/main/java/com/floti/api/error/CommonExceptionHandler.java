@@ -1,5 +1,6 @@
 package com.floti.api.error;
 
+import com.floti.api.error.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;

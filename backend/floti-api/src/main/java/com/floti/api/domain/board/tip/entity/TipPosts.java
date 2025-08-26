@@ -2,6 +2,7 @@ package com.floti.api.domain.board.tip.entity;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.board.common.dto.PostRequest;
+import com.floti.api.domain.board.common.entity.LikeableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TipPosts {
+public class TipPosts implements LikeableEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
@@ -37,7 +38,7 @@ public class TipPosts {
     @Column(nullable = false)
     private Integer likeCount = 0;
 
-    @Column(updatable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
@@ -46,6 +47,13 @@ public class TipPosts {
         this.title = title;
         this.content = content;
         this.thumbnail = thumbnail;
+    }
+
+    @PrePersist //테스트용
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
 
     public void update(PostRequest post) {

@@ -2,7 +2,6 @@ package com.floti.api.domain.board.qna.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.floti.api.domain.board.common.dto.AuthorResponse;
-import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import lombok.Getter;
 
@@ -27,14 +26,14 @@ public class QnaPostResponse {
         this(qnaPost, Collections.emptyList());
     }
 
-    public QnaPostResponse(QnaPosts qnaPost, List<Answers> answers) {
+    public QnaPostResponse(QnaPosts qnaPost, List<AnswerResponse> answers) {
         this.id = qnaPost.getId();
         this.author = new AuthorResponse(qnaPost.getAuthor());
         this.title = qnaPost.getTitle();
         this.content = qnaPost.getContent();
         this.answerCount = qnaPost.getAnswerCount();
         this.accepted = qnaPost.isAccepted();
-        this.answers = answers.stream().map(AnswerResponse::new).toList();
+        this.answers = answers;
         this.createdAt = qnaPost.getCreatedAt();
     }
 }
