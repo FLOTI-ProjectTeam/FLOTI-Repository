@@ -38,19 +38,19 @@ public class LikeService {
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException();
 
-        LikeableEntity target = targetSupplier.get();
-        Object like = likeSupplier.get();
-        boolean liked = (like == null);
+        LikeableEntity likeableEntity = targetSupplier.get();
+        Object likeEntity = likeSupplier.get();
+        boolean liked = (likeEntity == null);
 
         if (liked) {
             saveLike.run();
-            target.incrementLikeCount();
+            likeableEntity.incrementLikeCount();
         } else {
-            deleteLike.accept(like);
-            target.decrementLikeCount();
+            deleteLike.accept(likeEntity);
+            likeableEntity.decrementLikeCount();
         }
 
-        return new LikeResponse(liked, target.getLikeCount());
+        return new LikeResponse(liked, likeableEntity.getLikeCount());
     }
 
     /* 1. Tip 게시글 추천 토글 */

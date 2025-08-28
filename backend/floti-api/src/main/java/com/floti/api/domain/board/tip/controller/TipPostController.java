@@ -5,9 +5,6 @@ import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.service.TipPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,17 +21,13 @@ public class TipPostController {
 
     /* 1. 조회 & 검색 */
     @GetMapping
-    public Page<TipPostResponse> getTipPosts(@RequestParam(defaultValue = "latest") String sort,
-                                             @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "20") int size,
-                                             @RequestParam(required = false) String search) {
-        Pageable pageable;
-        if ("registered".equalsIgnoreCase(sort)) {
-            pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        } else {
-            pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        }
-        return tipPostService.getTipPosts(search, pageable);
+    public Page<TipPostResponse> getTipPosts(@RequestParam(required = false) String search,
+                                             @RequestParam(defaultValue = "latest") String sort,
+                                             @RequestParam(defaultValue = "0") int page) {
+        sort = sort.trim();
+        if (search == null || search.isBlank())
+            return tipPostService.getTipPosts(sort, page);
+        return tipPostService.searchTipPosts(search.trim(), sort, page);
     }
 
     /* 2. 상세 조회 */

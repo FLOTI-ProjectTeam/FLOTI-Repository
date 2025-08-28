@@ -13,7 +13,9 @@ import com.floti.api.error.exception.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,16 +27,24 @@ public class TipPostService {
     private final UserRepository userRepository;
     private final LikeTipPostRepository likeTipPostRepository;
 
-    /* 1. 조회 & 검색 */
-    public Page<TipPostResponse> getTipPosts(String search, Pageable pageable) {
-        Page<TipPosts> tipPostPage;
+    private static final int PAGE_SIZE = 20;
 
-        if (search != null && !search.isBlank()) {
-            tipPostPage = tipPostRepository.findByTitleContainingIgnoreCase(pageable, search);
-        } else {
-            tipPostPage = tipPostRepository.findAll(pageable);
-        }
+    /* 1-1. 조회 */
+    public Page<TipPostResponse> getTipPosts(String sort, int page) {
+        Pageable pageable = switch (sort.toLowerCase()) {
+            case "likes" -> PageRequest.of(page, PAGE_SIZE, Sort.by("likeCount").descending());
+            case "registered" -> PageRequest.of(page, PAGE_SIZE, Sort.by("id").ascending());
+            default -> PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
+        };
 
+        Page<TipPosts> tipPostPage = tipPostRepository.findAll(pageable);
+        return tipPostPage.map(TipPostResponse::new);
+    }
+
+    /* 1-2. 검색 */
+    public Page<TipPostResponse> searchTipPosts(String search, String sort, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        Page<TipPosts> tipPostPage = tipPostRepository.searchTipPosts(search, sort, pageable);
         return tipPostPage.map(TipPostResponse::new);
     }
 
@@ -47,13 +57,13 @@ public class TipPostService {
 
     /* 3. 등록 */
     @Transactional
-    public TipPostResponse createTipPost(Long userId, PostRequest postRequest, MultipartFile file) {
+    public TipPostResponse createTipPost(Long userId, PostRequest request, MultipartFile file) {
         Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         TipPosts tipPost = TipPosts.builder()
                 .author(author)
-                .title(postRequest.getTitle())
-                .content(postRequest.getContent())
+                .title(request.getTitle())
+                .content(request.getContent())
                 .build();
 
         return new TipPostResponse(tipPostRepository.save(tipPost));
@@ -61,7 +71,7 @@ public class TipPostService {
 
     /* 4. 수정 */
     @Transactional
-    public TipPostResponse updateTipPost(Long userId, Long id, PostRequest postRequest) {
+    public TipPostResponse updateTipPost(Long userId, Long id, PostRequest request) {
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException();
 
@@ -70,7 +80,7 @@ public class TipPostService {
         if (!userId.equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        tipPost.update(postRequest);
+        tipPost.update(request);
         return new TipPostResponse(tipPost);
     }
 

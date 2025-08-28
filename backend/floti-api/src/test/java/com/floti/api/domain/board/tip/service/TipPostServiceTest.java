@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -52,16 +51,15 @@ public class TipPostServiceTest {
             .author(testUser).title("테스트 제목").content("테스트 내용").build();
 
     @Test
-    @DisplayName("getTipPosts: 검색어 없음 - 전체 게시글 조회")
-    void getTipPosts_noSearch() {
+    @DisplayName("getTipPosts: 게시글 있음 - 게시글 페이지 반환")
+    void getTipPosts_exist() {
         //given
-        Pageable pageable = PageRequest.of(0, 20);
         Page<TipPosts> page = new PageImpl<>(List.of(testPost));
 
-        when(tipPostRepository.findAll(pageable)).thenReturn(page);
+        when(tipPostRepository.findAll(any(Pageable.class))).thenReturn(page);
 
         //when
-        Page<TipPostResponse> responses = tipPostService.getTipPosts("", pageable);
+        Page<TipPostResponse> responses = tipPostService.getTipPosts("latest", 0);
 
         //then
         assertEquals(1, responses.getTotalElements());
@@ -69,25 +67,21 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("getTipPosts: 검색어 있음 - 게시글 조회")
-    void getTipPosts_search() {
+    @DisplayName("getTipPosts: 게시글 없음 - 빈 페이지 반환")
+    void getTipPosts_empty() {
         //given
-        Pageable pageable = PageRequest.of(0, 20);
-        Page<TipPosts> page = new PageImpl<>(List.of(testPost));
-
-        when(tipPostRepository.findByTitleContainingIgnoreCase(pageable, "테스트")).thenReturn(page);
+        when(tipPostRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
         //when
-        Page<TipPostResponse> responses = tipPostService.getTipPosts("테스트", pageable);
+        Page<TipPostResponse> responses = tipPostService.getTipPosts("latest", 0);
 
         //then
-        assertEquals(1, responses.getTotalElements());
-        assertEquals("테스트 제목", responses.getContent().get(0).getTitle());
+        assertTrue(responses.isEmpty());
     }
 
     @Test
-    @DisplayName("getTipPost: 게시글 있음 - 게시글 상세 반환")
-    void getTipPost_success() {
+    @DisplayName("getTipPost: 추천 없음 - 게시글 상세 반환 (liked=false)")
+    void getTipPost_likedFalse() {
         //given
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(likeTipPostRepository.existsByUserIdAndPostId(anyLong(), anyLong())).thenReturn(false);
@@ -96,6 +90,23 @@ public class TipPostServiceTest {
         TipPostResponse response = tipPostService.getTipPost(VALID_ID, VALID_ID);
 
         //then
+        assertFalse(response.isLiked());
+        assertEquals("테스트 제목", response.getTitle());
+        assertEquals("테스트 내용", response.getContent());
+    }
+
+    @Test
+    @DisplayName("getTipPost: 추천 있음 - 게시글 상세 반환 (liked=true)")
+    void getTipPost_likedTrue() {
+        // given
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(likeTipPostRepository.existsByUserIdAndPostId(anyLong(), anyLong())).thenReturn(true);
+
+        // when
+        TipPostResponse response = tipPostService.getTipPost(VALID_ID, VALID_ID);
+
+        // then
+        assertTrue(response.isLiked());
         assertEquals("테스트 제목", response.getTitle());
         assertEquals("테스트 내용", response.getContent());
     }
@@ -116,7 +127,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("createTipPost: 사용자 있음 - 게시글 등록")
+    @DisplayName("createTipPost: 게시글 등록")
     void createTipPost_success() {
         //given
         PostRequest request = new PostRequest();
@@ -154,7 +165,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("updateTipPost: 작성자 맞음 - 게시글 수정")
+    @DisplayName("updateTipPost: 게시글 수정")
     void updateTipPost_success() {
         //given
         PostRequest request = new PostRequest();
@@ -191,7 +202,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("deleteTipPost: 작성자 맞음 - 게시글 삭제")
+    @DisplayName("deleteTipPost: 게시글 삭제")
     void deleteTipPost_success() {
         //given
         when(userRepository.existsById(anyLong())).thenReturn(true);

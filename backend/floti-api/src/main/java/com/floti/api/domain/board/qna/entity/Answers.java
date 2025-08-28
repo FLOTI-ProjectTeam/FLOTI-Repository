@@ -54,8 +54,8 @@ public class Answers implements LikeableEntity {
         }
     }
 
-    public void update(AnswerRequest answer) {
-        this.content = answer.getContent();
+    public void update(AnswerRequest request) {
+        this.content = request.getContent();
     }
 
     public void accept() {

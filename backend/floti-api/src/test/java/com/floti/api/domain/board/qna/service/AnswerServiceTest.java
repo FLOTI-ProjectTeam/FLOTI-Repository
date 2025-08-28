@@ -78,7 +78,7 @@ public class AnswerServiceTest {
     }
 
     @Test
-    @DisplayName("createAnswer: 채택된 게시글에 답변 등록 - PostAlreadyClosedException")
+    @DisplayName("createAnswer: 채택된 게시글 - PostAlreadyClosedException")
     void createAnswer_fail_acceptedPost() {
         //given
         AnswerRequest request = new AnswerRequest();
@@ -115,7 +115,7 @@ public class AnswerServiceTest {
     }
 
     @Test
-    @DisplayName("updateAnswer: 없는 답변 수정 - AnswerNotFoundException")
+    @DisplayName("updateAnswer: 답변 없음 - AnswerNotFoundException")
     void updateAnswer_fail_answerNotFound() {
         //given
         AnswerRequest request = new AnswerRequest();
@@ -133,7 +133,7 @@ public class AnswerServiceTest {
     }
 
     @Test
-    @DisplayName("updateAnswer: 채택된 답변 수정 - AcceptedAnswerUpdateException")
+    @DisplayName("updateAnswer: 채택된 답변 - AcceptedAnswerUpdateException")
     void updateAnswer_fail_acceptedAnswer() {
         //given
         AnswerRequest request = new AnswerRequest();
@@ -189,7 +189,7 @@ public class AnswerServiceTest {
     }
 
     @Test
-    @DisplayName("acceptAnswer: 작성자 맞음 - 답변 채택")
+    @DisplayName("acceptAnswer: 답변 채택")
     void acceptAnswer_success() {
         //given
         when(userRepository.existsById(anyLong())).thenReturn(true);
@@ -222,7 +222,7 @@ public class AnswerServiceTest {
     }
 
     @Test
-    @DisplayName("acceptAnswer: 채택된 게시글 답변 채택 - PostAlreadyAcceptedException")
+    @DisplayName("acceptAnswer: 채택된 게시글 - PostAlreadyAcceptedException")
     void acceptAnswer_fail_acceptedPost() {
         //given
         testPost.accept(testAnswer);

@@ -52,9 +52,9 @@ public class QnaPosts {
         }
     }
 
-    public void update(PostRequest post) {
-        this.title = post.getTitle();
-        this.content = post.getContent();
+    public void update(PostRequest request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
     }
 
     public void accept(Answers answer) {

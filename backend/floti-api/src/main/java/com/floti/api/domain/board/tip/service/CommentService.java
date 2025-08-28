@@ -70,10 +70,10 @@ public class CommentService {
 
     /* 2. 등록 */
     @Transactional
-    public CommentResponse createComment(Long userId, Long postId, CommentRequest commentRequest) {
+    public CommentResponse createComment(Long userId, Long postId, CommentRequest request) {
         Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         TipPosts tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Long parentId = commentRequest.getParentId();
+        Long parentId = request.getParentId();
 
         if (parentId != null) {
             Comments parentComment = commentRepository.findByIdAndPostId(parentId, postId)
@@ -90,7 +90,7 @@ public class CommentService {
                 .postId(postId)
                 .parentId(parentId)
                 .author(author)
-                .content(commentRequest.getContent())
+                .content(request.getContent())
                 .build();
 
         commentRepository.save(comment);
@@ -101,7 +101,7 @@ public class CommentService {
 
     /* 3. 수정 */
     @Transactional
-    public CommentResponse updateComment(Long userId, Long id, CommentRequest commentRequest) {
+    public CommentResponse updateComment(Long userId, Long id, CommentRequest request) {
         if (!userRepository.existsById(userId))
             throw new UserNotFoundException();
 
@@ -110,7 +110,7 @@ public class CommentService {
         if (!userId.equals(comment.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        comment.update(commentRequest);
+        comment.update(request);
         return new CommentResponse(comment);
     }
 

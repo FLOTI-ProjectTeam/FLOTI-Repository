@@ -57,8 +57,8 @@ public class Comments implements LikeableEntity {
         }
     }
 
-    public void update(CommentRequest comment) {
-        this.content = comment.getContent();
+    public void update(CommentRequest request) {
+        this.content = request.getContent();
     }
 
     public void softDelete() {

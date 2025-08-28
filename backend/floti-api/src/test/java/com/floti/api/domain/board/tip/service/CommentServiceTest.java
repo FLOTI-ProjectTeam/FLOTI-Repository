@@ -2,6 +2,7 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
+import com.floti.api.domain.board.like.entity.LikeComments;
 import com.floti.api.domain.board.like.repository.LikeCommentRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
@@ -62,13 +63,14 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("getComments: 댓글 있음 - 댓글 반환")
+    @DisplayName("getComments: 댓글 있음 - 댓글 리스트 반환")
     void getComments_exist() {
         //given
         List<Comments> comments = List.of(testComment, testReply);
+        LikeComments likeComment = new LikeComments(VALID_ID, VALID_ID);
 
         when(commentRepository.findByPostId(anyLong())).thenReturn(comments);
-        when(likeCommentRepository.findByUserIdAndCommentIdIn(anyLong(), anyList())).thenReturn(Collections.emptyList());
+        when(likeCommentRepository.findByUserIdAndCommentIdIn(anyLong(), anyList())).thenReturn(List.of(likeComment));
 
         //when
         List<CommentResponse> responses = commentService.getComments(VALID_ID, VALID_ID);
@@ -76,7 +78,9 @@ public class CommentServiceTest {
         //then
         assertEquals(1, responses.size());
         assertEquals("첫번째 댓글", responses.get(0).getContent());
+        assertTrue(responses.get(0).isLiked());
         assertEquals("첫번째 답글", responses.get(0).getReplies().get(0).getContent());
+        assertFalse(responses.get(0).getReplies().get(0).isLiked());
     }
 
     @Test
@@ -93,7 +97,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 댓글 등록")
+    @DisplayName("createComment: 댓글 미지정 - 댓글 등록")
     void createComment_noReply() {
         //given
         CommentRequest request = new CommentRequest();
@@ -117,7 +121,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 답글 등록")
+    @DisplayName("createComment: 댓글 있음 - 답글 등록")
     void createComment_reply() {
         //given
         CommentRequest request = new CommentRequest();
@@ -144,7 +148,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 없는 댓글에 답글 등록 - CommentNotFoundException")
+    @DisplayName("createComment: 댓글 없음 - CommentNotFoundException")
     void createComment_fail_commentNotFound() {
         //given
         CommentRequest request = new CommentRequest();
@@ -164,7 +168,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 삭제된 댓글에 답글 등록 - CommentNotFoundException")
+    @DisplayName("createComment: 삭제된 댓글 - CommentNotFoundException")
     void createComment_fail_deletedComment() {
         //then
         CommentRequest request = new CommentRequest();
@@ -186,7 +190,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 답글에 답글 등록 - ReplyNotAllowedException")
+    @DisplayName("createComment: 답글 - ReplyNotAllowedException")
     void createComment_fail_replyToReply() {
         //given
         CommentRequest request = new CommentRequest();
