@@ -18,23 +18,17 @@ public class CommentResponse {
     private String content;
     private Integer likeCount;
     private final boolean deleted; //상위 댓글 전용
-    private final boolean liked;
     private final List<CommentResponse> replies; //상위 댓글 전용
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     public CommentResponse(Comments comment) {
-        this(comment, false);
-    }
-
-    public CommentResponse(Comments comment, boolean liked) {
         this.id = comment.getId();
         this.postId = comment.getPostId();
         this.parentId = comment.getParentId();
         this.deleted = comment.isDeleted();
         this.replies = new ArrayList<>();
-        this.liked = liked;
 
         if (!this.deleted) {
             this.author = new AuthorResponse(comment.getAuthor());

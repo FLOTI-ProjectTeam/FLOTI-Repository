@@ -5,9 +5,6 @@ import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.service.QnaPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,19 +17,15 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class QnaPostController {
     private final QnaPostService qnaPostService;
 
-    /* 1. 조회 & 검색 */
+    /* 1. 조회 & 검색 - 추후 변경 예정 */
     @GetMapping
-    public Page<QnaPostResponse> getQnaPosts(@RequestParam(defaultValue = "latest") String sort,
-                                             @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "20") int size,
-                                             @RequestParam(required = false) String search) {
-        Pageable pageable;
-        if ("registered".equalsIgnoreCase(sort)) {
-            pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        } else {
-            pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        }
-        return qnaPostService.getQnaPosts(search, pageable);
+    public Page<QnaPostResponse> getQnaPosts(@RequestParam(required = false) String search,
+                                             @RequestParam(defaultValue = "latest") String sort,
+                                             @RequestParam(defaultValue = "0") int page) {
+        sort = sort.trim();
+        if (search == null || search.isBlank())
+            return qnaPostService.getQnaPosts(sort, page);
+        return qnaPostService.searchQnaPosts(search.trim(), sort, page);
     }
 
     /* 2. 상세 조회 */

@@ -74,7 +74,7 @@ public class TipPostRepositoryTest {
                             .asc(),
                     tip.id.desc()
             };
-            case "likes" -> new OrderSpecifier[] {tip.likeCount.desc()};
+            case "likes" -> new OrderSpecifier[] {tip.likeCount.desc(), tip.id.desc()};
             default -> new OrderSpecifier[] {tip.id.desc()};
         };
 

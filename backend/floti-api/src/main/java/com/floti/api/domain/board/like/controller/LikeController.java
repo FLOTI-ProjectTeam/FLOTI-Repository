@@ -20,15 +20,7 @@ public class LikeController {
         return ResponseEntity.ok(response); // 200 Ok
     }
 
-    /* 2. 댓글 추천 토글 */
-    @PostMapping("/tip/comments/{commentId}")
-    public ResponseEntity<LikeResponse> toggleLikeComment(@RequestParam Long userId, //임시
-                                                          @PathVariable Long commentId) {
-        LikeResponse response = likeService.toggleLikeComment(userId, commentId);
-        return ResponseEntity.ok(response); // 200 Ok
-    }
-
-    /* 3. 답변 추천 토글 */
+    /* 2. 답변 추천 토글 */
     @PostMapping("/tip/comments/{answerId}")
     public ResponseEntity<LikeResponse> toggleLikeAnswer(@RequestParam Long userId, //임시
                                                          @PathVariable Long answerId) {

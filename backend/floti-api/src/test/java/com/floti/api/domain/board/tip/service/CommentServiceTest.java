@@ -2,8 +2,6 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.like.entity.LikeComments;
-import com.floti.api.domain.board.like.repository.LikeCommentRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
@@ -25,7 +23,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,9 +38,6 @@ public class CommentServiceTest {
 
     @Mock
     private TipPostRepository tipPostRepository;
-
-    @Mock
-    private LikeCommentRepository likeCommentRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -67,10 +63,8 @@ public class CommentServiceTest {
     void getComments_exist() {
         //given
         List<Comments> comments = List.of(testComment, testReply);
-        LikeComments likeComment = new LikeComments(VALID_ID, VALID_ID);
 
         when(commentRepository.findByPostId(anyLong())).thenReturn(comments);
-        when(likeCommentRepository.findByUserIdAndCommentIdIn(anyLong(), anyList())).thenReturn(List.of(likeComment));
 
         //when
         List<CommentResponse> responses = commentService.getComments(VALID_ID, VALID_ID);
@@ -78,9 +72,7 @@ public class CommentServiceTest {
         //then
         assertEquals(1, responses.size());
         assertEquals("첫번째 댓글", responses.get(0).getContent());
-        assertTrue(responses.get(0).isLiked());
         assertEquals("첫번째 답글", responses.get(0).getReplies().get(0).getContent());
-        assertFalse(responses.get(0).getReplies().get(0).isLiked());
     }
 
     @Test

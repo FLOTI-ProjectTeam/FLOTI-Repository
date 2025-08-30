@@ -3,13 +3,15 @@ package com.floti.api.domain.board.like.service;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.entity.LikeableEntity;
 import com.floti.api.domain.board.like.dto.LikeResponse;
-import com.floti.api.domain.board.like.entity.*;
-import com.floti.api.domain.board.like.repository.*;
+import com.floti.api.domain.board.like.entity.LikeAnswers;
+import com.floti.api.domain.board.like.entity.LikeTipPosts;
+import com.floti.api.domain.board.like.entity.UserAnswerId;
+import com.floti.api.domain.board.like.entity.UserPostId;
+import com.floti.api.domain.board.like.repository.LikeAnswerRepository;
+import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
-import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.exception.AnswerNotFoundException;
-import com.floti.api.error.exception.CommentNotFoundException;
 import com.floti.api.error.exception.PostNotFoundException;
 import com.floti.api.error.exception.UserNotFoundException;
 import jakarta.transaction.Transactional;
@@ -23,10 +25,8 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeTipPostRepository likeTipPostRepository;
-    private final LikeCommentRepository likeCommentRepository;
     private final LikeAnswerRepository likeAnswerRepository;
     private final TipPostRepository tipPostRepository;
-    private final CommentRepository commentRepository;
     private final AnswerRepository answerRepository;
     private final UserRepository userRepository;
 
@@ -65,19 +65,7 @@ public class LikeService {
         );
     }
 
-    /* 2. 댓글 추천 토글 */
-    @Transactional
-    public LikeResponse toggleLikeComment(Long userId, Long commentId) {
-        return toggleLike(
-                userId,
-                () -> commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new),
-                () -> likeCommentRepository.findById(new UserCommentId(userId, commentId)).orElse(null),
-                () -> likeCommentRepository.save(new LikeComments(userId, commentId)),
-                like -> likeCommentRepository.delete((LikeComments) like)
-        );
-    }
-
-    /* 3. 답변 추천 토글 */
+    /* 2. 답변 추천 토글 */
     @Transactional
     public LikeResponse toggleLikeAnswer(Long userId, Long answerId) {
         return toggleLike(

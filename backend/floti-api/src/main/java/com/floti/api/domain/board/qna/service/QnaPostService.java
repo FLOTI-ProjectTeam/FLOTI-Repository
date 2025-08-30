@@ -4,7 +4,6 @@ import com.floti.api.domain.auth.entity.Users;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.like.entity.LikeAnswers;
-import com.floti.api.domain.board.like.entity.LikeComments;
 import com.floti.api.domain.board.like.repository.LikeAnswerRepository;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
@@ -12,14 +11,15 @@ import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
-import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.error.ExceptionMessage;
 import com.floti.api.error.exception.PostNotFoundException;
 import com.floti.api.error.exception.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -35,16 +35,25 @@ public class QnaPostService {
     private final UserRepository userRepository;
     private final LikeAnswerRepository likeAnswerRepository;
 
-    /* 1. 조회 & 검색 */
-    public Page<QnaPostResponse> getQnaPosts(String search, Pageable pageable) {
-        Page<QnaPosts> qnaPostPage;
+    private static final int PAGE_SIZE = 20;
 
-        if (search != null && !search.isBlank()) {
-            qnaPostPage = qnaPostRepository.findByTitleContainingIgnoreCase(pageable, search);
+    /* 1-1. 조회 */
+    public Page<QnaPostResponse> getQnaPosts(String sort, int page) {
+        Pageable pageable;
+        if (sort.equalsIgnoreCase("registered")) {
+            pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").ascending());
         } else {
-            qnaPostPage = qnaPostRepository.findAll(pageable);
+            pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         }
+        ;
+        Page<QnaPosts> qnaPostPage = qnaPostRepository.findAll(pageable);
+        return qnaPostPage.map(QnaPostResponse::new);
+    }
 
+    /* 1-2. 검색 */
+    public Page<QnaPostResponse> searchQnaPosts(String search, String sort, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+        Page<QnaPosts> qnaPostPage = qnaPostRepository.searchQnaPosts(search, sort, pageable);
         return qnaPostPage.map(QnaPostResponse::new);
     }
 

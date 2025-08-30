@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.tip.entity;
 
 import com.floti.api.domain.auth.entity.Users;
-import com.floti.api.domain.board.common.entity.LikeableEntity;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,9 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comments implements LikeableEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Comments {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Long id;
 
@@ -63,13 +61,5 @@ public class Comments implements LikeableEntity {
 
     public void softDelete() {
         this.deleted = true;
-    }
-
-    public void incrementLikeCount() {
-        this.likeCount++;
-    }
-
-    public void decrementLikeCount() {
-        if (this.likeCount > 0) this.likeCount--;
     }
 }

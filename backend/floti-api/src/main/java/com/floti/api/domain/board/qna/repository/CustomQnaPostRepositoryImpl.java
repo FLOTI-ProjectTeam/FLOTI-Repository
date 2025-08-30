@@ -1,7 +1,7 @@
-package com.floti.api.domain.board.tip.repository;
+package com.floti.api.domain.board.qna.repository;
 
-import com.floti.api.domain.board.tip.entity.QTipPosts;
-import com.floti.api.domain.board.tip.entity.TipPosts;
+import com.floti.api.domain.board.qna.entity.QQnaPosts;
+import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -16,40 +16,39 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomTipPostRepositoryImpl implements CustomTipPostRepository {
+public class CustomQnaPostRepositoryImpl implements CustomQnaPostRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<TipPosts> searchTipPosts(String search, String sort, Pageable pageable) {
-        QTipPosts tip = QTipPosts.tipPost;
+    public Page<QnaPosts> searchQnaPosts(String search, String sort, Pageable pageable) {
+        QQnaPosts qna = QQnaPosts.qnaPost;
 
         /* 검색 조건 */
-        BooleanExpression condition = tip.title.containsIgnoreCase(search)
-                .or(tip.content.containsIgnoreCase(search));
+        BooleanExpression condition = qna.title.containsIgnoreCase(search)
+                .or(qna.content.containsIgnoreCase(search));
 
         /* 정렬 조건 */
         OrderSpecifier<?>[] sortSpec = switch (sort.toLowerCase()) {
             case "accuracy" -> new OrderSpecifier[]{
                     new CaseBuilder()
-                            .when(tip.title.containsIgnoreCase(search))
+                            .when(qna.title.containsIgnoreCase(search))
                             .then(0)
                             .otherwise(1)
                             .asc(),
-                    tip.id.desc()
+                    qna.id.desc()
             };
-            case "likes" -> new OrderSpecifier[] {tip.likeCount.desc(), tip.id.desc()};
-            default -> new OrderSpecifier[] {tip.id.desc()};
+            default -> new OrderSpecifier[] {qna.id.desc()};
         };
 
         Long totalCount = queryFactory
-                .select(tip.count())
-                .from(tip)
+                .select(qna.count())
+                .from(qna)
                 .where(condition)
                 .fetchOne();
 
         long total = (totalCount != null) ? totalCount : 0L;
 
-        List<TipPosts> content = queryFactory.selectFrom(tip)
+        List<QnaPosts> content = queryFactory.selectFrom(qna)
                 .where(condition)
                 .orderBy(sortSpec)
                 .offset(pageable.getOffset())
