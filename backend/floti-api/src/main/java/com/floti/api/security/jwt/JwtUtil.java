@@ -42,7 +42,7 @@ public class JwtUtil {
                 .setSubject(username) // 토큰의 주체
                 .setIssuedAt(Date.from(now)) // 발급 시각
                 .setExpiration(Date.from(exp)) // 만료 시각
-                .signWith(getKey(), SignatureAlgorithm.ES256) // 서명(HS256 + 비밀키)
+                .signWith(getKey(), SignatureAlgorithm.HS256) // 서명(HS256 + 비밀키)
                 .compact(); // 문자열 토큰 생성
     }
 
