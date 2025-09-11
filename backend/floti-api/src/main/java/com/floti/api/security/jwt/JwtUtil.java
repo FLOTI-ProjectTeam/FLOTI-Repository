@@ -13,24 +13,30 @@ import java.util.Date;                      // 만료시간 계산
 import java.time.Instant;                   // 현재 시간 취득
 import java.time.temporal.ChronoUnit;       // 시간 더하기(만료 계산)
 
-
-// JWT 생성/검증을 담당하는 유틸 컴포넌트
+/**
+ * JwtUtil
+ * - JWT 생성/검증을 담당하는 유틸 클래스
+ * - JwtKeyConfig에서 생성한 SecretKey를 주입받아 사용한다.
+ */
 @Component // 스프링 빈으로 등록하여 주입 가능하게 함
 public class JwtUtil {
 
-    // application.yml에서 비밀키 문자열을 주입받음 (환경변수로 세팅 권장)
-    @Value("${jwt.secret}")
-    private String secret; // 실제 서명에 사용할 비밀(절대 코드에 하드코딩 금지)
+    private final SecretKey signingKey;
 
-    // 토큰 만료(분) - yml에서 주입받고, 없으면 기본 60분
+    // application.yml에서 토큰 만료 시간(분 단위)을 읽어옴
     @Value("${jwt.exp-minutes:60}")
-    private long expMinutes; // 액세스 토큰 만료 시간(분 단위)
+    private long expMinutes;
 
-    // 서명용 SecretKey를 생성(매 요청마다 문자열→키 변환)
-    private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+    // 생성자 주입 (스프링이 자동으로 JwtKeyConfig에서 만든 SecretKey를 넣어줌)
+    public JwtUtil(SecretKey signingKey) {
+        this.signingKey = signingKey;
     }
 
+    /**
+     * 토큰 생성
+     * @param username - 사용자 이름 (subject)
+     * @return JWT 문자열
+     */
     // JWT 생성: 주체(subject)=username, 만료시간 포함
     public String generateToken(String username) {
         // 만료 시각 계산(현재 + expMinutes)
@@ -42,7 +48,7 @@ public class JwtUtil {
                 .setSubject(username) // 토큰의 주체
                 .setIssuedAt(Date.from(now)) // 발급 시각
                 .setExpiration(Date.from(exp)) // 만료 시각
-                .signWith(getKey(), SignatureAlgorithm.HS256) // 서명(HS256 + 비밀키)
+                .signWith(signingKey, SignatureAlgorithm.HS256) // 서명(HS256 + 비밀키)
                 .compact(); // 문자열 토큰 생성
     }
 
@@ -62,10 +68,10 @@ public class JwtUtil {
         }
     }
 
-    // 내부 유틸: 모든 클레임 파싱(서명 검증 포함)
+    // 내부 유틸: JWT에서 Claims(내용물) 전부 추출
     private Claims getAllClaims(String token) {
         return Jwts.parser()             // 파서 빌더로 시작
-                .setSigningKey(getKey())        // 서명 검증 키 설정
+                .setSigningKey(signingKey)        // 서명 검증 키 설정
                 .build()                        // 파서 생성
                 .parseClaimsJws(token)          // JWS(서명된 JWT) 파싱
                 .getBody();                     // 클레임(내용) 반환

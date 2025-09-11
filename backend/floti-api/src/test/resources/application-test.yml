@@ -14,5 +14,5 @@ spring:
         format_sql: true
         order_inserts: false
 jwt:
-  secret: ${JWT_SECRET:TEST-ONLY-DO-NOT-USE-IN-PROD-1234567890123456789012}
+  secret-base64: ${JWT_SECRET_BASE64:VEVTVF9PTkxZX1NFQ1JFVF9GT1JfVEVTVFQxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1} # Base64 인코딩된 문자열
   exp-minutes: 5
