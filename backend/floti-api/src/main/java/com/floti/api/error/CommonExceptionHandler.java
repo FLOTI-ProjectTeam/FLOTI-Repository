@@ -1,6 +1,7 @@
 package com.floti.api.error;
 
 import com.floti.api.error.exception.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,33 +15,18 @@ public class CommonExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFound(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
-    }
-
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<String> handlePostNotFound(PostNotFoundException e) {
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
     }
 
     /* 댓글 관련 예외 */
-    @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<String> handleCommentNotFound(CommentNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
-    }
-
     @ExceptionHandler(ReplyNotAllowedException.class)
     public ResponseEntity<String> handleReplyNotAllowed(ReplyNotAllowedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
     }
 
     /* 답변 관련 예외 */
-    @ExceptionHandler(AnswerNotFoundException.class)
-    public ResponseEntity<String> handleAnswerNotFound(AnswerNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
-    }
-
     @ExceptionHandler(AcceptedAnswerUpdateException.class)
     public ResponseEntity<String> handleAcceptedAnswerUpdate(AcceptedAnswerUpdateException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Not Found

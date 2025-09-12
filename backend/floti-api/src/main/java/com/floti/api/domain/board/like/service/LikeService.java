@@ -11,9 +11,8 @@ import com.floti.api.domain.board.like.repository.LikeAnswerRepository;
 import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.error.exception.AnswerNotFoundException;
-import com.floti.api.error.exception.PostNotFoundException;
-import com.floti.api.error.exception.UserNotFoundException;
+import com.floti.api.error.ExceptionMessage;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +35,7 @@ public class LikeService {
                                    Runnable saveLike,
                                    Consumer<Object> deleteLike) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
         LikeableEntity likeableEntity = targetSupplier.get();
         Object likeEntity = likeSupplier.get();
@@ -58,7 +57,8 @@ public class LikeService {
     public LikeResponse toggleLikeTipPost(Long userId, Long postId) {
         return toggleLike(
                 userId,
-                () -> tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new),
+                () -> tipPostRepository.findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND)),
                 () -> likeTipPostRepository.findById(new UserPostId(userId, postId)).orElse(null),
                 () -> likeTipPostRepository.save(new LikeTipPosts(userId, postId)),
                 like -> likeTipPostRepository.delete((LikeTipPosts) like)
@@ -70,7 +70,8 @@ public class LikeService {
     public LikeResponse toggleLikeAnswer(Long userId, Long answerId) {
         return toggleLike(
                 userId,
-                () -> answerRepository.findById(answerId).orElseThrow(AnswerNotFoundException::new),
+                () -> answerRepository.findById(answerId)
+                        .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ANSWER_NOT_FOUND)),
                 () -> likeAnswerRepository.findById(new UserAnswerId(userId, answerId)).orElse(null),
                 () -> likeAnswerRepository.save(new LikeAnswers(userId, answerId)),
                 like -> likeAnswerRepository.delete((LikeAnswers) like)

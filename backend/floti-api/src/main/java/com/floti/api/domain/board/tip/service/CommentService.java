@@ -9,10 +9,8 @@ import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.ExceptionMessage;
-import com.floti.api.error.exception.CommentNotFoundException;
-import com.floti.api.error.exception.PostNotFoundException;
 import com.floti.api.error.exception.ReplyNotAllowedException;
-import com.floti.api.error.exception.UserNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -32,7 +30,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
     /* 1. 조회 */
-    public List<CommentResponse> getComments(Long userId, Long postId) {
+    public List<CommentResponse> getComments(Long postId) {
         List<Comments> comments = commentRepository.findByPostId(postId);
 
         if (comments.isEmpty())
@@ -60,16 +58,18 @@ public class CommentService {
     /* 2. 등록 */
     @Transactional
     public CommentResponse createComment(Long userId, Long postId, CommentRequest request) {
-        Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        TipPosts tipPost = tipPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Users author = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
+        TipPosts tipPost = tipPostRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
         Long parentId = request.getParentId();
 
         if (parentId != null) {
             Comments parentComment = commentRepository.findByIdAndPostId(parentId, postId)
-                    .orElseThrow(CommentNotFoundException::new);
+                    .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.COMMENT_NOT_FOUND));
 
             if (parentComment.isDeleted())
-                throw new CommentNotFoundException();
+                throw new EntityNotFoundException(ExceptionMessage.COMMENT_NOT_FOUND);
 
             if (parentComment.getParentId() != null)
                 throw new ReplyNotAllowedException();
@@ -92,9 +92,10 @@ public class CommentService {
     @Transactional
     public CommentResponse updateComment(Long userId, Long id, CommentRequest request) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
-        Comments comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        Comments comment = commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.COMMENT_NOT_FOUND));
 
         if (!userId.equals(comment.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
@@ -107,9 +108,10 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long userId, Long id) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
-        Comments comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        Comments comment = commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.COMMENT_NOT_FOUND));
 
         if (comment.getAuthor() == null || !userId.equals(comment.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);

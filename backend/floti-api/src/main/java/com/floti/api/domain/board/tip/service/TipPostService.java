@@ -8,8 +8,7 @@ import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.ExceptionMessage;
-import com.floti.api.error.exception.PostNotFoundException;
-import com.floti.api.error.exception.UserNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,7 +49,8 @@ public class TipPostService {
 
     /* 2. 상세 조회 */
     public TipPostResponse getTipPost(Long userId, Long id) {
-        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        TipPosts tipPost = tipPostRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
         boolean liked = likeTipPostRepository.existsByUserIdAndPostId(userId, id);
         return new TipPostResponse(tipPost, liked);
     }
@@ -58,7 +58,8 @@ public class TipPostService {
     /* 3. 등록 */
     @Transactional
     public TipPostResponse createTipPost(Long userId, PostRequest request, MultipartFile file) {
-        Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Users author = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
 
         TipPosts tipPost = TipPosts.builder()
                 .author(author)
@@ -73,9 +74,10 @@ public class TipPostService {
     @Transactional
     public TipPostResponse updateTipPost(Long userId, Long id, PostRequest request) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
-        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        TipPosts tipPost = tipPostRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 
         if (!userId.equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
@@ -88,9 +90,10 @@ public class TipPostService {
     @Transactional
     public void deleteTipPost(Long userId, Long id) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
-        TipPosts tipPost = tipPostRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        TipPosts tipPost = tipPostRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 
         if (!userId.equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);

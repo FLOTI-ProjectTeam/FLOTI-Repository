@@ -7,8 +7,8 @@ import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.error.exception.PostNotFoundException;
-import com.floti.api.error.exception.UserNotFoundException;
+import com.floti.api.error.ExceptionMessage;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,12 +118,12 @@ public class TipPostServiceTest {
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when
-        PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             tipPostService.getTipPost(VALID_ID, INVALID_ID);
         });
 
         //then
-        assertEquals("게시글을 찾을 수 없습니다.", exception.getMessage());
+        assertEquals(ExceptionMessage.POST_NOT_FOUND, exception.getMessage());
     }
 
     @Test
@@ -156,12 +156,12 @@ public class TipPostServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             tipPostService.createTipPost(INVALID_ID, request, null);
         });
 
         //then
-        assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
+        assertEquals(ExceptionMessage.USER_NOT_FOUND, exception.getMessage());
     }
 
     @Test
@@ -198,7 +198,7 @@ public class TipPostServiceTest {
         });
 
         //then
-        assertEquals("수정할 권한이 없습니다.", exception.getMessage());
+        assertEquals(ExceptionMessage.UPDATE_DENIED, exception.getMessage());
     }
 
     @Test
@@ -228,6 +228,6 @@ public class TipPostServiceTest {
         });
 
         //then
-        assertEquals("삭제할 권한이 없습니다.", exception.getMessage());
+        assertEquals(ExceptionMessage.DELETE_DENIED, exception.getMessage());
     }
 }

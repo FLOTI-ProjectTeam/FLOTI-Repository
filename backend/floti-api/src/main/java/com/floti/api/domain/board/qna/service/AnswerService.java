@@ -8,8 +8,11 @@ import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
-import com.floti.api.error.*;
-import com.floti.api.error.exception.*;
+import com.floti.api.error.ExceptionMessage;
+import com.floti.api.error.exception.AcceptedAnswerDeletionException;
+import com.floti.api.error.exception.AcceptedAnswerUpdateException;
+import com.floti.api.error.exception.PostAlreadyClosedException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,8 +28,10 @@ public class AnswerService {
     /* 1. 등록 */
     @Transactional
     public AnswerResponse createAnswer(Long userId, Long postId, AnswerRequest answerRequest) {
-        Users author = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        QnaPosts qnaPost = qnaPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Users author = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
+        QnaPosts qnaPost = qnaPostRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 
         if (qnaPost.isAccepted())
             throw new PostAlreadyClosedException();
@@ -47,9 +52,10 @@ public class AnswerService {
     @Transactional
     public AnswerResponse updateAnswer(Long userId, Long id, AnswerRequest answerRequest) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
-        Answers answer = answerRepository.findById(id).orElseThrow(AnswerNotFoundException::new);
+        Answers answer = answerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ANSWER_NOT_FOUND));
 
         if (!userId.equals(answer.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
@@ -65,30 +71,32 @@ public class AnswerService {
     @Transactional
     public void deleteAnswer(Long userId, Long id) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
-        Answers answer = answerRepository.findById(id).orElseThrow(AnswerNotFoundException::new);
+        Answers answer = answerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ANSWER_NOT_FOUND));
 
         if (!userId.equals(answer.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
 
-        if (answer.isAccepted()) {
+        if (answer.isAccepted())
             throw new AcceptedAnswerDeletionException();
-        } else {
-            QnaPosts qnaPost = qnaPostRepository.getReferenceById(answer.getPostId());
-            answerRepository.delete(answer);
-            qnaPost.decrementAnswerCount();
-        }
+
+        QnaPosts qnaPost = qnaPostRepository.getReferenceById(answer.getPostId());
+        answerRepository.delete(answer);
+        qnaPost.decrementAnswerCount();
     }
 
     /* 4. 채택 */
     @Transactional
     public void acceptAnswer(Long userId, Long postId, Long id) {
         if (!userRepository.existsById(userId))
-            throw new UserNotFoundException();
+            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
-        QnaPosts qnaPost = qnaPostRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        Answers answer = answerRepository.findById(id).orElseThrow(AnswerNotFoundException::new);
+        QnaPosts qnaPost = qnaPostRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
+        Answers answer = answerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ANSWER_NOT_FOUND));
 
         if (!userId.equals(qnaPost.getAuthor().getId()))
             throw new AccessDeniedException("채택할 권한이 없습니다.");

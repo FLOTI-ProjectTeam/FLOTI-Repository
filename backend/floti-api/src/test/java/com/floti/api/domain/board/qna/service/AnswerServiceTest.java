@@ -8,7 +8,12 @@ import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
-import com.floti.api.error.exception.*;
+import com.floti.api.error.ExceptionMessage;
+import com.floti.api.error.exception.AcceptedAnswerDeletionException;
+import com.floti.api.error.exception.AcceptedAnswerUpdateException;
+import com.floti.api.error.exception.PostAlreadyAcceptedException;
+import com.floti.api.error.exception.PostAlreadyClosedException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,12 +129,12 @@ public class AnswerServiceTest {
         when(answerRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when
-        AnswerNotFoundException exception = assertThrows(AnswerNotFoundException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             answerService.updateAnswer(VALID_ID, INVALID_ID, request);
         });
 
         //then
-        assertEquals("답변을 찾을 수 없습니다.", exception.getMessage());
+        assertEquals(ExceptionMessage.ANSWER_NOT_FOUND, exception.getMessage());
     }
 
     @Test

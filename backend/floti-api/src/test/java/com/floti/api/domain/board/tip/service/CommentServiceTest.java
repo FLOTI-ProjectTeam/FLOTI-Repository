@@ -8,8 +8,9 @@ import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
-import com.floti.api.error.exception.CommentNotFoundException;
+import com.floti.api.error.ExceptionMessage;
 import com.floti.api.error.exception.ReplyNotAllowedException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ public class CommentServiceTest {
         when(commentRepository.findByPostId(anyLong())).thenReturn(comments);
 
         //when
-        List<CommentResponse> responses = commentService.getComments(VALID_ID, VALID_ID);
+        List<CommentResponse> responses = commentService.getComments(VALID_ID);
 
         //then
         assertEquals(1, responses.size());
@@ -82,7 +83,7 @@ public class CommentServiceTest {
         when(commentRepository.findByPostId(anyLong())).thenReturn(Collections.emptyList());
 
         //when
-        List<CommentResponse> responses = commentService.getComments(VALID_ID, INVALID_ID);
+        List<CommentResponse> responses = commentService.getComments(INVALID_ID);
 
         //then
         assertTrue(responses.isEmpty());
@@ -151,12 +152,12 @@ public class CommentServiceTest {
         when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
         //when
-        CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             commentService.createComment(VALID_ID, VALID_ID, request);
         });
 
         //then
-        assertEquals("댓글을 찾을 수 없습니다.", exception.getMessage());
+        assertEquals(ExceptionMessage.COMMENT_NOT_FOUND, exception.getMessage());
     }
 
     @Test
@@ -173,12 +174,12 @@ public class CommentServiceTest {
         when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.of(testComment));
 
         //when
-        CommentNotFoundException exception = assertThrows(CommentNotFoundException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             commentService.createComment(VALID_ID, VALID_ID, request);
         });
 
         //then
-        assertEquals("댓글을 찾을 수 없습니다.", exception.getMessage());
+        assertEquals(ExceptionMessage.COMMENT_NOT_FOUND, exception.getMessage());
     }
 
     @Test
