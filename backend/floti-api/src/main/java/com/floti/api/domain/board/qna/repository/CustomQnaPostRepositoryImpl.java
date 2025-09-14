@@ -23,11 +23,11 @@ public class CustomQnaPostRepositoryImpl implements CustomQnaPostRepository {
     public Page<QnaPosts> searchQnaPosts(String search, String sort, Pageable pageable) {
         QQnaPosts qna = QQnaPosts.qnaPost;
 
-        /* 검색 조건 */
+        // 1. 검색 조건
         BooleanExpression condition = qna.title.containsIgnoreCase(search)
                 .or(qna.content.containsIgnoreCase(search));
 
-        /* 정렬 조건 */
+        // 2. 정렬 조건
         OrderSpecifier<?>[] sortSpec = switch (sort.toLowerCase()) {
             case "accuracy" -> new OrderSpecifier[]{
                     new CaseBuilder()
@@ -40,6 +40,7 @@ public class CustomQnaPostRepositoryImpl implements CustomQnaPostRepository {
             default -> new OrderSpecifier[] {qna.id.desc()};
         };
 
+        // 3. 총 개수
         Long totalCount = queryFactory
                 .select(qna.count())
                 .from(qna)
@@ -48,6 +49,7 @@ public class CustomQnaPostRepositoryImpl implements CustomQnaPostRepository {
 
         long total = (totalCount != null) ? totalCount : 0L;
 
+        // 4. 실제 데이터
         List<QnaPosts> content = queryFactory.selectFrom(qna)
                 .where(condition)
                 .orderBy(sortSpec)

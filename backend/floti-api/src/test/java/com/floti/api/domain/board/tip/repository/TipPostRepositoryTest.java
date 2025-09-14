@@ -2,7 +2,6 @@ package com.floti.api.domain.board.tip.repository;
 
 import com.floti.api.config.QuerydslTestConfig;
 import com.floti.api.domain.auth.entity.Users;
-import com.floti.api.domain.board.like.entity.LikeTipPosts;
 import com.floti.api.domain.board.tip.entity.QTipPosts;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.querydsl.core.types.OrderSpecifier;
@@ -105,14 +104,12 @@ public class TipPostRepositoryTest {
                 .title("검색할 제목")
                 .content("검색할 내용")
                 .build();
-        tipPostRepository.save(post1);
-
         TipPosts post2 = TipPosts.builder()
                 .author(testUser)
                 .title("테스트 제목")
                 .content("검색할 내용")
                 .build();
-        tipPostRepository.save(post2);
+        tipPostRepository.saveAll(List.of(post1, post2));
 
         Page<TipPosts> result = searchTipPosts("검색", "accuracy");
 
@@ -124,7 +121,7 @@ public class TipPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("searchTipPosts: 추천순 - 추천수 많은 TipPosts 페이지 먼저 반환")
+    @DisplayName("searchTipPosts: 추천순 - 추천 많은 TipPosts 페이지 먼저 반환")
     void searchTipPosts_likes() {
         //given
         TipPosts post1 = TipPosts.builder()
@@ -132,14 +129,12 @@ public class TipPostRepositoryTest {
                 .title("검색할 제목")
                 .content("검색할 내용")
                 .build();
-        tipPostRepository.save(post1);
-
         TipPosts post2 = TipPosts.builder()
                 .author(testUser)
                 .title("검색할 제목")
                 .content("검색할 내용")
                 .build();
-        tipPostRepository.save(post2);
+        tipPostRepository.saveAll(List.of(post1, post2));
 
         post1.incrementLikeCount();
 

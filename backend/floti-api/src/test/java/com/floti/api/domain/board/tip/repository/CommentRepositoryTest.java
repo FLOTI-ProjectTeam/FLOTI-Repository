@@ -59,14 +59,12 @@ public class CommentRepositoryTest {
                 .author(testUser)
                 .content("첫번째 댓글")
                 .build();
-        commentRepository.save(comment1);
-
         Comments comment2 = Comments.builder()
                 .postId(testPost.getId())
                 .author(testUser)
                 .content("두번째 댓글")
                 .build();
-        commentRepository.save(comment2);
+        commentRepository.saveAll(List.of(comment1, comment2));
 
         //when
         List<Comments> result = commentRepository.findByPostId(testPost.getId());

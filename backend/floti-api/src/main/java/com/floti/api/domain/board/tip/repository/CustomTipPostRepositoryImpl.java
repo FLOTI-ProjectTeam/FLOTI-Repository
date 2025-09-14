@@ -23,11 +23,11 @@ public class CustomTipPostRepositoryImpl implements CustomTipPostRepository {
     public Page<TipPosts> searchTipPosts(String search, String sort, Pageable pageable) {
         QTipPosts tip = QTipPosts.tipPost;
 
-        /* 검색 조건 */
+        // 1. 검색 조건
         BooleanExpression condition = tip.title.containsIgnoreCase(search)
                 .or(tip.content.containsIgnoreCase(search));
 
-        /* 정렬 조건 */
+        // 2. 정렬 조건
         OrderSpecifier<?>[] sortSpec = switch (sort.toLowerCase()) {
             case "accuracy" -> new OrderSpecifier[]{
                     new CaseBuilder()
@@ -41,6 +41,7 @@ public class CustomTipPostRepositoryImpl implements CustomTipPostRepository {
             default -> new OrderSpecifier[] {tip.id.desc()};
         };
 
+        // 4. 총 개수
         Long totalCount = queryFactory
                 .select(tip.count())
                 .from(tip)
@@ -49,6 +50,7 @@ public class CustomTipPostRepositoryImpl implements CustomTipPostRepository {
 
         long total = (totalCount != null) ? totalCount : 0L;
 
+        // 5. 실제 데이터
         List<TipPosts> content = queryFactory.selectFrom(tip)
                 .where(condition)
                 .orderBy(sortSpec)

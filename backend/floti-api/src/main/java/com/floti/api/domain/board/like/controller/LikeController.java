@@ -14,16 +14,16 @@ public class LikeController {
 
     /* 1. Tip 게시글 추천 토글 */
     @PostMapping("/tip/posts/{postId}")
-    public ResponseEntity<LikeResponse> toggleLikeTipPost(@RequestParam Long userId, //임시
-                                                          @PathVariable Long postId) {
+    public ResponseEntity<LikeResponse> toggleLikeTipPost(@RequestParam long userId, //임시
+                                                          @PathVariable long postId) {
         LikeResponse response = likeService.toggleLikeTipPost(userId, postId);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 2. 답변 추천 토글 */
     @PostMapping("/tip/comments/{answerId}")
-    public ResponseEntity<LikeResponse> toggleLikeAnswer(@RequestParam Long userId, //임시
-                                                         @PathVariable Long answerId) {
+    public ResponseEntity<LikeResponse> toggleLikeAnswer(@RequestParam long userId, //임시
+                                                         @PathVariable long answerId) {
         LikeResponse response = likeService.toggleLikeAnswer(userId, answerId);
         return ResponseEntity.ok(response); // 200 Ok
     }

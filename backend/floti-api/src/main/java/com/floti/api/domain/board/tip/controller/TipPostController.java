@@ -32,8 +32,8 @@ public class TipPostController {
 
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<TipPostResponse> getTipPost(@RequestParam Long userId, //임시,
-                                                      @PathVariable Long id) {
+    public ResponseEntity<TipPostResponse> getTipPost(@RequestParam long userId, //임시,
+                                                      @PathVariable long id) {
         TipPostResponse response = tipPostService.getTipPost(userId, id);
         return ResponseEntity.ok(response);
     }
@@ -49,15 +49,15 @@ public class TipPostController {
     /* 4. 수정 */
     @PutMapping("/{id}")
     public ResponseEntity<TipPostResponse> updateTipPost(@Validated @RequestBody PostRequest post,
-                                                         @PathVariable Long id) {
+                                                         @PathVariable long id) {
         TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), id, post);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 5. 삭제 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTipPost(@RequestParam Long userId, //임시
-                                              @PathVariable Long id) {
+    public ResponseEntity<Void> deleteTipPost(@RequestParam long userId, //임시
+                                              @PathVariable long id) {
         tipPostService.deleteTipPost(userId, id);
         return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
     }

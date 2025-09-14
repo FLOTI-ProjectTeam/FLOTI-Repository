@@ -17,21 +17,22 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class QnaPostController {
     private final QnaPostService qnaPostService;
 
-    /* 1. 조회 & 검색 - 추후 변경 예정 */
+    /* 1. 조회 & 검색 */
     @GetMapping
     public Page<QnaPostResponse> getQnaPosts(@RequestParam(required = false) String search,
                                              @RequestParam(defaultValue = "latest") String sort,
-                                             @RequestParam(defaultValue = "0") int page) {
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "false") boolean accepted) {
         sort = sort.trim();
         if (search == null || search.isBlank())
-            return qnaPostService.getQnaPosts(sort, page);
+            return qnaPostService.getQnaPosts(sort, page, accepted);
         return qnaPostService.searchQnaPosts(search.trim(), sort, page);
     }
 
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<QnaPostResponse> getQnaPost(@RequestParam Long userId, //임시
-                                                      @PathVariable Long id) {
+    public ResponseEntity<QnaPostResponse> getQnaPost(@RequestParam long userId, //임시
+                                                      @PathVariable long id) {
         QnaPostResponse response = qnaPostService.getQnaPost(userId, id);
         return ResponseEntity.ok(response);
     }
@@ -46,15 +47,15 @@ public class QnaPostController {
     /* 4. 수정 */
     @PutMapping("/{id}")
     public ResponseEntity<QnaPostResponse> updateQnaPost(@Validated @RequestBody PostRequest post,
-                                                         @PathVariable Long id) {
+                                                         @PathVariable long id) {
         QnaPostResponse response = qnaPostService.updateQnaPost(post.getAuthorId(), id, post);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 5. 삭제 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQnaPost(@RequestParam Long userId, //임시
-                                              @PathVariable Long id) {
+    public ResponseEntity<Void> deleteQnaPost(@RequestParam long userId, //임시
+                                              @PathVariable long id) {
         qnaPostService.deleteQnaPost(userId, id);
         return ResponseEntity.noContent().build(); // 204 No Content
     }

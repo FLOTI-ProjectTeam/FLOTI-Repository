@@ -30,12 +30,13 @@ public class TipPostService {
 
     /* 1-1. 조회 */
     public Page<TipPostResponse> getTipPosts(String sort, int page) {
-        Pageable pageable = switch (sort.toLowerCase()) {
-            case "likes" -> PageRequest.of(page, PAGE_SIZE, Sort.by("likeCount").descending());
-            case "registered" -> PageRequest.of(page, PAGE_SIZE, Sort.by("id").ascending());
-            default -> PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
+        Sort sortOrder = switch (sort.toLowerCase()) {
+            case "likes" -> Sort.by("likeCount").descending();
+            case "registered" -> Sort.by("id").ascending();
+            default -> Sort.by("id").descending();
         };
 
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, sortOrder);
         Page<TipPosts> tipPostPage = tipPostRepository.findAll(pageable);
         return tipPostPage.map(TipPostResponse::new);
     }

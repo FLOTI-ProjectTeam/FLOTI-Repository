@@ -6,4 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface QnaPostRepository extends JpaRepository<QnaPosts, Long>, CustomQnaPostRepository {
+    Page<QnaPosts> findByAccepted(boolean accepted, Pageable pageable);
 }
