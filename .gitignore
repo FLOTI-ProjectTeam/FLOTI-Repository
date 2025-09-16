@@ -7,7 +7,11 @@ backend/floti-api/.gradle/
 backend/floti-api/.idea/
 backend/floti-api/build/
 backend/floti-api/gradle/
-backend/floti-api/src/main/resources/application.properties
+# 환경별 설정: test만 허용, 나머지는 무시
+backend/floti-api/src/main/resources/application.yml
+backend/floti-api/src/main/resources/application-dev.yml
+backend/floti-api/src/main/resources/application-prod.yml
+# application-test.yml 은 제외하지 않음
 
 ### Docker ENV ###
 backend/.env

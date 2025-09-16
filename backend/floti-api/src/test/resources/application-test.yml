@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        order_inserts: false
+jwt:
+  secret-base64: ${JWT_SECRET_BASE64:VEVTVF9PTkxZX1NFQ1JFVF9GT1JfVEVTVFQxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1} # Base64 인코딩된 문자열 (단순 테스트용 더미 값)
+  exp-minutes: 5
