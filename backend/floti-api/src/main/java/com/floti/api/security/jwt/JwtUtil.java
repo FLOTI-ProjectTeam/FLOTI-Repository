@@ -23,6 +23,9 @@ public class JwtUtil {
 
     private final SecretKey signingKey;
 
+    @Value("${jwt.refresh-exp-minutes:10080}") // 7일(60*24*7)
+    private long refreshExpMinutes;
+
     // application.yml에서 토큰 만료 시간(분 단위)을 읽어옴
     @Value("${jwt.exp-minutes:60}")
     private long expMinutes;
@@ -75,6 +78,26 @@ public class JwtUtil {
                 .build()                        // 파서 생성
                 .parseClaimsJws(token)          // JWS(서명된 JWT) 파싱
                 .getBody();                     // 클레임(내용) 반환
+    }
+
+    /**
+     * Refresh 토큰 생성
+     */
+    public String generateRefreshToken(String username) {
+        Instant now = Instant.now();
+        Instant exp = now.plus(refreshExpMinutes, ChronoUnit.MINUTES);
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(exp))
+                .signWith(signingKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    /** Refresh TTL getter (Redis 저장 시 활용) */
+    public long getRefreshExpMinutes() {
+        return refreshExpMinutes;
     }
 
 }

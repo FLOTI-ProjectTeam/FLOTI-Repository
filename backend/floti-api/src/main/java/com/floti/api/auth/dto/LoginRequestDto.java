@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginRequestDto {
     @NotBlank(message = "아이디는 필수입니다.")
-    private String usrename;
+    private String username;
     @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
 }

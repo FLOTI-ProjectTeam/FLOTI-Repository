@@ -13,4 +13,5 @@ import lombok.Setter;
 public class LoginResponseDto {
     private String jwt;               // 액세스 토큰
     private String nickname;          // 닉네임(응답 명세대로)
+    private String refreshToken; // [추가됨] Refresh 토큰
 }

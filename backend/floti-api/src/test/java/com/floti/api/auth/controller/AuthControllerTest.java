@@ -10,6 +10,7 @@ import com.floti.api.auth.entity.User;
 import com.floti.api.auth.repository.UserRepository;
 import com.floti.api.auth.service.UserService;
 import com.floti.api.security.jwt.JwtUtil;
+import com.floti.api.security.jwt.RefreshTokenService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,7 @@ public class AuthControllerTest {
     @MockitoBean private PasswordEncoder passwordEncoder;
     @MockitoBean private InMemoryCodeService codeService;
     @MockitoBean private JwtUtil jwtUtil;
+    @MockitoBean private RefreshTokenService refreshTokenService; // [추가됨]
 
     // ---------- 회원가입 ----------
     @Test
@@ -95,7 +97,7 @@ public class AuthControllerTest {
 
     // ---------- 로그인 ----------
     @Test
-    @DisplayName("로그인 성공 → 200 + jwt, nickname")
+    @DisplayName("로그인 성공 → 200 + access, refresh, nickname")
     void login_success() throws Exception {
         // given: DB에 사용자 존재 + 비번 일치 + 토큰 발급
         User user = User.builder()
@@ -108,7 +110,8 @@ public class AuthControllerTest {
         // 레포지토리에서 username으로 찾게 설정(권장 메서드)
         given(userRepository.findByUsername("user1")).willReturn(Optional.of(user));
         given(passwordEncoder.matches("pw123456", "ENC(pw)")).willReturn(true);
-        given(jwtUtil.generateToken("user1")).willReturn("JWT_TOKEN");
+        given(jwtUtil.generateToken("user1")).willReturn("ACCESS_TOKEN"); // [변경됨]
+        given(jwtUtil.generateRefreshToken("user1")).willReturn("REFRESH_TOKEN"); // [추가됨]
 
         LoginRequestDto req = new LoginRequestDto("user1", "pw123456");
 
@@ -116,7 +119,8 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.jwt").value("JWT_TOKEN"))
+                .andExpect(jsonPath("$.data.jwt").value("ACCESS_TOKEN"))
+                .andExpect(jsonPath("$.data.refreshToken").value("REFRESH_TOKEN")) // [추가됨]
                 .andExpect(jsonPath("$.data.nickname").value("닉"));
     }
 
@@ -140,6 +144,56 @@ public class AuthControllerTest {
                         .content(om.writeValueAsString(req)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false));
+    }
+
+    // ---------- Refresh ----------
+    @Test
+    @DisplayName("Refresh 성공 → 200 + 새 access")
+    void refresh_success() throws Exception {
+        String refreshToken = "REFRESH_TOKEN";
+
+        given(jwtUtil.isValid(refreshToken)).willReturn(true);
+        given(jwtUtil.extractUsername(refreshToken)).willReturn("user1");
+        given(refreshTokenService.get("user1")).willReturn(refreshToken);
+        given(jwtUtil.generateToken("user1")).willReturn("NEW_ACCESS");
+
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"REFRESH_TOKEN\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("NEW_ACCESS"));
+    }
+
+    @Test
+    @DisplayName("Refresh 실패(잘못된 토큰) → 401")
+    void refresh_fail() throws Exception {
+        String refreshToken = "BAD_TOKEN";
+
+        given(jwtUtil.isValid(refreshToken)).willReturn(false);
+
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"BAD_TOKEN\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Invalid refresh token"));
+    }
+
+    // ---------- 로그아웃 ----------
+    @Test
+    @DisplayName("로그아웃 성공 → 200")
+    void logout_success() throws Exception {
+        String refreshToken = "REFRESH_TOKEN";
+
+        given(jwtUtil.isValid(refreshToken)).willReturn(true);
+        given(jwtUtil.extractUsername(refreshToken)).willReturn("user1");
+
+        mockMvc.perform(post("/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"REFRESH_TOKEN\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Logged out"));
+
+        verify(refreshTokenService, times(1)).delete("user1");
     }
 
     // ---------- 아이디 찾기 ----------

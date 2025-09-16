@@ -2,25 +2,32 @@ package com.floti.api.auth.controller;
 
 
 // 스프링/검증 관련 import
-import com.floti.api.auth.dto.*;                     // 우리가 만든 DTO들
-import com.floti.api.auth.entity.User;               // 사용자 엔티티
-import com.floti.api.auth.repository.UserRepository; // 사용자 레포지토리
-import com.floti.api.auth.service.UserService;       // 기존 회원가입 서비스
-import com.floti.api.auth.code.InMemoryCodeService;  // 코드 서비스
-import com.floti.api.auth.code.CodeType;             // 코드 타입
-import com.floti.api.security.jwt.JwtUtil;           // JWT 유틸
-import jakarta.validation.Valid;                     // @Valid 검증
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;      // 응답 객체
-import org.springframework.security.crypto.password.PasswordEncoder; // 비번 인코더
-import org.springframework.web.bind.annotation.*;     // 컨트롤러 어노테이션 전반
 
-import java.awt.*;
-import java.util.Optional;                           // Optional 처리
+import com.floti.api.auth.code.CodeType;
+import com.floti.api.auth.code.InMemoryCodeService;
+import com.floti.api.auth.dto.*;
+import com.floti.api.auth.entity.User;
+import com.floti.api.auth.repository.UserRepository;
+import com.floti.api.auth.service.UserService;
+import com.floti.api.security.jwt.JwtUtil;
+import com.floti.api.security.jwt.RefreshTokenService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
-// 인증/계정 관련 엔드포인트를 담당하는 컨트롤러
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * AuthController
+ * - 회원가입 / 로그인 / 계정 찾기
+ * - Access + Refresh 발급 & 관리
+ */
 @RestController // JSON 응답 컨트롤러
 @RequestMapping("/auth") // 공통 URL prefix
+@RequiredArgsConstructor
 public class AuthController {
 
     // 필요한 의존성들 주입
@@ -29,19 +36,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;   // 비번 검증/인코딩
     private final InMemoryCodeService codeService;   // 인증코드 발급/검증
     private final JwtUtil jwtUtil;                   // JWT 발급/검증
-
-    // 생성자 주입(스프링이 자동으로 빈을 넣어줌)
-    public AuthController(UserService userService,
-                          UserRepository userRepository,
-                          PasswordEncoder passwordEncoder,
-                          InMemoryCodeService codeService,
-                          JwtUtil jwtUtil) {
-        this.userService = userService;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.codeService = codeService;
-        this.jwtUtil = jwtUtil;
-    }
+    private final RefreshTokenService refreshTokenService; // [추가됨]
 
     // ───────────────── 회원가입 ─────────────────
 
@@ -91,29 +86,61 @@ public class AuthController {
 
     @PostMapping("/login") // POST /auth/login
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(@RequestBody @Valid LoginRequestDto req) {
-        // 1) username으로 사용자 조회
-        Optional<User> opt = userRepository.findByUsername(req.getUsrename()); // username 정확히 일치하는 사용자 1명 조회
-
-        // 2) 사용자가 없으면 401
+        // username으로 사용자 조회
+        Optional<User> opt = userRepository.findByUsername(req.getUsername()); // username 정확히 일치하는 사용자 1명 조회
+        // 사용자가 없으면 401
         if (opt.isEmpty()) {
             return ResponseEntity.status(401).body(ApiResponse.fail("존재하지 않는 사용자입니다.")); // 401
         }
 
-        // 3) 비밀번호 비교(BCrypt)
+        // 비밀번호 비교(BCrypt)
         User user = opt.get(); // DB에서 가져온 사용자
         // passwordEncoder.matches(평문, 해시) → true면 일치
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
                 return ResponseEntity.status(401).body(ApiResponse.fail("비밀번호가 올바르지 않습니다.")); // 401
         }
-        // 4) JWT 발급(토큰 주체에 username 넣음)
-        String token = jwtUtil.generateToken(user.getUsername());
 
-        // 5) 응답 바디 구성 (명세: { jwt, nickname })
-        LoginResponseDto body = new LoginResponseDto(token, user.getNickname());
+        // [변경됨] Access + Refresh 발급
+        String accessToken = jwtUtil.generateToken(user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
-        // 6) 200 OK 반환
+        // [추가됨] Redis에 Refresh 저장
+        refreshTokenService.save(user.getUsername(), refreshToken, jwtUtil.getRefreshExpMinutes());
+
+        // [변경됨] 응답 DTO에 refreshToken 포함
+        LoginResponseDto body = new LoginResponseDto(accessToken, user.getNickname(), refreshToken);
+
         return ResponseEntity.ok(ApiResponse.ok(body, "로그인 성공"));
 
+    }
+
+    // ───────────────── Access 재발급 ─────────────────
+    @PostMapping("/refresh") // [추가됨]
+    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+
+        if (jwtUtil.isValid(refreshToken)) {
+            String username = jwtUtil.extractUsername(refreshToken);
+            String saved = refreshTokenService.get(username);
+
+            if (saved != null && saved.equals(refreshToken)) {
+                String newAccess = jwtUtil.generateToken(username);
+                return ResponseEntity.ok(Map.of("accessToken", newAccess));
+            }
+        }
+        return ResponseEntity.status(401).body(Map.of("error", "Invalid refresh token"));
+    }
+
+    // ───────────────── 로그아웃 ─────────────────
+    @PostMapping("/logout") // [추가됨]
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+
+        if (jwtUtil.isValid(refreshToken)) {
+            String username = jwtUtil.extractUsername(refreshToken);
+            refreshTokenService.delete(username);
+        }
+        return ResponseEntity.ok(Map.of("message", "Logged out"));
     }
 
     // ───────────────── 아이디 찾기 ─────────────────
