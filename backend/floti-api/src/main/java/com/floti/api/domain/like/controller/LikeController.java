@@ -1,7 +1,7 @@
-package com.floti.api.domain.board.like.controller;
+package com.floti.api.domain.like.controller;
 
-import com.floti.api.domain.board.like.dto.LikeResponse;
-import com.floti.api.domain.board.like.service.LikeService;
+import com.floti.api.domain.like.dto.LikeResponse;
+import com.floti.api.domain.like.service.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -15,7 +15,7 @@ public class QnaPostResponse {
     private final AuthorResponse author;
     private final String title;
     private final String content;
-    private final Integer answerCount;
+    private final int answerCount;
     private final boolean accepted;
     private final List<AnswerResponse> answers;
 

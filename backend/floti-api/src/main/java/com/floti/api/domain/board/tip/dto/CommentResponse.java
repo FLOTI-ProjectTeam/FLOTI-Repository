@@ -16,7 +16,7 @@ public class CommentResponse {
     private final Long parentId; //하위 댓글 전용
     private AuthorResponse author;
     private String content;
-    private Integer likeCount;
+    private int likeCount;
     private final boolean deleted; //상위 댓글 전용
     private final List<CommentResponse> replies; //상위 댓글 전용
 

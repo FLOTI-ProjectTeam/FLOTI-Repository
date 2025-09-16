@@ -31,10 +31,10 @@ public class Comments {
     private String content;
 
     @Column(nullable = false)
-    private Integer likeCount = 0;
+    private int likeCount;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
+    private boolean deleted;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

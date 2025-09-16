@@ -1,4 +1,4 @@
-package com.floti.api.domain.board.like.dto;
+package com.floti.api.domain.like.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class LikeResponse {
     private final boolean liked;
-    private final Integer likeCount;
+    private final int likeCount;
 }

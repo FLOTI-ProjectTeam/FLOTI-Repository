@@ -30,16 +30,16 @@ public class QnaPosts {
     private String content;
 
     @Column(nullable = false)
-    private Integer answerCount = 0;
+    private int answerCount;
 
     @Column(name = "is_accepted", nullable = false)
-    private boolean accepted = false;
+    private boolean accepted;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    public QnaPosts(User author, String title, String content, Integer answerCount, Boolean accepted) {
+    public QnaPosts(User author, String title, String content, int answerCount, boolean accepted) {
         this.author = author;
         this.title = title;
         this.content = content;

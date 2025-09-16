@@ -64,14 +64,12 @@ public class QnaPostRepositoryTest {
                 .title("미채택된 제목")
                 .content("테스트 내용")
                 .answerCount(0)
-                .accepted(false)
                 .build();
         QnaPosts post4 = QnaPosts.builder()
                 .author(testUser)
                 .title("미채택된 제목")
                 .content("테스트 내용")
                 .answerCount(3)
-                .accepted(false)
                 .build();
         qnaPostRepository.saveAll(List.of(post1, post2, post3, post4));
     }

@@ -27,7 +27,7 @@ public class AnswerController {
     /* 2. 수정 */
     @PutMapping("/answers/{id}")
     public ResponseEntity<AnswerResponse> updateAnswer(@Validated @RequestBody AnswerRequest Answer,
-                                                         @PathVariable long id) {
+                                                       @PathVariable long id) {
         AnswerResponse response = answerService.updateAnswer(Answer.getAuthorId(), id, Answer);
         return ResponseEntity.ok(response); // 200 Ok
     }

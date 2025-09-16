@@ -1,7 +1,7 @@
-package com.floti.api.domain.board.like.repository;
+package com.floti.api.domain.like.repository;
 
-import com.floti.api.domain.board.like.entity.LikeAnswers;
-import com.floti.api.domain.board.like.entity.UserAnswerId;
+import com.floti.api.domain.like.entity.LikeAnswers;
+import com.floti.api.domain.like.entity.UserAnswerId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

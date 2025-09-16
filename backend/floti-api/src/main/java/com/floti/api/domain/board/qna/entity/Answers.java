@@ -30,10 +30,10 @@ public class Answers implements LikeableEntity {
     private String content;
 
     @Column(nullable = false)
-    private Integer likeCount = 0;
+    private int likeCount;
 
     @Column(name = "is_accepted", nullable = false)
-    private boolean accepted = false;
+    private boolean accepted;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

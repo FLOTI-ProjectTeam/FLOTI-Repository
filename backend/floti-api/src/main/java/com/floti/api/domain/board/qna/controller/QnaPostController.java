@@ -13,7 +13,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/community/qna/posts")
+@RequestMapping("/community/qnas")
 public class QnaPostController {
     private final QnaPostService qnaPostService;
 

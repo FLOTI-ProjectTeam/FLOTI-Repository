@@ -3,7 +3,7 @@ package com.floti.api.domain.board.tip.service;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
-import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
+import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
@@ -176,7 +176,7 @@ public class TipPostServiceTest {
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
-        TipPostResponse response = tipPostService.updateTipPost(VALID_ID, VALID_ID, request);
+        TipPostResponse response = tipPostService.updateTipPost(VALID_ID, VALID_ID, request, null, false);
 
         //then
         assertEquals("수정된 제목", response.getTitle());
@@ -194,7 +194,7 @@ public class TipPostServiceTest {
 
         //when
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            tipPostService.updateTipPost(INVALID_ID, VALID_ID, request);
+            tipPostService.updateTipPost(INVALID_ID, VALID_ID, request, null, false);
         });
 
         //then

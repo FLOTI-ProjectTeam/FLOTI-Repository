@@ -2,8 +2,9 @@ package com.floti.api.domain.board.like.repository;
 
 import com.floti.api.config.QuerydslTestConfig;
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.board.like.entity.LikeTipPosts;
+import com.floti.api.domain.like.entity.LikeTipPosts;
 import com.floti.api.domain.board.tip.entity.TipPosts;
+import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

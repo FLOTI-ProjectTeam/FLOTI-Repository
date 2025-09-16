@@ -27,7 +27,7 @@ public class AnswerService {
 
     /* 1. 등록 */
     @Transactional
-    public AnswerResponse createAnswer(Long userId, Long postId, AnswerRequest answerRequest) {
+    public AnswerResponse createAnswer(Long userId, Long postId, AnswerRequest request) {
         User author = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
         QnaPosts qnaPost = qnaPostRepository.findById(postId)
@@ -39,7 +39,7 @@ public class AnswerService {
         Answers answer = Answers.builder()
                 .postId(postId)
                 .author(author)
-                .content(answerRequest.getContent())
+                .content(request.getContent())
                 .build();
 
         answerRepository.save(answer);
@@ -50,7 +50,7 @@ public class AnswerService {
 
     /* 2. 수정 */
     @Transactional
-    public AnswerResponse updateAnswer(Long userId, Long id, AnswerRequest answerRequest) {
+    public AnswerResponse updateAnswer(Long userId, Long id, AnswerRequest request) {
         if (!userRepository.existsById(userId))
             throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
@@ -63,7 +63,7 @@ public class AnswerService {
         if (answer.isAccepted())
             throw new AcceptedAnswerUpdateException();
 
-        answer.update(answerRequest);
+        answer.update(request);
         return new AnswerResponse(answer);
     }
 

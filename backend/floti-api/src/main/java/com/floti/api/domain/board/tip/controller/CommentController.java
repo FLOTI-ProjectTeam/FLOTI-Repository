@@ -14,18 +14,18 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/community/tip")
+@RequestMapping("/community/tips")
 public class CommentController {
     private final CommentService commentService;
 
     /* 1. 조회 */
-    @GetMapping("/posts/{postId}/comments")
+    @GetMapping("/{postId}/comments")
     public List<CommentResponse> getComments(@PathVariable long postId) {
         return commentService.getComments(postId);
     }
 
     /* 2. 등록 */
-    @PostMapping("/posts/{postId}/comments")
+    @PostMapping("/{postId}/comments")
     public ResponseEntity<CommentResponse> createComment(@Validated @RequestBody CommentRequest comment,
                                                          @PathVariable long postId) {
         CommentResponse response = commentService.createComment(comment.getAuthorId(), postId, comment);

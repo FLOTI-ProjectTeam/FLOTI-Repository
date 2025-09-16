@@ -30,23 +30,22 @@ public class TipPosts implements LikeableEntity {
     private String content;
 
     @Column(length = 65)
-    private String thumbnail; //경로: tip/thumbnail/날짜_UUID.확장자
+    private String thumbnail; //경로: tips/thumbnail/날짜_UUID.확장자
 
     @Column(nullable = false)
-    private Integer commentCount = 0;
+    private int commentCount;
 
     @Column(nullable = false)
-    private Integer likeCount = 0;
+    private int likeCount;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    public TipPosts(User author, String title, String content, String thumbnail) {
+    public TipPosts(User author, String title, String content) {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.thumbnail = thumbnail;
     }
 
     @PrePersist //테스트용
@@ -59,6 +58,10 @@ public class TipPosts implements LikeableEntity {
     public void update(PostRequest request) {
         this.title = request.getTitle();
         this.content = request.getContent();
+    }
+
+    public void updateThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public void incrementCommentCount() {
