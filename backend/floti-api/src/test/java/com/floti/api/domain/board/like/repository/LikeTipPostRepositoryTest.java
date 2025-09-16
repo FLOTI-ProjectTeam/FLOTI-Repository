@@ -1,9 +1,9 @@
 package com.floti.api.domain.board.like.repository;
 
-import com.floti.api.config.QuerydslTestConfig;
+import com.floti.api.config.QuerydslConfig;
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.like.entity.LikeTipPosts;
 import com.floti.api.domain.board.tip.entity.TipPosts;
+import com.floti.api.domain.like.entity.LikeTipPosts;
 import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("test") //application-test.yml 사용
-@Import(QuerydslTestConfig.class)
+@Import(QuerydslConfig.class)
 public class LikeTipPostRepositoryTest {
     @Autowired
     private LikeTipPostRepository likeTipPostRepository;

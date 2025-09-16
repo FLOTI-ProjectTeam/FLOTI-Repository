@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.qna.repository;
 
-import com.floti.api.config.QuerydslTestConfig;
+import com.floti.api.config.QuerydslConfig;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("test") //application-test.yml 사용
-@Import(QuerydslTestConfig.class)
+@Import(QuerydslConfig.class)
 public class QnaPostRepositoryTest {
     @Autowired
     private QnaPostRepository qnaPostRepository;

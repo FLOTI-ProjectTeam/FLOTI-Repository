@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.repository;
 
-import com.floti.api.config.QuerydslTestConfig;
+import com.floti.api.config.QuerydslConfig;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.tip.entity.QTipPosts;
 import com.floti.api.domain.board.tip.entity.TipPosts;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test") //application-test.yml 사용
-@Import(QuerydslTestConfig.class)
+@Import(QuerydslConfig.class)
 public class TipPostRepositoryTest {
     @Autowired
     private TipPostRepository tipPostRepository;

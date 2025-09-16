@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.repository;
 
-import com.floti.api.config.QuerydslTestConfig;
+import com.floti.api.config.QuerydslConfig;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.domain.board.tip.entity.TipPosts;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("test") //application-test.yml 사용
-@Import(QuerydslTestConfig.class)
+@Import(QuerydslConfig.class)
 public class CommentRepositoryTest {
     @Autowired
     private CommentRepository commentRepository;
