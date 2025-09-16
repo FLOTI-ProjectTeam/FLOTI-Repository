@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.entity;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -25,22 +25,22 @@ public class Comments {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private Users author;
+    private User author;
 
     @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
-    private Integer likeCount = 0;
+    private int likeCount;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
+    private boolean deleted;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    public Comments(Long id, Long postId, Long parentId, Users author, String content) {
+    public Comments(Long id, Long postId, Long parentId, User author, String content) {
         this.id = id; //테스트용
         this.postId = postId;
         this.parentId = parentId;

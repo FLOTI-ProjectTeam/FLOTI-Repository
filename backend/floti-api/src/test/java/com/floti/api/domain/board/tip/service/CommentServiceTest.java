@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
@@ -46,7 +46,7 @@ public class CommentServiceTest {
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
 
-    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
     private final TipPosts testPost = TipPosts.builder().author(testUser).build();
     private final Comments testComment = Comments.builder()
             .id(VALID_ID).postId(VALID_ID).author(testUser).content("첫번째 댓글").build();

@@ -1,4 +1,4 @@
-package com.floti.api.domain.board.like.entity;
+package com.floti.api.domain.like.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

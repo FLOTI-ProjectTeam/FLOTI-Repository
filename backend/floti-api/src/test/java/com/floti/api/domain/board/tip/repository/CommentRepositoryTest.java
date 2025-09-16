@@ -1,7 +1,7 @@
 package com.floti.api.domain.board.tip.repository;
 
 import com.floti.api.config.QuerydslTestConfig;
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import jakarta.persistence.EntityManager;
@@ -29,12 +29,12 @@ public class CommentRepositoryTest {
     @Autowired
     private EntityManager em;
 
-    private Users testUser;
+    private User testUser;
     private TipPosts testPost;
 
     @BeforeEach
     void setUp() {
-        testUser = Users.builder()
+        testUser = User.builder()
                 .email("test01@gmail.com")
                 .username("test01")
                 .password("password123")

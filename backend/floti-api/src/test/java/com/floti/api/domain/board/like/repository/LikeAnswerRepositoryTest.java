@@ -1,10 +1,11 @@
 package com.floti.api.domain.board.like.repository;
 
 import com.floti.api.config.QuerydslTestConfig;
-import com.floti.api.domain.auth.entity.Users;
-import com.floti.api.domain.board.like.entity.LikeAnswers;
+import com.floti.api.domain.auth.entity.User;
+import com.floti.api.domain.like.entity.LikeAnswers;
 import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
+import com.floti.api.domain.like.repository.LikeAnswerRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,13 +30,13 @@ public class LikeAnswerRepositoryTest {
     @Autowired
     private EntityManager em;
 
-    private Users testUser;
+    private User testUser;
     private QnaPosts testPost;
     private Answers testAnswer;
 
     @BeforeEach
     void setUp() {
-        testUser = Users.builder()
+        testUser = User.builder()
                 .email("test01@gmail.com")
                 .username("test01")
                 .password("password123")

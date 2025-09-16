@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
@@ -58,7 +58,7 @@ public class CommentService {
     /* 2. 등록 */
     @Transactional
     public CommentResponse createComment(Long userId, Long postId, CommentRequest request) {
-        Users author = userRepository.findById(userId)
+        User author = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
         TipPosts tipPost = tipPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));

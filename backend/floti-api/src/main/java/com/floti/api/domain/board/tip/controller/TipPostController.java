@@ -15,7 +15,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/community/tip/posts")
+@RequestMapping("/community/tips")
 public class TipPostController {
     private final TipPostService tipPostService;
 
@@ -48,9 +48,11 @@ public class TipPostController {
 
     /* 4. 수정 */
     @PutMapping("/{id}")
-    public ResponseEntity<TipPostResponse> updateTipPost(@Validated @RequestBody PostRequest post,
+    public ResponseEntity<TipPostResponse> updateTipPost(@Validated @RequestPart PostRequest post,
+                                                         @RequestPart(required = false) MultipartFile file,
+                                                         @RequestPart boolean deleted,
                                                          @PathVariable long id) {
-        TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), id, post);
+        TipPostResponse response = tipPostService.updateTipPost(post.getAuthorId(), id, post, file, deleted);
         return ResponseEntity.ok(response); // 200 Ok
     }
 

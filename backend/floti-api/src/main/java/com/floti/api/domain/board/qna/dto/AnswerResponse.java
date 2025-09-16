@@ -14,7 +14,7 @@ public class AnswerResponse {
     private final Long postId;
     private final AuthorResponse author;
     private final String content;
-    private final Integer likeCount;
+    private final int likeCount;
     private final boolean accepted;
     private final boolean liked;
 

@@ -1,14 +1,14 @@
-package com.floti.api.domain.board.like.service;
+package com.floti.api.domain.like.service;
 
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.entity.LikeableEntity;
-import com.floti.api.domain.board.like.dto.LikeResponse;
-import com.floti.api.domain.board.like.entity.LikeAnswers;
-import com.floti.api.domain.board.like.entity.LikeTipPosts;
-import com.floti.api.domain.board.like.entity.UserAnswerId;
-import com.floti.api.domain.board.like.entity.UserPostId;
-import com.floti.api.domain.board.like.repository.LikeAnswerRepository;
-import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
+import com.floti.api.domain.like.dto.LikeResponse;
+import com.floti.api.domain.like.entity.LikeAnswers;
+import com.floti.api.domain.like.entity.LikeTipPosts;
+import com.floti.api.domain.like.entity.UserAnswerId;
+import com.floti.api.domain.like.entity.UserPostId;
+import com.floti.api.domain.like.repository.LikeAnswerRepository;
+import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.ExceptionMessage;

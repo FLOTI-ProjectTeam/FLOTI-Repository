@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.qna.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.qna.dto.AnswerRequest;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
@@ -27,8 +27,8 @@ public class AnswerService {
 
     /* 1. 등록 */
     @Transactional
-    public AnswerResponse createAnswer(Long userId, Long postId, AnswerRequest answerRequest) {
-        Users author = userRepository.findById(userId)
+    public AnswerResponse createAnswer(Long userId, Long postId, AnswerRequest request) {
+        User author = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
         QnaPosts qnaPost = qnaPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
@@ -39,7 +39,7 @@ public class AnswerService {
         Answers answer = Answers.builder()
                 .postId(postId)
                 .author(author)
-                .content(answerRequest.getContent())
+                .content(request.getContent())
                 .build();
 
         answerRepository.save(answer);
@@ -50,7 +50,7 @@ public class AnswerService {
 
     /* 2. 수정 */
     @Transactional
-    public AnswerResponse updateAnswer(Long userId, Long id, AnswerRequest answerRequest) {
+    public AnswerResponse updateAnswer(Long userId, Long id, AnswerRequest request) {
         if (!userRepository.existsById(userId))
             throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
 
@@ -63,7 +63,7 @@ public class AnswerService {
         if (answer.isAccepted())
             throw new AcceptedAnswerUpdateException();
 
-        answer.update(answerRequest);
+        answer.update(request);
         return new AnswerResponse(answer);
     }
 

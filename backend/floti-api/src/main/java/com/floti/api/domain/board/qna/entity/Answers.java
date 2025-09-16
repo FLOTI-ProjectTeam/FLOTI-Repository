@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.qna.entity;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.entity.LikeableEntity;
 import com.floti.api.domain.board.qna.dto.AnswerRequest;
 import jakarta.persistence.*;
@@ -24,22 +24,22 @@ public class Answers implements LikeableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private Users author;
+    private User author;
 
     @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
-    private Integer likeCount = 0;
+    private int likeCount;
 
     @Column(name = "is_accepted", nullable = false)
-    private boolean accepted = false;
+    private boolean accepted;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    public Answers(Long id, Long postId, Users author, String content) {
+    public Answers(Long id, Long postId, User author, String content) {
         this.id = id; //테스트용
         this.postId = postId;
         this.author = author;

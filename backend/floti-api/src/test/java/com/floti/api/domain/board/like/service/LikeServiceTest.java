@@ -1,13 +1,14 @@
 package com.floti.api.domain.board.like.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.board.like.entity.UserPostId;
-import com.floti.api.domain.board.like.dto.LikeResponse;
-import com.floti.api.domain.board.like.entity.LikeTipPosts;
-import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
+import com.floti.api.domain.like.entity.UserPostId;
+import com.floti.api.domain.like.dto.LikeResponse;
+import com.floti.api.domain.like.entity.LikeTipPosts;
+import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
+import com.floti.api.domain.like.service.LikeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,7 @@ public class LikeServiceTest {
 
     private static final Long VALID_ID = 1L;
 
-    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
     private final TipPosts testPost = TipPosts.builder().author(testUser).build();
 
     @Test

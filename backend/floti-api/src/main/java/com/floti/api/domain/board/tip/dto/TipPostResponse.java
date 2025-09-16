@@ -13,24 +13,28 @@ public class TipPostResponse {
     private final AuthorResponse author;
     private final String title;
     private final String content;
-    private final String thumbnail; //경로: tip/thumbnail/날짜_UUID.확장자
-    private final Integer commentCount;
-    private final Integer likeCount;
+    private final String thumbnail;
+    private final int commentCount;
+    private final int likeCount;
     private final boolean liked;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
     private final LocalDateTime createdAt;
 
-    public TipPostResponse(TipPosts tipPost) {
-        this(tipPost, false);
+    public TipPostResponse(TipPosts tipPost, String baseUrl) {
+        this(tipPost, baseUrl, false);
     }
 
-    public TipPostResponse(TipPosts tipPost, boolean liked) {
+    public TipPostResponse(TipPosts tipPost, String baseUrl, boolean liked) {
         this.id = tipPost.getId();
         this.author = new AuthorResponse(tipPost.getAuthor());
         this.title = tipPost.getTitle();
         this.content = tipPost.getContent();
-        this.thumbnail = tipPost.getThumbnail();
+        if (tipPost.getThumbnail() != null) {
+            this.thumbnail = baseUrl + "/" + tipPost.getThumbnail();
+        } else {
+            this.thumbnail = null;
+        }
         this.commentCount = tipPost.getCommentCount();
         this.likeCount = tipPost.getLikeCount();
         this.createdAt = tipPost.getCreatedAt();
