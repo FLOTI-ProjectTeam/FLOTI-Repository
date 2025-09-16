@@ -32,15 +32,23 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis' //Redis
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0' // Swagger
-	testImplementation 'com.h2database:h2' // H2 (인메모리 DB)
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis' 
+	// Swagger (최신 버전)
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9' 
+	// Validator
+	implementation 'org.springframework.boot:spring-boot-starter-validation' 
+	// QueryDSL
+	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta' 
+	// H2 (인메모리 DB)
+	testImplementation 'com.h2database:h2' 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test' // 스프링 부트 기본 테스트( JUnit5, AssertJ, Mockito 등 포함 )
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'com.h2database:h2' //H2
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// JWT (JJWT 최신 모듈 3종)
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
