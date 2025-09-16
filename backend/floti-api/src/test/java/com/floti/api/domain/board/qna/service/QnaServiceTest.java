@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.qna.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.like.entity.LikeAnswers;
 import com.floti.api.domain.board.like.repository.LikeAnswerRepository;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
@@ -41,7 +41,7 @@ public class QnaServiceTest {
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
 
-    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
     private final QnaPosts testPost = QnaPosts.builder().author(testUser).title("테스트 제목").build();
 
     @Test

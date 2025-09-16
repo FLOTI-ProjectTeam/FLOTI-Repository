@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
@@ -46,7 +46,7 @@ public class TipPostServiceTest {
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
 
-    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
     private final TipPosts testPost = TipPosts.builder()
             .author(testUser).title("테스트 제목").content("테스트 내용").build();
 

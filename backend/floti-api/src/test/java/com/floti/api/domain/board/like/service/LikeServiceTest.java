@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.like.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.like.entity.UserPostId;
 import com.floti.api.domain.board.like.dto.LikeResponse;
@@ -39,7 +39,7 @@ public class LikeServiceTest {
 
     private static final Long VALID_ID = 1L;
 
-    private final Users testUser = Users.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
     private final TipPosts testPost = TipPosts.builder().author(testUser).build();
 
     @Test

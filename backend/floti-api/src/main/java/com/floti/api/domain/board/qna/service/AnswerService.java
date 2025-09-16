@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.qna.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.qna.dto.AnswerRequest;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
@@ -28,7 +28,7 @@ public class AnswerService {
     /* 1. 등록 */
     @Transactional
     public AnswerResponse createAnswer(Long userId, Long postId, AnswerRequest answerRequest) {
-        Users author = userRepository.findById(userId)
+        User author = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
         QnaPosts qnaPost = qnaPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));

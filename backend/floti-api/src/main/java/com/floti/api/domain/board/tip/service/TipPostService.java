@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.like.repository.LikeTipPostRepository;
@@ -59,7 +59,7 @@ public class TipPostService {
     /* 3. 등록 */
     @Transactional
     public TipPostResponse createTipPost(Long userId, PostRequest request, MultipartFile file) {
-        Users author = userRepository.findById(userId)
+        User author = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
 
         TipPosts tipPost = TipPosts.builder()

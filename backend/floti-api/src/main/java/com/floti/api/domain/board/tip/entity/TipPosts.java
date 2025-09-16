@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.tip.entity;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.common.entity.LikeableEntity;
 import jakarta.persistence.*;
@@ -21,7 +21,7 @@ public class TipPosts implements LikeableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    private Users author;
+    private User author;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -42,7 +42,7 @@ public class TipPosts implements LikeableEntity {
     private LocalDateTime createdAt;
 
     @Builder
-    public TipPosts(Users author, String title, String content, String thumbnail) {
+    public TipPosts(User author, String title, String content, String thumbnail) {
         this.author = author;
         this.title = title;
         this.content = content;

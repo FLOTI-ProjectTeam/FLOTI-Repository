@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.qna.entity;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.error.exception.PostAlreadyAcceptedException;
 import jakarta.persistence.*;
@@ -21,7 +21,7 @@ public class QnaPosts {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    private Users author;
+    private User author;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -39,7 +39,7 @@ public class QnaPosts {
     private LocalDateTime createdAt;
 
     @Builder
-    public QnaPosts(Users author, String title, String content, Integer answerCount, Boolean accepted) {
+    public QnaPosts(User author, String title, String content, Integer answerCount, Boolean accepted) {
         this.author = author;
         this.title = title;
         this.content = content;

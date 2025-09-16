@@ -1,6 +1,6 @@
 package com.floti.api.domain.board.qna.service;
 
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.like.entity.LikeAnswers;
@@ -83,7 +83,7 @@ public class QnaPostService {
     /* 3. 등록 */
     @Transactional
     public QnaPostResponse createQnaPost(Long userId, PostRequest postRequest) {
-        Users author = userRepository.findById(userId)
+        User author = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
 
         QnaPosts qnaPost = QnaPosts.builder()

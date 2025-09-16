@@ -1,7 +1,7 @@
 package com.floti.api.domain.board.qna.repository;
 
 import com.floti.api.config.QuerydslTestConfig;
-import com.floti.api.domain.auth.entity.Users;
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -37,7 +37,7 @@ public class QnaPostRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        Users testUser = Users.builder()
+        User testUser = User.builder()
                 .email("test01@gmail.com")
                 .username("test01")
                 .password("password123")
