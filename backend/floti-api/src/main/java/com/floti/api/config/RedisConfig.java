@@ -3,6 +3,7 @@ package com.floti.api.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  * RedisConfig
  * - Redis 연결 설정 (환경별 host/port를 yml에서 읽어옴)
  */
+@Profile({"dev", "prod"})   // 오직 dev, prod에서만 로딩
 @Configuration
 public class RedisConfig {
 

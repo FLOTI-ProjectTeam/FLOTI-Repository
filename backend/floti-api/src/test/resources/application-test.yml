@@ -4,16 +4,24 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+
   jpa:
     hibernate:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     properties:
-      hibernate:
-        format_sql: true
-        order_inserts: false  # insert 순서 보장 -> 중복 제약 즉시 발생
+      hibernate.format_sql: true
+      hibernate.order_inserts: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 jwt:
-  secret-base64: ${JWT_SECRET_BASE64:VEVTVF9PTkxZX1NFQ1JFVF9GT1JfVEVTVFQxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1} # Base64 인코딩된 문자열 (단순 테스트용 더미 값)
+  secret-base64: ${JWT_SECRET_BASE64:VEVTVF9PTkxZX1NFQ1JFVF9GT1JfVEVTVFQxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1}
   exp-minutes: 5
+
+file:
+  base-url: http://localhost:8080/test-files
