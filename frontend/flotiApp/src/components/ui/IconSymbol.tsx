@@ -22,7 +22,7 @@ const MAPPING = {
 
   // FontAwesome
   'community.fill': { lib: 'FontAwesome', name: 'wechat' },
-  'mindmap.fill': { lib: 'FontAwesome5', name: 'brain' },
+  'mindMap.fill': { lib: 'FontAwesome5', name: 'brain' },
 
   // Ionicons
   'mypage.fill': { lib: 'Ionicons', name: 'happy' },

@@ -2,11 +2,11 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
 
-import { HapticTab } from '@/src/components/HapticTab';
-import { IconSymbol } from '@/src/components/ui/IconSymbol';
-import TabBarBackground from '@/src/components/ui/TabBarBackground';
-import { Colors } from '@/src/constants/Colors';
-import { useColorScheme } from '@/src/hooks/useColorScheme';
+import { HapticTab } from '@/components/HapticTab';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import TabBarBackground from '@/components/ui/TabBarBackground';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -36,9 +36,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="mindmap"
+        name="mind-map"
         options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mindmap.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mindMap.fill" color={color} />,
         }}
       />
       <Tabs.Screen
