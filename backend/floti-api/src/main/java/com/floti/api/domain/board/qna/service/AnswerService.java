@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.qna.dto.AnswerRequest;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
 import com.floti.api.domain.board.qna.entity.Answers;
@@ -23,13 +22,10 @@ import org.springframework.stereotype.Service;
 public class AnswerService {
     private final AnswerRepository answerRepository;
     private final QnaPostRepository qnaPostRepository;
-    private final UserRepository userRepository;
 
     /* 1. 등록 */
     @Transactional
-    public AnswerResponse createAnswer(Long userId, Long postId, AnswerRequest request) {
-        User author = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
+    public AnswerResponse createAnswer(User user, Long postId, AnswerRequest request) {
         QnaPosts qnaPost = qnaPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 
@@ -38,7 +34,7 @@ public class AnswerService {
 
         Answers answer = Answers.builder()
                 .postId(postId)
-                .author(author)
+                .author(user)
                 .content(request.getContent())
                 .build();
 
@@ -51,9 +47,6 @@ public class AnswerService {
     /* 2. 수정 */
     @Transactional
     public AnswerResponse updateAnswer(Long userId, Long id, AnswerRequest request) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         Answers answer = answerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ANSWER_NOT_FOUND));
 
@@ -70,9 +63,6 @@ public class AnswerService {
     /* 3. 삭제 */
     @Transactional
     public void deleteAnswer(Long userId, Long id) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         Answers answer = answerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ANSWER_NOT_FOUND));
 
@@ -90,9 +80,6 @@ public class AnswerService {
     /* 4. 채택 */
     @Transactional
     public void acceptAnswer(Long userId, Long postId, Long id) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         QnaPosts qnaPost = qnaPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
         Answers answer = answerRepository.findById(id)

@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter //테스트용
 public class CommentRequest {
     private Long parentId;
-    private Long authorId; //임시
 
     @NotBlank
     @Size(max = 255)

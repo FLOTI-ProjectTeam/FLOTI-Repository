@@ -1,13 +1,12 @@
 package com.floti.api.domain.board.like.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.auth.repository.UserRepository;
-import com.floti.api.domain.like.entity.UserPostId;
-import com.floti.api.domain.like.dto.LikeResponse;
-import com.floti.api.domain.like.entity.LikeTipPosts;
-import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
+import com.floti.api.domain.like.dto.LikeResponse;
+import com.floti.api.domain.like.entity.LikeTipPosts;
+import com.floti.api.domain.like.entity.UserPostId;
+import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.like.service.LikeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,9 +34,6 @@ public class LikeServiceTest {
     @Mock
     private TipPostRepository tipPostRepository;
 
-    @Mock
-    private UserRepository userRepository;
-
     private static final Long VALID_ID = 1L;
 
     private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
@@ -47,7 +43,6 @@ public class LikeServiceTest {
     @DisplayName("toggleLikeTipPost: 추천 없음 - 게시글 추천")
     void toggleLikeTipPost_like() {
         //given
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(likeTipPostRepository.findById(new UserPostId(VALID_ID, VALID_ID))).thenReturn(Optional.empty());
         when(likeTipPostRepository.save(any(LikeTipPosts.class)))
@@ -67,7 +62,6 @@ public class LikeServiceTest {
         //given
         LikeTipPosts likeTipPost = new LikeTipPosts(VALID_ID, VALID_ID);
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(likeTipPostRepository.findById(new UserPostId(VALID_ID, VALID_ID))).thenReturn(Optional.of(likeTipPost));
         doNothing().when(likeTipPostRepository).delete(any(LikeTipPosts.class));

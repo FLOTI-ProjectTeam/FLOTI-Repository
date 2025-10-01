@@ -99,5 +99,4 @@ public class JwtUtil {
     public long getRefreshExpMinutes() {
         return refreshExpMinutes;
     }
-
 }

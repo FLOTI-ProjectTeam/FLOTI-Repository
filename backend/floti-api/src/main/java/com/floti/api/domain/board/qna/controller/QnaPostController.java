@@ -1,11 +1,15 @@
 package com.floti.api.domain.board.qna.controller;
 
+import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.service.QnaPostService;
+import com.floti.api.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +20,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/community/qnas")
 public class QnaPostController {
     private final QnaPostService qnaPostService;
+    private final AuthUtil authUtil;
 
     /* 1. 조회 & 검색 */
     @GetMapping
@@ -31,31 +36,37 @@ public class QnaPostController {
 
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<QnaPostResponse> getQnaPost(@RequestParam long userId, //임시
+    public ResponseEntity<QnaPostResponse> getQnaPost(@AuthenticationPrincipal UserDetails userDetails,
                                                       @PathVariable long id) {
+        Long userId = authUtil.resolveUserId(userDetails);
         QnaPostResponse response = qnaPostService.getQnaPost(userId, id);
         return ResponseEntity.ok(response);
     }
 
     /* 3. 등록 */
     @PostMapping
-    public ResponseEntity<QnaPostResponse> createQnaPost(@Validated @RequestBody PostRequest post) {
-        QnaPostResponse response = qnaPostService.createQnaPost(post.getAuthorId(), post);
+    public ResponseEntity<QnaPostResponse> createQnaPost(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @Validated @RequestBody PostRequest post) {
+        User user = authUtil.resolveUser(userDetails);
+        QnaPostResponse response = qnaPostService.createQnaPost(user, post);
         return ResponseEntity.status(CREATED).body(response); // 201 Created
     }
 
     /* 4. 수정 */
     @PutMapping("/{id}")
-    public ResponseEntity<QnaPostResponse> updateQnaPost(@Validated @RequestBody PostRequest post,
-                                                         @PathVariable long id) {
-        QnaPostResponse response = qnaPostService.updateQnaPost(post.getAuthorId(), id, post);
+    public ResponseEntity<QnaPostResponse> updateQnaPost(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @PathVariable long id,
+                                                         @Validated @RequestBody PostRequest post) {
+        Long userId = authUtil.resolveUserId(userDetails);
+        QnaPostResponse response = qnaPostService.updateQnaPost(userId, id, post);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 5. 삭제 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQnaPost(@RequestParam long userId, //임시
+    public ResponseEntity<Void> deleteQnaPost(@AuthenticationPrincipal UserDetails userDetails,
                                               @PathVariable long id) {
+        Long userId = authUtil.resolveUserId(userDetails);
         qnaPostService.deleteQnaPost(userId, id);
         return ResponseEntity.noContent().build(); // 204 No Content
     }

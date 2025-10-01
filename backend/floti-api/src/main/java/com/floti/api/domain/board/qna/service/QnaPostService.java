@@ -1,16 +1,15 @@
 package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
-import com.floti.api.domain.like.entity.LikeAnswers;
-import com.floti.api.domain.like.repository.LikeAnswerRepository;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
+import com.floti.api.domain.like.entity.LikeAnswers;
+import com.floti.api.domain.like.repository.LikeAnswerRepository;
 import com.floti.api.error.ExceptionMessage;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 public class QnaPostService {
     private final QnaPostRepository qnaPostRepository;
     private final AnswerRepository answerRepository;
-    private final UserRepository userRepository;
     private final LikeAnswerRepository likeAnswerRepository;
 
     private static final int PAGE_SIZE = 20;
@@ -82,12 +80,9 @@ public class QnaPostService {
 
     /* 3. 등록 */
     @Transactional
-    public QnaPostResponse createQnaPost(Long userId, PostRequest request) {
-        User author = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
-
+    public QnaPostResponse createQnaPost(User user, PostRequest request) {
         QnaPosts qnaPost = QnaPosts.builder()
-                .author(author)
+                .author(user)
                 .title(request.getTitle())
                 .content(request.getContent())
                 .build();
@@ -98,9 +93,6 @@ public class QnaPostService {
     /* 4. 수정 */
     @Transactional
     public QnaPostResponse updateQnaPost(Long userId, Long id, PostRequest request) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         QnaPosts qnaPost = qnaPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 
@@ -114,9 +106,6 @@ public class QnaPostService {
     /* 5. 삭제 */
     @Transactional
     public void deleteQnaPost(Long userId, Long id) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         QnaPosts qnaPost = qnaPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 

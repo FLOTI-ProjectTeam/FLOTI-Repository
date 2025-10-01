@@ -43,17 +43,7 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable()) // HTTP Basic 비활성화
                 .authorizeHttpRequests(auth -> auth
                         // 공개 허용 경로
-                        .requestMatchers(
-                                "/auth/signup",
-                                "/auth/signup/send-code",
-                                "/auth/signup/verify-code",
-                                "/auth/signup/check-username",
-                                "/auth/login",
-                                "/auth/find-username",
-                                "/auth/find-password/send-code",
-                                "/auth/find-password/verify-code",
-                                "/auth/find-password/reset"
-                        ).permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         // 나머지는 인증 필요
                         .anyRequest().authenticated()
                 )

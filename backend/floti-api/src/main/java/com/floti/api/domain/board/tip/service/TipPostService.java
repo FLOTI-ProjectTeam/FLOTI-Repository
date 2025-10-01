@@ -1,13 +1,12 @@
 package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.dto.PostRequest;
-import com.floti.api.domain.image.service.ImageService;
-import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
+import com.floti.api.domain.image.service.ImageService;
+import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.error.ExceptionMessage;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -28,7 +27,6 @@ public class TipPostService {
     private String baseUrl;
 
     private final TipPostRepository tipPostRepository;
-    private final UserRepository userRepository;
     private final LikeTipPostRepository likeTipPostRepository;
     private final ImageService imageService;
 
@@ -65,12 +63,9 @@ public class TipPostService {
 
     /* 3. 등록 */
     @Transactional
-    public TipPostResponse createTipPost(Long userId, PostRequest request, MultipartFile file) {
-        User author = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
-
+    public TipPostResponse createTipPost(User user, PostRequest request, MultipartFile file) {
         TipPosts tipPost = TipPosts.builder()
-                .author(author)
+                .author(user)
                 .title(request.getTitle())
                 .content(request.getContent())
                 .build();
@@ -85,14 +80,11 @@ public class TipPostService {
 
     /* 4. 수정 */
     @Transactional
-    public TipPostResponse updateTipPost(Long userId, Long id, PostRequest request, MultipartFile file, boolean deleted) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
+    public TipPostResponse updateTipPost(User user, Long id, PostRequest request, MultipartFile file, boolean deleted) {
         TipPosts tipPost = tipPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 
-        if (!userId.equals(tipPost.getAuthor().getId()))
+        if (!user.getId().equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
         tipPost.update(request);
@@ -112,9 +104,6 @@ public class TipPostService {
     /* 5. 삭제 */
     @Transactional
     public void deleteTipPost(Long userId, Long id) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         TipPosts tipPost = tipPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
 

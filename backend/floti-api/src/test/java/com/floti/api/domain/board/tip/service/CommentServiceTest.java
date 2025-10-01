@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
@@ -39,9 +38,6 @@ public class CommentServiceTest {
 
     @Mock
     private TipPostRepository tipPostRepository;
-
-    @Mock
-    private UserRepository userRepository;
 
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
@@ -98,13 +94,12 @@ public class CommentServiceTest {
 
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(commentRepository.save(any(Comments.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        CommentResponse response = commentService.createComment(VALID_ID, VALID_ID, request);
+        CommentResponse response = commentService.createComment(testUser, VALID_ID, request);
 
         //then
         assertEquals(VALID_ID, response.getPostId());
@@ -123,14 +118,13 @@ public class CommentServiceTest {
 
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.of(testComment));
         when(commentRepository.save(any(Comments.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        CommentResponse response = commentService.createComment(VALID_ID, VALID_ID, request);
+        CommentResponse response = commentService.createComment(testUser, VALID_ID, request);
 
         //then
         assertEquals(VALID_ID, response.getPostId());
@@ -147,13 +141,12 @@ public class CommentServiceTest {
         CommentRequest request = new CommentRequest();
         request.setParentId(INVALID_ID);
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.empty());
 
         //when
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            commentService.createComment(VALID_ID, VALID_ID, request);
+            commentService.createComment(testUser, VALID_ID, request);
         });
 
         //then
@@ -169,13 +162,12 @@ public class CommentServiceTest {
 
         testComment.softDelete();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.of(testComment));
 
         //when
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            commentService.createComment(VALID_ID, VALID_ID, request);
+            commentService.createComment(testUser, VALID_ID, request);
         });
 
         //then
@@ -189,13 +181,12 @@ public class CommentServiceTest {
         CommentRequest request = new CommentRequest();
         request.setParentId(INVALID_ID);
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(commentRepository.findByIdAndPostId(anyLong(), anyLong())).thenReturn(Optional.of(testReply));
 
         //when
         ReplyNotAllowedException exception = assertThrows(ReplyNotAllowedException.class, () -> {
-            commentService.createComment(VALID_ID, VALID_ID, request);
+            commentService.createComment(testUser, VALID_ID, request);
         });
 
         //then
@@ -209,7 +200,6 @@ public class CommentServiceTest {
         CommentRequest request = new CommentRequest();
         request.setContent("수정된 댓글");
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testComment));
 
         //when
@@ -225,7 +215,6 @@ public class CommentServiceTest {
         //given
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testComment));
         when(tipPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 
@@ -243,7 +232,6 @@ public class CommentServiceTest {
         //given
         int previousCommentCount = testPost.getCommentCount();
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testReply));
         when(tipPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 

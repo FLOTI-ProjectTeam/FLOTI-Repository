@@ -1,7 +1,8 @@
 package com.floti.api.domain.like.service;
 
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.common.entity.LikeableEntity;
+import com.floti.api.domain.board.qna.repository.AnswerRepository;
+import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.domain.like.dto.LikeResponse;
 import com.floti.api.domain.like.entity.LikeAnswers;
 import com.floti.api.domain.like.entity.LikeTipPosts;
@@ -9,8 +10,6 @@ import com.floti.api.domain.like.entity.UserAnswerId;
 import com.floti.api.domain.like.entity.UserPostId;
 import com.floti.api.domain.like.repository.LikeAnswerRepository;
 import com.floti.api.domain.like.repository.LikeTipPostRepository;
-import com.floti.api.domain.board.qna.repository.AnswerRepository;
-import com.floti.api.domain.board.tip.repository.TipPostRepository;
 import com.floti.api.error.ExceptionMessage;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,16 +26,11 @@ public class LikeService {
     private final LikeAnswerRepository likeAnswerRepository;
     private final TipPostRepository tipPostRepository;
     private final AnswerRepository answerRepository;
-    private final UserRepository userRepository;
 
-    public LikeResponse toggleLike(Long userId,
-                                   Supplier<LikeableEntity> targetSupplier,
+    public LikeResponse toggleLike(Supplier<LikeableEntity> targetSupplier,
                                    Supplier<Object> likeSupplier,
                                    Runnable saveLike,
                                    Consumer<Object> deleteLike) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         LikeableEntity likeableEntity = targetSupplier.get();
         Object likeEntity = likeSupplier.get();
         boolean liked = (likeEntity == null);
@@ -56,7 +50,6 @@ public class LikeService {
     @Transactional
     public LikeResponse toggleLikeTipPost(Long userId, Long postId) {
         return toggleLike(
-                userId,
                 () -> tipPostRepository.findById(postId)
                         .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND)),
                 () -> likeTipPostRepository.findById(new UserPostId(userId, postId)).orElse(null),
@@ -69,7 +62,6 @@ public class LikeService {
     @Transactional
     public LikeResponse toggleLikeAnswer(Long userId, Long answerId) {
         return toggleLike(
-                userId,
                 () -> answerRepository.findById(answerId)
                         .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ANSWER_NOT_FOUND)),
                 () -> likeAnswerRepository.findById(new UserAnswerId(userId, answerId)).orElse(null),

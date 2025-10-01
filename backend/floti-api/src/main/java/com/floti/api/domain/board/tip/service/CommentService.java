@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final TipPostRepository tipPostRepository;
-    private final UserRepository userRepository;
 
     /* 1. 조회 */
     public List<CommentResponse> getComments(Long postId) {
@@ -57,9 +55,7 @@ public class CommentService {
 
     /* 2. 등록 */
     @Transactional
-    public CommentResponse createComment(Long userId, Long postId, CommentRequest request) {
-        User author = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND));
+    public CommentResponse createComment(User user, Long postId, CommentRequest request) {
         TipPosts tipPost = tipPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
         Long parentId = request.getParentId();
@@ -78,7 +74,7 @@ public class CommentService {
         Comments comment = Comments.builder()
                 .postId(postId)
                 .parentId(parentId)
-                .author(author)
+                .author(user)
                 .content(request.getContent())
                 .build();
 
@@ -91,9 +87,6 @@ public class CommentService {
     /* 3. 수정 */
     @Transactional
     public CommentResponse updateComment(Long userId, Long id, CommentRequest request) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         Comments comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.COMMENT_NOT_FOUND));
 
@@ -107,9 +100,6 @@ public class CommentService {
     /* 4. 삭제 */
     @Transactional
     public void deleteComment(Long userId, Long id) {
-        if (!userRepository.existsById(userId))
-            throw new EntityNotFoundException(ExceptionMessage.USER_NOT_FOUND);
-
         Comments comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.COMMENT_NOT_FOUND));
 

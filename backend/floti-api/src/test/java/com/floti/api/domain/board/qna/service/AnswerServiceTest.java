@@ -1,7 +1,6 @@
 package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.board.qna.dto.AnswerRequest;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
 import com.floti.api.domain.board.qna.entity.Answers;
@@ -42,9 +41,6 @@ public class AnswerServiceTest {
     @Mock
     private AnswerRepository answerRepository;
 
-    @Mock
-    private UserRepository userRepository;
-
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
 
@@ -67,13 +63,12 @@ public class AnswerServiceTest {
 
         int previousAnswerCount = testPost.getAnswerCount();
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(answerRepository.save(any(Answers.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        AnswerResponse response = answerService.createAnswer(VALID_ID, VALID_ID, request);
+        AnswerResponse response = answerService.createAnswer(testUser, VALID_ID, request);
 
         //then
         assertEquals(VALID_ID, response.getPostId());
@@ -90,12 +85,11 @@ public class AnswerServiceTest {
 
         testPost.accept(testAnswer);
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
         PostAlreadyClosedException exception = assertThrows(PostAlreadyClosedException.class, () -> {
-            answerService.createAnswer(VALID_ID, INVALID_ID, request);
+            answerService.createAnswer(testUser, INVALID_ID, request);
         });
 
         //then
@@ -109,7 +103,6 @@ public class AnswerServiceTest {
         AnswerRequest request = new AnswerRequest();
         request.setContent("수정된 답변");
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
         //when
@@ -125,7 +118,6 @@ public class AnswerServiceTest {
         //given
         AnswerRequest request = new AnswerRequest();
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(answerRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when
@@ -145,7 +137,6 @@ public class AnswerServiceTest {
 
         testAnswer.accept();
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
         //when
@@ -163,7 +154,6 @@ public class AnswerServiceTest {
         // given
         int previousAnswerCount = testPost.getAnswerCount();
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
         when(qnaPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 
@@ -181,7 +171,6 @@ public class AnswerServiceTest {
         //given
         testAnswer.accept();
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
         //when
@@ -197,7 +186,6 @@ public class AnswerServiceTest {
     @DisplayName("acceptAnswer: 답변 채택")
     void acceptAnswer_success() {
         //given
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
@@ -213,7 +201,6 @@ public class AnswerServiceTest {
     @DisplayName("acceptAnswer: 작성자 아님 - AccessDeniedException")
     void acceptAnswer_fail_authorMismatch() {
         //given
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
@@ -232,7 +219,6 @@ public class AnswerServiceTest {
         //given
         testPost.accept(testAnswer);
 
-        when(userRepository.existsById(anyLong())).thenReturn(true);
         when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
