@@ -42,15 +42,15 @@ public class JwtUtil {
      */
     // JWT 생성: 주체(subject)=username, 만료시간 포함
     public String generateToken(String username) {
-        // 만료 시각 계산(현재 + expMinutes)
-        Instant now = Instant.now();
-        Instant exp = now.plus(expMinutes, ChronoUnit.MINUTES);
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        Date exp = new Date(nowMillis + expMinutes * 60 * 1000);
 
         // HS256 알고리즘으로 서명된 JWT를 생성
         return Jwts.builder()
                 .setSubject(username) // 토큰의 주체
-                .setIssuedAt(Date.from(now)) // 발급 시각
-                .setExpiration(Date.from(exp)) // 만료 시각
+                .setIssuedAt(new Date(nowMillis)) // 발급 시각
+                .setExpiration(exp) // 만료 시각
                 .signWith(signingKey, SignatureAlgorithm.HS256) // 서명(HS256 + 비밀키)
                 .compact(); // 문자열 토큰 생성
     }
@@ -84,13 +84,14 @@ public class JwtUtil {
      * Refresh 토큰 생성
      */
     public String generateRefreshToken(String username) {
-        Instant now = Instant.now();
-        Instant exp = now.plus(refreshExpMinutes, ChronoUnit.MINUTES);
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        Date exp = new Date(nowMillis + refreshExpMinutes * 60 * 1000);
 
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(exp))
+                .setIssuedAt(new Date(nowMillis))
+                .setExpiration(exp)
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }

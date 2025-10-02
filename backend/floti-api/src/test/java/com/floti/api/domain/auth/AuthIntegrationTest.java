@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 public class AuthIntegrationTest {
 
     @Autowired
@@ -45,7 +45,7 @@ public class AuthIntegrationTest {
         mockMvc.perform(post("/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(signup)))
-                        .andExpect(status().isCreated());
+                .andExpect(status().isCreated());
 
         // 2) 로그인 요청 DTO
         LoginRequestDto login = new LoginRequestDto("user1", "pw123456");
@@ -54,12 +54,12 @@ public class AuthIntegrationTest {
         String loginResponse = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(login)))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.data.jwt").exists())
-                        .andExpect(jsonPath("$.data.refreshToken").exists())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.jwt").exists())
+                .andExpect(jsonPath("$.data.refreshToken").exists())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         // JSON 파싱 → 토큰 추출
         String accessToken = om.readTree(loginResponse).path("data").path("jwt").asText();
@@ -73,11 +73,11 @@ public class AuthIntegrationTest {
         String refreshResponse = mockMvc.perform(post("/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"" + refreshToken + "\"}"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.accessToken").exists())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         String newAccessToken = om.readTree(refreshResponse).path("accessToken").asText();
         assertThat(newAccessToken).isNotEqualTo(accessToken); // 새 토큰이 발급되었는지 확인
@@ -86,8 +86,8 @@ public class AuthIntegrationTest {
         mockMvc.perform(post("/auth/logout")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"" + refreshToken + "\"}"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.message").value("Logged out"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Logged out"));
 
         String afterLogout = refreshTokenService.get("user1");
         assertThat(afterLogout).isNull(); // 로그아웃 후 저장소에서 제거됨
@@ -112,7 +112,7 @@ public class AuthIntegrationTest {
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(login)))
-                        .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class AuthIntegrationTest {
         mockMvc.perform(post("/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"fake.token.value\"}"))
-                        .andExpect(status().isUnauthorized())
-                        .andExpect(jsonPath("$.error").value("Invalid refresh token"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Invalid refresh token"));
     }
 }
