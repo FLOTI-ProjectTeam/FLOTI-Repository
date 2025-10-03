@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { BASE_URL } from '@/constants/api';
+import { BASE_URL } from '@/constants/endpoints';
 
-/* axios 인스턴스 생성 */
+// Axios 인스턴스 생성: API 호출 시 공통 설정 적용
 const apiClient = axios.create({
     baseURL: BASE_URL,
     timeout: 5000,
 });
 
-/* 모든 요청 전에 JWT 토큰 자동 추가 */
+// 모든 요청에 JWT 토큰 자동 추가
 apiClient.interceptors.request.use(config => {
     const jwt = localStorage.getItem('jwt'); 
     if (jwt) config.headers.Authorization = `Bearer ${jwt}`;

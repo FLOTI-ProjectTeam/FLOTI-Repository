@@ -4,27 +4,26 @@ import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import COLORS from '@/constants/colors';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarInactiveTintColor: '#B0C4DE', // 기본 탭 색상
-        tabBarActiveTintColor: '#153257',   // 활성화된 탭 색상
+        tabBarInactiveTintColor: COLORS.ICON.LIGHT_SLATE, // 기본 탭 색상
+        tabBarActiveTintColor: COLORS.ICON.DARK_GRAY,  // 활성화 탭 색상
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+          android: {
+            borderTopWidth: 0,  // 구분선 제거
+            elevation: 0 // 그림자 제거
           },
-          default: {},
+          ios: {
+            position: 'absolute', // 투명 배경을 사용하여 블러 효과 표시
+            borderTopWidth: 0,  // 구분선 제거
+            shadowOpacity: 0 // 그림자 제거
+          }
         }),
         tabBarLabel: () => null,  // 라벨 제거
       }}
@@ -32,19 +31,19 @@ export default function TabLayout() {
       <Tabs.Screen
         name="community"
         options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="community.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={26} name="community.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="mind-map"
         options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mindMap.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="mindMap.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="home"
+        name="index"
         options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -56,7 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mypage"
         options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mypage.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={26} name="mypage.fill" color={color} />,
         }}
       />
     </Tabs>

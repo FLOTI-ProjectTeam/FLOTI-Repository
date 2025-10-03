@@ -2,7 +2,7 @@
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SymbolWeight } from 'expo-symbols';
 import React from 'react';
@@ -14,15 +14,15 @@ const MAPPING = {
   // See SF Symbols in the SF Symbols app on Mac.
   
   // MaterialIcons
-  'house.fill': { lib: 'MaterialIcons', name: 'home' },
   'paperplane.fill': { lib: 'MaterialIcons', name: 'send' },
   'chevron.left.forwardslash.chevron.right': { lib: 'MaterialIcons', name: 'code' },
   'chevron.right': { lib: 'MaterialIcons', name: 'chevron-right' },
-  'report.fill': { lib: 'MaterialIcons', name: 'auto-graph' },
+  'report.fill': { lib: 'MaterialIcons', name: 'analytics' },
 
   // FontAwesome
   'community.fill': { lib: 'FontAwesome', name: 'wechat' },
-  'mindMap.fill': { lib: 'FontAwesome5', name: 'brain' },
+  'mindMap.fill': { lib: 'FontAwesome6', name: 'brain' },
+  'house.fill': { lib: 'FontAwesome6', name: 'house' },
 
   // Ionicons
   'mypage.fill': { lib: 'Ionicons', name: 'happy' },
@@ -56,8 +56,8 @@ export function IconSymbol({
       return <MaterialIcons color={color} size={size} name={mapping.name} style={style as any} />;
     case 'FontAwesome':
       return <FontAwesome color={color} size={size} name={mapping.name} style={style as any} />;
-    case 'FontAwesome5':
-      return <FontAwesome5 color={color} size={size} name={mapping.name} style={style as any} />;
+    case 'FontAwesome6':
+      return <FontAwesome6 color={color} size={size} name={mapping.name} style={style as any} />;
     case 'Ionicons':
       return <Ionicons color={color} size={size} name={mapping.name} style={style as any} />;
   }

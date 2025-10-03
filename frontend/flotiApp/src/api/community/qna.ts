@@ -1,42 +1,42 @@
 import apiClient from '@/api/apiClient';
-import { QNA_URL } from '@/constants/api'
+import { QNA_API } from '@/constants/endpoints';
 import { PostRequest } from '@/types/community/common';
 import { QnaPostResponse, AnswerRequest, AnswerReponse } from '@/types/community/qna';
 
-/* QNA 게시판 글 API */
+/* 게시글 API */
 // 1. 조회 & 검색
-export const getQnaPosts = (search?: string, sort = 'latest', page = 0, accepted = 'false') =>
-    apiClient.get<QnaPostResponse[]>(QNA_URL, { params: { search, sort, page, accepted } });
+export const getQnaPosts = (search?: string, sort: string = 'latest', page: number = 0, accepted: boolean = false) =>
+    apiClient.get<QnaPostResponse[]>(QNA_API.POST_BASE, { params: { search, sort, page, accepted } });
 
 // 2. 상세 조회
-export const getQnaPost = (id: number) => 
-    apiClient.get<QnaPostResponse>(`${QNA_URL}/${id}`);
+export const getQnaPost = (postId: number) => 
+    apiClient.get<QnaPostResponse>(QNA_API.POST_DETAIL(postId));
 
 // 3. 등록
 export const createQnaPost = (data: PostRequest) => 
-    apiClient.post<QnaPostResponse>(QNA_URL, data);
+    apiClient.post<QnaPostResponse>(QNA_API.POST_BASE, data);
 
 // 4. 수정
-export const updateQnaPost = (id: number, data: PostRequest) =>
-    apiClient.put<QnaPostResponse>(`${QNA_URL}/${id}`, data);
+export const updateQnaPost = (postId: number, data: PostRequest) =>
+    apiClient.put<QnaPostResponse>(QNA_API.POST_DETAIL(postId), data);
 
 // 5. 삭제
-export const deleteQnaPost = (id: number) => 
-    apiClient.delete(`${QNA_URL}/${id}`);
+export const deleteQnaPost = (postId: number) => 
+    apiClient.delete(QNA_API.POST_DETAIL(postId));
 
-/* QNA 게시판 답변 API */
+/* 답변 API */
 // 1. 등록
 export const createAnswer = (postId: number, data: AnswerRequest) => 
-    apiClient.post<AnswerReponse>(`${QNA_URL}/${postId}/answers`, data);
+    apiClient.post<AnswerReponse>(QNA_API.ENTITY_BASE(postId), data);
   
 // 2. 수정
-export const updateAnswer = (id: number, data: AnswerRequest) => 
-    apiClient.put<AnswerReponse>(`${QNA_URL}/answers/${id}`, data);
+export const updateAnswer = (answerId: number, data: AnswerRequest) => 
+    apiClient.put<AnswerReponse>(QNA_API.ENTITY_DETAIL(answerId), data);
 
 // 3. 삭제
-export const deleteAnswer = (id: number) => 
-    apiClient.delete(`${QNA_URL}/answers/${id}`);
+export const deleteAnswer = (answerId: number) => 
+    apiClient.delete(QNA_API.ENTITY_DETAIL(answerId));
 
 // 4. 채택
-export const acceptAnswer = (postId: number, id: number) => 
-    apiClient.patch(`${QNA_URL}/${postId}/answers/${id}/accept`);
+export const acceptAnswer = (postId: number, answerId: number) => 
+    apiClient.patch(QNA_API.ACCEPT_ENTITY(postId, answerId));

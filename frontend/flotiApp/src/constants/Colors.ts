@@ -1,26 +1,47 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+const COLORS = {
+  BLACK: '#000000',
+  WHITE: '#FFFFFF',
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+  TEXT: {
+    DARK_GRAY: '#323232',
+    MEDIUM_GRAY: '#898989',
+    LIGHT_GRAY: '#BDBDBD',
+    NAVY: '#405876',
+    SKY: '#4FC3F7'
+  },
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+  BACKGROUND: {
+    LIGHT_SLATE: '#EBF0F6',
+    LIGHT_POWDER: '#E8F6F8'
   },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+
+  TINT: {
+    GRAY: '#DDDDDD',
+    LIGHT_GRAY: '#F3F5F7',
+    RED: '#FF5356',
+    SLATE: '#B0C4DE',
+    SOFT_SLATE: '#D7E1EE',
+    POWDER: '#B0E0E6',
+    LIGHT_POWDER: '#E8F6F8'
   },
+
+  CARD: {
+    LIGHT_SLATE: '#EBF0F6',
+    LIGHT_POWDER: '#E8F6F8'
+  },
+
+  BUTTON: {
+    GRAY: '#DDDDDD',
+    NAVY: '#153257',
+    DARK_SLATE: '#7D98C9',
+    SLATE: '#B0C4DE',
+    POWDER: '#B0E0E6'
+  },
+
+  ICON: {
+    DARK_GRAY: '#556170',
+    LIGHT_SLATE: '#B0C4DE'
+  }
 };
+
+export default COLORS;
