@@ -110,6 +110,7 @@ public class TipPostService {
         if (!userId.equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
 
+        imageService.deleteImage(tipPost.getThumbnail());
         tipPostRepository.delete(tipPost);
     }
 }
