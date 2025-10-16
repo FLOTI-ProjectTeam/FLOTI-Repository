@@ -1,4 +1,4 @@
-import { TipPostResponse } from '@/types/community/tip';
+import { TipPostResponse, CommentResponse } from '@/types/community/tip';
 
 const URL: string = 'https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg';
 
@@ -32,5 +32,65 @@ export const dummyPosts: TipPostResponse[] = [
     commentCount: 1,
     likeCount: 0,
     liked: false,
+  },
+];
+
+export const dummyComments: CommentResponse[] = [
+  {
+      id: 1,
+      postId: 1,
+      author: {
+          id: 1,
+          nickname: "Alice",
+          profileImage: "https://i.pravatar.cc/150?img=1",
+      },
+      content: "좋은 글 감사합니다!",
+      thumbnail: "",
+      likeCount: 5,
+      deleted: false,
+      replies: [
+          {
+              id: 2,
+              postId: 1,
+              author: {
+                  id: 2,
+                  nickname: "Bob",
+                  profileImage: "https://i.pravatar.cc/150?img=2",
+              },
+              content: "저도 공감합니다!",
+              thumbnail: "",
+              likeCount: 2,
+              deleted: false,
+              replies: [],
+          },
+      ],
+  },
+  {
+      id: 3,
+      postId: 1,
+      author: {
+          id: 3,
+          nickname: "Charlie",
+          profileImage: "https://i.pravatar.cc/150?img=3",
+      },
+      content: "조금 다른 의견이 있습니다.",
+      thumbnail: "",
+      likeCount: 1,
+      deleted: false,
+      replies: [],
+  },
+  {
+      id: 4,
+      postId: 2,
+      author: {
+          id: 4,
+          nickname: "David",
+          profileImage: "https://i.pravatar.cc/150?img=4",
+      },
+      content: "이 글 정말 도움이 되었어요.",
+      thumbnail: "",
+      likeCount: 3,
+      deleted: false,
+      replies: [],
   },
 ];

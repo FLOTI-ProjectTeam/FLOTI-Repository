@@ -1,5 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter, useSegments } from 'expo-router';
+import { useEffect } from 'react';
 
 import COLORS from '@/constants/colors';
 
@@ -10,39 +11,32 @@ const TAB_ITEMS = [
   { name: 'qna', title: '❓ Q&A', path: '/community/qna' },
 ];
 
-function CommunityTabBar() {
+export default function CommunityTabBar() {
   const router = useRouter();
   const segments = useSegments();
   
-  const currentTab = segments[segments.length - 1] || 'tip';
+  // 현재 탭 계산
+  const currentTab = segments[segments.length - 1] || "tip";
 
-  const handleTabPress = (tabName: string, path: string) => {
-    router.push(path as any);
-  };
+  // 첫 진입 시 TIP 게시판으로 이동
+  useEffect(() => {
+    if (currentTab === "community") {
+      router.replace("/community/tip");
+    }
+  }, [segments]);
+
+  // 탭 클릭 이벤트
+  const handleTabPress = (path: string) => router.push(path as any);
 
   return (
     <View style={styles.tabBarContainer}>
-      {TAB_ITEMS.map((tab) => {
-        const isFocused = currentTab === tab.name;
+      {TAB_ITEMS.map(({ name, title, path }) => {
+        const isFocused = currentTab === name;
 
         return (
-          <Pressable
-            key={tab.name}
-            onPress={() => handleTabPress(tab.name, tab.path)}
-            style={styles.tabItem}
-          >
-            <View style={[
-              styles.tabLabelContainer,
-              isFocused && styles.tabLabelContainerActive
-            ]}>
-              <Text
-                style={[
-                  styles.tabLabel,
-                  isFocused && styles.tabLabelActive
-                ]}
-              >
-                {tab.title}
-              </Text>
+          <Pressable key={name} onPress={() => handleTabPress(path)} style={styles.tabItem}>
+            <View style={[styles.tabLabelContainer, isFocused && styles.tabLabelContainerActive]}>
+              <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{title}</Text>
             </View>
           </Pressable>
         );
@@ -61,24 +55,21 @@ const styles = StyleSheet.create({
   tabItem: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   tabLabelContainer: {
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16
+    paddingVertical: 8
   },
   tabLabelContainerActive: {
-    backgroundColor: COLORS.TINT.LIGHT_POWDER,
+    backgroundColor: COLORS.TINT.SLATE_LIGHT,
+    borderRadius: 8
   },
   tabLabel: {
     fontSize: 14,
-    fontWeight: '500',
-    color: COLORS.BLACK,
+    color: 'black'
   },
   tabLabelActive: {
-    fontWeight: '800',
-  },
+    fontWeight: 'bold'
+  }
 });
-
-export default CommunityTabBar;

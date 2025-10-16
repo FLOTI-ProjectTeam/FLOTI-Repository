@@ -1,46 +1,45 @@
 const COLORS = {
-  BLACK: '#000000',
-  WHITE: '#FFFFFF',
-
   TEXT: {
-    DARK_GRAY: '#323232',
-    MEDIUM_GRAY: '#898989',
-    LIGHT_GRAY: '#BDBDBD',
+    GRAY_DARK: '#323232',
+    GRAY_CHARCOAL: '#556170',
+    GRAY_MEDIUM: '#898989',
+    GRAY_LIGHT: '#BDBDBD',
     NAVY: '#405876',
     SKY: '#4FC3F7'
   },
 
   BACKGROUND: {
-    LIGHT_SLATE: '#EBF0F6',
-    LIGHT_POWDER: '#E8F6F8'
-  },
-
-  TINT: {
-    GRAY: '#DDDDDD',
-    LIGHT_GRAY: '#F3F5F7',
-    RED: '#FF5356',
-    SLATE: '#B0C4DE',
-    SOFT_SLATE: '#D7E1EE',
-    POWDER: '#B0E0E6',
-    LIGHT_POWDER: '#E8F6F8'
+    SLATE_LIGHT: '#EBF0F6',
+    POWDER_LIGHT: '#E8F6F8'
   },
 
   CARD: {
-    LIGHT_SLATE: '#EBF0F6',
-    LIGHT_POWDER: '#E8F6F8'
+    SLATE_LIGHT: '#EBF0F6',
+    POWDER_LIGHT: '#E8F6F8'
   },
 
   BUTTON: {
     GRAY: '#DDDDDD',
     NAVY: '#153257',
-    DARK_SLATE: '#7D98C9',
+    SLATE_DARK: '#7D98C9',
     SLATE: '#B0C4DE',
     POWDER: '#B0E0E6'
   },
 
   ICON: {
-    DARK_GRAY: '#556170',
-    LIGHT_SLATE: '#B0C4DE'
+    GRAY_DARK: '#556170',
+    SLATE_LIGHT: '#B0C4DE'
+  },
+
+  TINT: {
+    GRAY: '#DDDDDD',
+    GRAY_LIGHT: '#F3F5F7',
+    RED: '#FF5356',
+    SLATE: '#B0C4DE',
+    SLATE_SOFT: '#D7E1EE',
+    SLATE_LIGHT: '#EBF0F6',
+    POWDER: '#B0E0E6',
+    POWDER_LIGHT: '#E8F6F8'
   }
 };
 
