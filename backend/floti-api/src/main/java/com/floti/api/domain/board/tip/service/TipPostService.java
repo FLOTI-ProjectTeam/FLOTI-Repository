@@ -43,14 +43,14 @@ public class TipPostService {
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, sortOrder);
         Page<TipPosts> tipPostPage = tipPostRepository.findAll(pageable);
-        return tipPostPage.map(tipPost -> new TipPostResponse(tipPost, baseUrl));
+        return tipPostPage.map(p -> new TipPostResponse(p, baseUrl));
     }
 
     /* 1-2. 검색 */
     public Page<TipPostResponse> searchTipPosts(String search, String sort, int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<TipPosts> tipPostPage = tipPostRepository.searchTipPosts(search, sort, pageable);
-        return tipPostPage.map(tipPost -> new TipPostResponse(tipPost, baseUrl));
+        return tipPostPage.map(tp -> new TipPostResponse(tp, baseUrl));
     }
 
     /* 2. 상세 조회 */
@@ -87,7 +87,7 @@ public class TipPostService {
         if (!user.getId().equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        tipPost.update(request);
+        tipPost.update(request.getTitle(), request.getContent());
 
         if (file != null && !file.isEmpty()) {
             String newPath = imageService.saveImage(file, THUMBNAIL_DIR);

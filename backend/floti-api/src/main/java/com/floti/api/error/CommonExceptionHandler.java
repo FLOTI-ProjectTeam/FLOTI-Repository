@@ -21,23 +21,24 @@ public class CommonExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<String> handleMaxUploadSize(MaxUploadSizeExceededException e) {
-        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("최대 20MB까지 업로드 가능합니다."); // 413 Payload Too Lager
+    @ExceptionHandler(MaxParticipantExceededException.class)
+    public ResponseEntity<String> handleMaxParticipantExceeded(MaxParticipantExceededException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409 Conflict
     }
 
-    @ExceptionHandler(ImageStorageException.class)
-    public ResponseEntity<String> handleImageStorage(ImageStorageException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500 Internal Server Error
+    /* 사용자 예외 */
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFound(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
     }
 
-    /* 댓글 관련 예외 */
+    /* 댓글 예외 */
     @ExceptionHandler(ReplyNotAllowedException.class)
     public ResponseEntity<String> handleReplyNotAllowed(ReplyNotAllowedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
     }
 
-    /* 답변 관련 예외 */
+    /* 답변 예외 */
     @ExceptionHandler(AcceptedAnswerUpdateException.class)
     public ResponseEntity<String> handleAcceptedAnswerUpdate(AcceptedAnswerUpdateException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Not Found
@@ -56,5 +57,21 @@ public class CommonExceptionHandler {
     @ExceptionHandler(PostAlreadyAcceptedException.class)
     public ResponseEntity<String> handlePostAlreadyAccepted(PostAlreadyAcceptedException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409 Conflict
+    }
+
+    /* 이미지 예외 */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<String> handleMaxUploadSize(MaxUploadSizeExceededException e) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("최대 20MB까지 업로드 가능합니다."); // 413 Payload Too Lager
+    }
+
+    @ExceptionHandler(ImageSaveFailedException.class)
+    public ResponseEntity<String> handleImageSaveFailed(ImageSaveFailedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500 Internal Server Error
+    }
+
+    @ExceptionHandler(ImageDeleteFailedException.class)
+    public ResponseEntity<String> handleImageDeleteFailed(ImageDeleteFailedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500 Internal Server Error
     }
 }

@@ -2,6 +2,7 @@ package com.floti.api.domain.board.qna.controller;
 
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
+import com.floti.api.domain.board.qna.dto.QnaPostDetailResponse;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.service.QnaPostService;
 import com.floti.api.util.AuthUtil;
@@ -20,6 +21,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/community/qnas")
 public class QnaPostController {
     private final QnaPostService qnaPostService;
+
     private final AuthUtil authUtil;
 
     /* 1. 조회 & 검색 */
@@ -36,11 +38,11 @@ public class QnaPostController {
 
     /* 2. 상세 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<QnaPostResponse> getQnaPost(@AuthenticationPrincipal UserDetails userDetails,
-                                                      @PathVariable long id) {
+    public ResponseEntity<QnaPostDetailResponse> getQnaPost(@AuthenticationPrincipal UserDetails userDetails,
+                                                            @PathVariable long id) {
         Long userId = authUtil.resolveUserId(userDetails);
-        QnaPostResponse response = qnaPostService.getQnaPost(userId, id);
-        return ResponseEntity.ok(response);
+        QnaPostDetailResponse response = qnaPostService.getQnaPost(userId, id);
+        return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 3. 등록 */

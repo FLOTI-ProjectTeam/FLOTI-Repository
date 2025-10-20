@@ -1,12 +1,12 @@
 package com.floti.api.domain.board.tip.entity;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.board.tip.dto.CommentRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -36,6 +36,7 @@ public class Comments {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -48,15 +49,8 @@ public class Comments {
         this.content = content;
     }
 
-    @PrePersist //테스트용
-    public void prePersist() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
-
-    public void update(CommentRequest request) {
-        this.content = request.getContent();
+    public void update(String content) {
+        this.content = content;
     }
 
     public void softDelete() {

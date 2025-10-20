@@ -3,6 +3,7 @@ package com.floti.api.domain.board.qna.service;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
+import com.floti.api.domain.board.qna.dto.QnaPostDetailResponse;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
 import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,7 +58,7 @@ public class QnaPostService {
     }
 
     /* 2. 상세 조회 */
-    public QnaPostResponse getQnaPost(Long userId, Long id) {
+    public QnaPostDetailResponse getQnaPost(Long userId, Long id) {
         QnaPosts qnaPost = qnaPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
         List<Answers> answers = answerRepository.findByPostId(id);
@@ -72,22 +74,22 @@ public class QnaPostService {
                 .collect(Collectors.toSet());
 
         List<AnswerResponse> answerResponses = answers.stream()
-                .map(answer -> new AnswerResponse(answer, likedAnswerIds.contains(answer.getId())))
+                .map(a -> new AnswerResponse(a, likedAnswerIds.contains(a.getId())))
                 .toList();
 
-        return new QnaPostResponse(qnaPost, answerResponses);
+        return new QnaPostDetailResponse(qnaPost, answerResponses);
     }
 
     /* 3. 등록 */
     @Transactional
-    public QnaPostResponse createQnaPost(User user, PostRequest request) {
+    public QnaPostDetailResponse createQnaPost(User user, PostRequest request) {
         QnaPosts qnaPost = QnaPosts.builder()
                 .author(user)
                 .title(request.getTitle())
                 .content(request.getContent())
                 .build();
 
-        return new QnaPostResponse(qnaPostRepository.save(qnaPost));
+        return new QnaPostDetailResponse(qnaPostRepository.save(qnaPost), Collections.emptyList());
     }
 
     /* 4. 수정 */
@@ -99,7 +101,7 @@ public class QnaPostService {
         if (!userId.equals(qnaPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        qnaPost.update(request);
+        qnaPost.update(request.getTitle(), request.getContent());
         return new QnaPostResponse(qnaPost);
     }
 

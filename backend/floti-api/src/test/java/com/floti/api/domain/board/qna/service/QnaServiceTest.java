@@ -1,13 +1,13 @@
 package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.like.entity.LikeAnswers;
-import com.floti.api.domain.like.repository.LikeAnswerRepository;
-import com.floti.api.domain.board.qna.dto.QnaPostResponse;
+import com.floti.api.domain.board.qna.dto.QnaPostDetailResponse;
 import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.floti.api.domain.board.qna.repository.AnswerRepository;
 import com.floti.api.domain.board.qna.repository.QnaPostRepository;
+import com.floti.api.domain.like.entity.LikeAnswers;
+import com.floti.api.domain.like.repository.LikeAnswerRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,7 +59,7 @@ public class QnaServiceTest {
         when(likeAnswerRepository.findByUserIdAndAnswerIdIn(anyLong(), anyList())).thenReturn(List.of(likeAnswer));
 
         //when
-        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
+        QnaPostDetailResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());
@@ -79,7 +79,7 @@ public class QnaServiceTest {
         when(likeAnswerRepository.findByUserIdAndAnswerIdIn(anyLong(), anyList())).thenReturn(Collections.emptyList());
 
         //when
-        QnaPostResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
+        QnaPostDetailResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());

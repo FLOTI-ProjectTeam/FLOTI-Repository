@@ -1,6 +1,7 @@
 package com.floti.api.domain.image.service;
 
-import com.floti.api.error.exception.ImageStorageException;
+import com.floti.api.error.exception.ImageDeleteFailedException;
+import com.floti.api.error.exception.ImageSaveFailedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,7 +41,7 @@ public class ImageService {
 
             return directory + "/" + fileName;
         } catch (IOException e) {
-            throw new ImageStorageException("이미지 저장에 실패하였습니다.");
+            throw new ImageSaveFailedException();
         }
     }
 
@@ -51,7 +52,7 @@ public class ImageService {
         try {
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
-            throw new ImageStorageException("이미지 삭제에 실패하였습니다.");
+            throw new ImageDeleteFailedException();
         }
     }
 }

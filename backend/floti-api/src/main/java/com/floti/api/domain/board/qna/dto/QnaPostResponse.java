@@ -17,23 +17,17 @@ public class QnaPostResponse {
     private final String content;
     private final int answerCount;
     private final boolean accepted;
-    private final List<AnswerResponse> answers;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
     private final LocalDateTime createdAt;
 
     public QnaPostResponse(QnaPosts qnaPost) {
-        this(qnaPost, Collections.emptyList());
-    }
-
-    public QnaPostResponse(QnaPosts qnaPost, List<AnswerResponse> answers) {
         this.id = qnaPost.getId();
         this.author = new AuthorResponse(qnaPost.getAuthor());
         this.title = qnaPost.getTitle();
         this.content = qnaPost.getContent();
         this.answerCount = qnaPost.getAnswerCount();
         this.accepted = qnaPost.isAccepted();
-        this.answers = answers;
         this.createdAt = qnaPost.getCreatedAt();
     }
 }

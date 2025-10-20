@@ -4,6 +4,8 @@ import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.qna.dto.AnswerRequest;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
 import com.floti.api.domain.board.qna.service.AnswerService;
+import com.floti.api.domain.like.dto.LikeResponse;
+import com.floti.api.domain.like.service.LikeService;
 import com.floti.api.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/community/qnas")
 public class AnswerController {
     private final AnswerService answerService;
+    private final LikeService likeService;
+
     private final AuthUtil authUtil;
 
     /* 1. 등록 */
@@ -58,5 +62,14 @@ public class AnswerController {
         Long userId = authUtil.resolveUserId(userDetails);
         answerService.acceptAnswer(userId, postId, id);
         return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    /* 5. 추천 토글 */
+    @PostMapping("/answers/{id}/like")
+    public ResponseEntity<LikeResponse> toggleLikeAnswer(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @PathVariable long id) {
+        Long userId = authUtil.resolveUserId(userDetails);
+        LikeResponse response = likeService.toggleLikeAnswer(userId, id);
+        return ResponseEntity.ok(response); // 200 Ok
     }
 }

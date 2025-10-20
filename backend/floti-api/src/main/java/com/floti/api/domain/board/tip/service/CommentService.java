@@ -93,7 +93,7 @@ public class CommentService {
         if (!userId.equals(comment.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        comment.update(request);
+        comment.update(request.getContent());
         return new CommentResponse(comment);
     }
 

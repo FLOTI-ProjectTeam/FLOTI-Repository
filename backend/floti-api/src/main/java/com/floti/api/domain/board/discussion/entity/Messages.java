@@ -1,4 +1,4 @@
-package com.floti.api.domain.board.tip.entity;
+package com.floti.api.domain.board.discussion.entity;
 
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.entity.LikeableEntity;
@@ -14,26 +14,20 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TipPosts implements LikeableEntity {
+public class Messages implements LikeableEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
+    @Column(name = "message_id")
     private Long id;
 
+    @Column(nullable = false)
+    private Long postId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "author_id")
     private User author;
 
-    @Column(nullable = false, length = 100)
-    private String title;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
-
-    @Column(length = 65)
-    private String thumbnail; //경로: tips/thumbnail/날짜_UUID.확장자
-
     @Column(nullable = false)
-    private int commentCount;
+    private String content;
 
     @Column(nullable = false)
     private int likeCount;
@@ -43,27 +37,11 @@ public class TipPosts implements LikeableEntity {
     private LocalDateTime createdAt;
 
     @Builder
-    public TipPosts(User author, String title, String content) {
+    public Messages(Long id, Long postId, User author, String content) {
+        this.id = id; //테스트용
+        this.postId = postId;
         this.author = author;
-        this.title = title;
         this.content = content;
-    }
-
-    public void update(String title, String content) {
-        this.title = title;
-        this.content = content;
-    }
-
-    public void updateThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public void incrementCommentCount() {
-        this.commentCount++;
-    }
-
-    public void decrementCommentCount() {
-        if (this.commentCount > 0) this.commentCount--;
     }
 
     public void incrementLikeCount() {

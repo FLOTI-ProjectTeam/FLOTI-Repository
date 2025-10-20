@@ -20,8 +20,9 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequiredArgsConstructor
 @RequestMapping("/community/tips")
 public class CommentController {
-    private final AuthUtil authUtil;
     private final CommentService commentService;
+
+    private final AuthUtil authUtil;
 
     /* 1. 조회 */
     @GetMapping("/{postId}/comments")

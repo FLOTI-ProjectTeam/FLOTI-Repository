@@ -56,7 +56,7 @@ public class AnswerService {
         if (answer.isAccepted())
             throw new AcceptedAnswerUpdateException();
 
-        answer.update(request);
+        answer.update(request.getContent());
         return new AnswerResponse(answer);
     }
 

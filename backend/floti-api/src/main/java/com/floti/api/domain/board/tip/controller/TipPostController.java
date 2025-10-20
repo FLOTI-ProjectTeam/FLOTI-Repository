@@ -4,6 +4,8 @@ import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.service.TipPostService;
+import com.floti.api.domain.like.dto.LikeResponse;
+import com.floti.api.domain.like.service.LikeService;
 import com.floti.api.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 @RequestMapping("/community/tips")
 public class TipPostController {
     private final TipPostService tipPostService;
+    private final LikeService likeService;
+
     private final AuthUtil authUtil;
 
     /* 1. 조회 & 검색 */
@@ -73,5 +77,14 @@ public class TipPostController {
         Long userId = authUtil.resolveUserId(userDetails);
         tipPostService.deleteTipPost(userId, id);
         return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
+    }
+
+    /* 6. 추천 토글 */
+    @PostMapping("/{id}/like")
+    public ResponseEntity<LikeResponse> toggleLikeTipPost(@AuthenticationPrincipal UserDetails userDetails,
+                                                          @PathVariable long id) {
+        Long userId = authUtil.resolveUserId(userDetails);
+        LikeResponse response = likeService.toggleLikeTipPost(userId, id);
+        return ResponseEntity.ok(response); // 200 Ok
     }
 }

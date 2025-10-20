@@ -2,12 +2,12 @@ package com.floti.api.domain.board.qna.entity;
 
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.entity.LikeableEntity;
-import com.floti.api.domain.board.qna.dto.AnswerRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -35,6 +35,7 @@ public class Answers implements LikeableEntity {
     @Column(name = "is_accepted", nullable = false)
     private boolean accepted;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -46,15 +47,8 @@ public class Answers implements LikeableEntity {
         this.content = content;
     }
 
-    @PrePersist //테스트용
-    public void prePersist() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
-
-    public void update(AnswerRequest request) {
-        this.content = request.getContent();
+    public void update(String content) {
+        this.content = content;
     }
 
     public void accept() {
