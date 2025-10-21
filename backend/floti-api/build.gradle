@@ -39,7 +39,9 @@ dependencies {
 	// Validator
 	implementation 'org.springframework.boot:spring-boot-starter-validation' 
 	// QueryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta' 
+	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+	// WebSocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	// H2 (인메모리 DB)
 	testImplementation 'com.h2database:h2' 
 	compileOnly 'org.projectlombok:lombok'
@@ -48,7 +50,6 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test' // 스프링 부트 기본 테스트( JUnit5, AssertJ, Mockito 등 포함 )
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'com.h2database:h2' //H2
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// JWT (JJWT 최신 모듈 3종)
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'

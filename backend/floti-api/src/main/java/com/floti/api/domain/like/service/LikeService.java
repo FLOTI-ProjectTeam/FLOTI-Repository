@@ -51,7 +51,7 @@ public class LikeService {
             likeableEntity.decrementLikeCount();
         }
 
-        return new LikeResponse(liked, likeableEntity.getLikeCount());
+        return new LikeResponse(likeableEntity.getId(), liked, likeableEntity.getLikeCount());
     }
 
     /* 메시지별 추천 여부 반환 */

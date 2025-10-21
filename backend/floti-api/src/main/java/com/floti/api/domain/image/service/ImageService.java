@@ -18,6 +18,7 @@ import java.util.UUID;
 
 @Service
 public class ImageService {
+    /* 1. 이미지 저장 */
     public String saveImage(MultipartFile file, String directory) {
         try {
             // 1. 파일명 생성
@@ -45,6 +46,7 @@ public class ImageService {
         }
     }
 
+    /* 2. 이미지 삭제 */
     public void deleteImage(String path) {
         if (path == null) return;
 

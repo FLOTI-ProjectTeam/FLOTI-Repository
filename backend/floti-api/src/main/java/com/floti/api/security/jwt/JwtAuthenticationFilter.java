@@ -1,10 +1,12 @@
 package com.floti.api.security.jwt;
 
 // 스프링/서블릿 관련 import
+import com.floti.api.util.AuthUtil;
 import jakarta.servlet.FilterChain;                       // 필터 체인
 import jakarta.servlet.ServletException;                  // 서블릿 예외
 import jakarta.servlet.http.HttpServletRequest;           // 요청 객체
 import jakarta.servlet.http.HttpServletResponse;          // 응답 객체
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // 인증 토큰
 import org.springframework.security.core.context.SecurityContextHolder; // 시큐리티 컨텍스트
 import org.springframework.security.core.userdetails.User; // 스프링 시큐리티 User(간단 구현)
@@ -17,15 +19,12 @@ import java.util.Collections;                             // 빈 권한 컬렉�
 
 // JWT를 읽어 인증객체를 세팅하는 커스텀 필터
 @Component // 스프링이 자동 등록
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    // OncePerRequestFilter: 요청 한 번에 딱 1회만 실행되도록 보장하는 기반 클래스(
+    // OncePerRequestFilter: 요청 한 번에 딱 1회만 실행되도록 보장하는 기반 클래스
 
-    private final JwtUtil jwtUtil; // JWT 유틸 주입
-
-    // 생성자 주입
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
+    private final JwtUtil jwtUtil;
+    private final AuthUtil authUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -49,11 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 아직 인증이 안 되어 있고(username 존재) 유효한 경우 인증객체 세팅
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // 간단히 ROLE_USER 하나만 가진 사용자로 구성(실무는 권한 테이블 등에서 로드)
-            UserDetails userDetails = User
-                    .withUsername(username)                // 사용자명
-                    .password("N/A")                       // 비번은 사용 안 함
-                    .authorities(Collections.singleton(() -> "ROLE_USER")) // 권한
-                    .build();
+            UserDetails userDetails = authUtil.loadUserByUsername(username);
 
             // 인증 토큰 생성(비밀번호 검증은 이미 로그인 시 끝)
             UsernamePasswordAuthenticationToken authToken =
@@ -72,6 +67,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 다음 필터로 진행
         filterChain.doFilter(request, response);
-
     }
 }

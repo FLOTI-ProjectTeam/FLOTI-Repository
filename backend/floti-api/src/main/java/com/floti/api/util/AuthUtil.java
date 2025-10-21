@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
+import static org.springframework.security.core.userdetails.User.*;
+
 @Component
 @RequiredArgsConstructor
 public class AuthUtil {
@@ -19,5 +23,12 @@ public class AuthUtil {
 
     public Long resolveUserId(UserDetails userDetails) {
         return resolveUser(userDetails).getId();
+    }
+
+    public UserDetails loadUserByUsername(String username) {
+        return withUsername(username) // 사용자 ID
+                .password("N/A") // 비밀번호 미사용
+                .authorities(Collections.singleton(() -> "ROLE_USER")) // 권한
+                .build();
     }
 }

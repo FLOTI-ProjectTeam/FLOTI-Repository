@@ -63,7 +63,8 @@ public class DiscussionPostService {
     public DiscussionPostDetailResponse getDiscussionPost(Long userId, Long id) {
         DiscussionPosts discussionPost = discussionPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
-        List<Messages> messages = messageRepository.findTop50ByPostIdOrderByIdDesc(id);
+
+        /* 참여자 리스트 */
         List<DiscussionParticipants> discussionParticipants = discussionParticipantRepository.findByPostId(id);
         List<AuthorResponse> participantResponses = discussionParticipants.stream()
                 .map(dp -> new AuthorResponse(dp.getParticipant()))
@@ -71,6 +72,7 @@ public class DiscussionPostService {
 
         /* 메시지별 추천 여부 */
         // 1. 모든 메시지 ID
+        List<Messages> messages = messageRepository.findTop50ByPostIdOrderByIdDesc(id);
         List<Long> messageIds = messages.stream().map(Messages::getId).toList();
 
         // 2. 사용자가 추천한 메시지 ID

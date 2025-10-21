@@ -11,47 +11,32 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @ControllerAdvice
 public class CommonExceptionHandler {
+    /* 공통 예외 처리 */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handleAccessDenied(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleEntityNotFound(EntityNotFoundException e) {
+    @ExceptionHandler({EntityNotFoundException.class, UserNotFoundException.class})
+    public ResponseEntity<String> handleEntityNotFound(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
     }
 
-    @ExceptionHandler(MaxParticipantExceededException.class)
-    public ResponseEntity<String> handleMaxParticipantExceeded(MaxParticipantExceededException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409 Conflict
-    }
-
-    /* 사용자 예외 */
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFound(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 Not Found
-    }
-
-    /* 댓글 예외 */
+    /* 댓글 예외 처리 */
     @ExceptionHandler(ReplyNotAllowedException.class)
     public ResponseEntity<String> handleReplyNotAllowed(ReplyNotAllowedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
     }
 
-    /* 답변 예외 */
-    @ExceptionHandler(AcceptedAnswerUpdateException.class)
-    public ResponseEntity<String> handleAcceptedAnswerUpdate(AcceptedAnswerUpdateException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Not Found
-    }
-
-    @ExceptionHandler(AcceptedAnswerDeletionException.class)
-    public ResponseEntity<String> handleAcceptedAnswerDeletion(AcceptedAnswerDeletionException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Not Found
+    /* 답변 예외 처리 */
+    @ExceptionHandler({AcceptedAnswerUpdateException.class, AcceptedAnswerDeletionException.class})
+    public ResponseEntity<String> handleAcceptedAnswer(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
     }
 
     @ExceptionHandler(PostAlreadyClosedException.class)
     public ResponseEntity<String> handlePostAlreadyClosed(PostAlreadyClosedException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Not Found
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
     }
 
     @ExceptionHandler(PostAlreadyAcceptedException.class)
@@ -59,19 +44,20 @@ public class CommonExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409 Conflict
     }
 
-    /* 이미지 예외 */
+    /* 참여자 예외 처리 */
+    @ExceptionHandler(MaxParticipantExceededException.class)
+    public ResponseEntity<String> handleMaxParticipantExceeded(MaxParticipantExceededException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); // 409 Conflict
+    }
+
+    /* 이미지 예외 처리 */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<String> handleMaxUploadSize(MaxUploadSizeExceededException e) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("최대 20MB까지 업로드 가능합니다."); // 413 Payload Too Lager
     }
 
-    @ExceptionHandler(ImageSaveFailedException.class)
-    public ResponseEntity<String> handleImageSaveFailed(ImageSaveFailedException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500 Internal Server Error
-    }
-
-    @ExceptionHandler(ImageDeleteFailedException.class)
-    public ResponseEntity<String> handleImageDeleteFailed(ImageDeleteFailedException e) {
+    @ExceptionHandler({ImageSaveFailedException.class, ImageDeleteFailedException.class})
+    public ResponseEntity<String> handleImageFailed(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // 500 Internal Server Error
     }
 }

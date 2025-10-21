@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Messages, Long> {
     List<Messages> findTop50ByPostIdOrderByIdDesc(Long id);
+
+    List<Messages> findTop50ByPostIdAndIdLessThanOrderByIdDesc(Long postId, Long lastId);
 }
