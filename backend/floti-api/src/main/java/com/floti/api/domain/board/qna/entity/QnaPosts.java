@@ -40,11 +40,10 @@ public class QnaPosts {
     private LocalDateTime createdAt;
 
     @Builder
-    public QnaPosts(User author, String title, String content, int answerCount, boolean accepted) {
+    public QnaPosts(User author, String title, String content, boolean accepted) {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.answerCount = answerCount; //테스트용
         this.accepted = accepted; //테스트용
     }
 

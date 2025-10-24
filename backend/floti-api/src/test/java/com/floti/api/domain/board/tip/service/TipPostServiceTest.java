@@ -108,7 +108,7 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("getTipPost: 게시글 없음 - PostNotFoundException")
+    @DisplayName("getTipPost: 게시글 없음 - EntityNotFoundException")
     void getTipPost_fail_postNotFound() {
         //given
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.empty());

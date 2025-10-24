@@ -124,9 +124,10 @@ public class DiscussionPostService {
 
     /* 6. 참여 토글 */
     @Transactional
-    public void toggleJoinDiscussion(Long userId, Long postId) {
+    public void toggleJoinDiscussion(User user, Long postId) {
         DiscussionPosts discussionPost = discussionPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
+        Long userId = user.getId();
 
         if (discussionPost.getAuthor().getId().equals(userId))
             throw new AccessDeniedException(ExceptionMessage.HOST_CANNOT_LEAVE);
@@ -141,7 +142,7 @@ public class DiscussionPostService {
             if (discussionPost.getParticipantCount() == discussionPost.getMaxParticipants())
                 throw new MaxParticipantExceededException();
 
-            discussionParticipantRepository.save(new DiscussionParticipants(postId, userId));
+            discussionParticipantRepository.save(new DiscussionParticipants(discussionPost, user));
             discussionPost.incrementParticipantCount();
         }
     }

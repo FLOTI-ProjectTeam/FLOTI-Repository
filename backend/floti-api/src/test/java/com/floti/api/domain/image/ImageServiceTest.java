@@ -13,7 +13,7 @@ public class ImageServiceTest {
     private final ImageService imageService = new ImageService();
     
     @Test
-    @DisplayName("saveAndDeleteImage: 이미지 저장 및 삭제")
+    @DisplayName("saveAndDeleteImage: 이미지 저장 & 삭제")
     void saveAndDeleteImage_success() throws Exception {
         MockMultipartFile multipartFile = new MockMultipartFile(
                 "file",

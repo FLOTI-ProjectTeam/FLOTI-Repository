@@ -2,6 +2,7 @@ package com.floti.api.domain.board.qna.repository;
 
 import com.floti.api.config.QuerydslConfig;
 import com.floti.api.domain.auth.entity.User;
+import com.floti.api.domain.board.qna.entity.Answers;
 import com.floti.api.domain.board.qna.entity.QnaPosts;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -49,33 +50,33 @@ public class QnaPostRepositoryTest {
                 .author(testUser)
                 .title("채택된 제목")
                 .content("테스트 내용")
-                .answerCount(10)
                 .accepted(true)
                 .build();
         QnaPosts post2 = QnaPosts.builder()
                 .author(testUser)
                 .title("채택된 제목")
                 .content("테스트 내용")
-                .answerCount(5)
                 .accepted(true)
                 .build();
         QnaPosts post3 = QnaPosts.builder()
                 .author(testUser)
                 .title("미채택된 제목")
                 .content("테스트 내용")
-                .answerCount(0)
                 .build();
         QnaPosts post4 = QnaPosts.builder()
                 .author(testUser)
                 .title("미채택된 제목")
                 .content("테스트 내용")
-                .answerCount(3)
                 .build();
         qnaPostRepository.saveAll(List.of(post1, post2, post3, post4));
+
+        for (int i=0; i<10; i++) post1.incrementAnswerCount();
+        for (int i=0; i<5; i++) post2.incrementAnswerCount();
+        for (int i=0; i<3; i++) post4.incrementAnswerCount();
     }
 
     @Test
-    @DisplayName("getQnaPosts: 최신순(미채택) - 최신 QnaPosts 페이지 먼저 반환")
+    @DisplayName("getQnaPosts: 미채택 최신순 - 최신 QnaPosts 페이지 먼저 반환")
     void getQnaPosts_latest_notAccepted() {
         // given
         Pageable pageable = PageRequest.of(0, 20, Sort.by("id").descending());
@@ -90,7 +91,7 @@ public class QnaPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("getQnaPosts: 답변순(미채택) - 답변 적은 QnaPosts 페이지 먼저 반환")
+    @DisplayName("getQnaPosts: 미채택 답변순 - 답변 적은 QnaPosts 페이지 먼저 반환")
     void getQnaPosts_answers_notAccepted() {
         // given
         Pageable pageable = PageRequest.of(0, 20, Sort.by("answerCount").ascending());
@@ -105,7 +106,7 @@ public class QnaPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("getQnaPosts: 최신순(채택) - 최신 QnaPosts 페이지 먼저 반환")
+    @DisplayName("getQnaPosts: 채택 최신순 - 최신 QnaPosts 페이지 먼저 반환")
     void getQnaPosts_latest_accepted() {
         // given
         Pageable pageable = PageRequest.of(0, 20, Sort.by("id").descending());
@@ -120,7 +121,7 @@ public class QnaPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("getQnaPosts: 답변순(채택) - 답변 많은 QnaPosts 페이지 먼저 반환")
+    @DisplayName("getQnaPosts: 채택 답변순 - 답변 많은 QnaPosts 페이지 먼저 반환")
     void getQnaPosts_answers_accepted() {
         // given
         Pageable pageable = PageRequest.of(0, 20, Sort.by("answerCount").descending());

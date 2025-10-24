@@ -113,7 +113,7 @@ public class AnswerServiceTest {
     }
 
     @Test
-    @DisplayName("updateAnswer: 답변 없음 - AnswerNotFoundException")
+    @DisplayName("updateAnswer: 답변 없음 - EntityNotFoundException")
     void updateAnswer_fail_answerNotFound() {
         //given
         AnswerRequest request = new AnswerRequest();

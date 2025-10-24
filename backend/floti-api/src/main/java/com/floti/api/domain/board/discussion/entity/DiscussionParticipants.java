@@ -15,15 +15,15 @@ public class DiscussionParticipants {
     @Id private Long participantId;
 
     @ManyToOne
-    @MapsId("postId")
+    @MapsId("postId") // postId 필드에 엔티티의 id 값을 자동 매핑
     private DiscussionPosts post;
 
     @ManyToOne
-    @MapsId("participantId")
+    @MapsId("participantId") // participantId 필드에 엔티티의 id 값을 자동 매핑
     private User participant;
 
-    public DiscussionParticipants(Long postId, Long participantId) {
-        this.postId = postId;
-        this.participantId = participantId;
+    public DiscussionParticipants(DiscussionPosts post, User participant) {
+        this.post = post;
+        this.participant = participant;
     }
 }

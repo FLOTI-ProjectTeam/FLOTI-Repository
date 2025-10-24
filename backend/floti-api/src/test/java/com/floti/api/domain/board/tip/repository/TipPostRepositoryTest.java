@@ -37,12 +37,11 @@ public class TipPostRepositoryTest {
     @Autowired
     private JPAQueryFactory queryFactory;
 
-    private User testUser;
     private TipPosts testPost;
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
+        User testUser = User.builder()
                 .email("test01@gmail.com")
                 .username("test01")
                 .password("password123")
@@ -52,10 +51,20 @@ public class TipPostRepositoryTest {
 
         testPost = TipPosts.builder()
                 .author(testUser)
-                .title("테스트 제목")
-                .content("테스트 내용")
+                .title("검색할 제목")
+                .content("검색할 내용")
                 .build();
-        tipPostRepository.save(testPost);
+        TipPosts post1 = TipPosts.builder()
+                .author(testUser)
+                .title("테스트 제목")
+                .content("검색할 내용")
+                .build();
+        TipPosts post2 = TipPosts.builder()
+                .author(testUser)
+                .title("Search Title")
+                .content("Search Content")
+                .build();
+        tipPostRepository.saveAll(List.of(testPost, post1, post2));
     }
 
     private Page<TipPosts> searchTipPosts(String search, String sort) {
@@ -99,18 +108,6 @@ public class TipPostRepositoryTest {
     @DisplayName("searchTipPosts: 정확도순 - 제목 포함 TipPosts 페이지 먼저 반환")
     void searchTipPosts_accuracy() {
         //given
-        TipPosts post1 = TipPosts.builder()
-                .author(testUser)
-                .title("검색할 제목")
-                .content("검색할 내용")
-                .build();
-        TipPosts post2 = TipPosts.builder()
-                .author(testUser)
-                .title("테스트 제목")
-                .content("검색할 내용")
-                .build();
-        tipPostRepository.saveAll(List.of(post1, post2));
-
         Page<TipPosts> result = searchTipPosts("검색", "accuracy");
 
         //then
@@ -124,39 +121,18 @@ public class TipPostRepositoryTest {
     @DisplayName("searchTipPosts: 추천순 - 추천 많은 TipPosts 페이지 먼저 반환")
     void searchTipPosts_likes() {
         //given
-        TipPosts post1 = TipPosts.builder()
-                .author(testUser)
-                .title("검색할 제목")
-                .content("검색할 내용")
-                .build();
-        TipPosts post2 = TipPosts.builder()
-                .author(testUser)
-                .title("검색할 제목")
-                .content("검색할 내용")
-                .build();
-        tipPostRepository.saveAll(List.of(post1, post2));
-
-        post1.incrementLikeCount();
+        testPost.incrementLikeCount();
 
         Page<TipPosts> result = searchTipPosts("검색", "likes");
 
         //then
         assertEquals(2, result.getTotalElements());
-        assertEquals(post1.getId(), result.getContent().get(0).getId());
-        assertEquals(post2.getId(), result.getContent().get(1).getId());
+        assertEquals(testPost.getId(), result.getContent().get(0).getId());
     }
 
     @Test
     @DisplayName("searchTipPosts: 영어 검색어 - 대소문자 무시하고 TipPosts 페이지 반환")
     void searchTipPosts_ignoreCase() {
-        //given
-        TipPosts searchPost = TipPosts.builder()
-                .author(testUser)
-                .title("Search Title")
-                .content("Search Content")
-                .build();
-        tipPostRepository.save(searchPost);
-
         //when
         Page<TipPosts> result = searchTipPosts("SEARCH", "latest");
 
@@ -168,7 +144,7 @@ public class TipPostRepositoryTest {
     @DisplayName("searchTipPosts: 검색어 없음 - 빈 페이지 반환")
     void searchTipPosts_empty() {
         //when
-        Page<TipPosts> result = searchTipPosts("검색", "latest");
+        Page<TipPosts> result = searchTipPosts("NA", "latest");
 
         //then
         assertTrue(result.isEmpty());

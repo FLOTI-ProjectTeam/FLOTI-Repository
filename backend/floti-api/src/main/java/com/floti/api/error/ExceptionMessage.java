@@ -11,7 +11,4 @@ public class ExceptionMessage {
     public static final String COMMENT_NOT_FOUND = "댓글을 찾을 수 없습니다.";
     public static final String ANSWER_NOT_FOUND = "답변을 찾을 수 없습니다.";
     public static final String MESSAGE_NOT_FOUND = "메시지를 찾을 수 없습니다.";
-
-    /* 409 Conflict */
-    public static final String Max_Participant_Exceeded = "참여 인원이 꽉 찼습니다.";
 }

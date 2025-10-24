@@ -31,7 +31,6 @@ public class LikeAnswerRepositoryTest {
     private EntityManager em;
 
     private User testUser;
-    private QnaPosts testPost;
     private Answers testAnswer;
 
     @BeforeEach
@@ -44,7 +43,7 @@ public class LikeAnswerRepositoryTest {
                 .build();
         em.persist(testUser);
 
-        testPost = QnaPosts.builder()
+        QnaPosts testPost = QnaPosts.builder()
                 .author(testUser)
                 .title("테스트 제목")
                 .content("테스트 내용")
@@ -57,15 +56,15 @@ public class LikeAnswerRepositoryTest {
                 .content("첫번째 답변")
                 .build();
         em.persist(testAnswer);
+
+        LikeAnswers likeAnswer = new LikeAnswers(testUser.getId(), testAnswer.getId());
+        likeAnswerRepository.save(likeAnswer);
     }
 
     @Test
     @DisplayName("findByUserIdAndAnswerIdIn: 추천 있음 - LikeAnswers 리스트 반환")
     void findByUserIdAndAnswerIdIn_exist() {
         //given
-        LikeAnswers likeAnswer = new LikeAnswers(testUser.getId(), testAnswer.getId());
-        likeAnswerRepository.save(likeAnswer);
-
         List<Long> answerIds = List.of(testAnswer.getId());
 
         //when
@@ -80,9 +79,6 @@ public class LikeAnswerRepositoryTest {
     @DisplayName("findByUserIdAndAnswerIdIn: 추천 없음 - 빈 리스트 반환")
     void findByUserIdAndAnswerIdIn_empty() {
         //given
-        LikeAnswers likeAnswer = new LikeAnswers(testUser.getId(), testAnswer.getId());
-        likeAnswerRepository.save(likeAnswer);
-
         List<Long> answerIds = List.of(9999L);
 
         //when

@@ -56,7 +56,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("getComments: 댓글 있음 - 댓글 리스트 반환")
+    @DisplayName("getComments: 댓글 있음")
     void getComments_exist() {
         //given
         List<Comments> comments = List.of(testComment, testReply);
@@ -73,7 +73,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("getComments: 댓글 없음 - 빈 리스트 반환")
+    @DisplayName("getComments: 댓글 없음")
     void getComments_empty() {
         //given
         when(commentRepository.findByPostId(anyLong())).thenReturn(Collections.emptyList());
@@ -86,7 +86,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 댓글 미지정 - 댓글 등록")
+    @DisplayName("createComment: 댓글 등록")
     void createComment_noReply() {
         //given
         CommentRequest request = new CommentRequest();
@@ -109,7 +109,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 댓글 있음 - 답글 등록")
+    @DisplayName("createComment: 답글 등록")
     void createComment_reply() {
         //given
         CommentRequest request = new CommentRequest();
@@ -135,7 +135,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 댓글 없음 - CommentNotFoundException")
+    @DisplayName("createComment: 댓글 없음 - EntityNotFoundException")
     void createComment_fail_commentNotFound() {
         //given
         CommentRequest request = new CommentRequest();
@@ -154,7 +154,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 삭제된 댓글 - CommentNotFoundException")
+    @DisplayName("createComment: 삭제된 댓글 - EntityNotFoundException")
     void createComment_fail_deletedComment() {
         //then
         CommentRequest request = new CommentRequest();
@@ -175,7 +175,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("createComment: 답글 - ReplyNotAllowedException")
+    @DisplayName("createComment: 답글에 답글 - ReplyNotAllowedException")
     void createComment_fail_replyToReply() {
         //given
         CommentRequest request = new CommentRequest();

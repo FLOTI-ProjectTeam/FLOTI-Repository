@@ -76,8 +76,8 @@ public class DiscussionPostController {
     @PostMapping("/{id}/join")
     public ResponseEntity<Void> toggleJoinDiscussion(@AuthenticationPrincipal UserDetails userDetails,
                                                      @PathVariable Long id) {
-        Long userId = authUtil.resolveUserId(userDetails);
-        discussionPostService.toggleJoinDiscussion(userId, id);
+        User user = authUtil.resolveUser(userDetails);
+        discussionPostService.toggleJoinDiscussion(user, id);
         return ResponseEntity.ok().build();
     }
 }

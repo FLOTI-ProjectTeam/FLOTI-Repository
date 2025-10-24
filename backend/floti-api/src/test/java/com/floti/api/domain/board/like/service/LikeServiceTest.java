@@ -40,7 +40,7 @@ public class LikeServiceTest {
     private final TipPosts testPost = TipPosts.builder().author(testUser).build();
 
     @Test
-    @DisplayName("toggleLikeTipPost: 추천 없음 - 게시글 추천")
+    @DisplayName("toggleLikeTipPost: 게시글 추천")
     void toggleLikeTipPost_like() {
         //given
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
@@ -57,7 +57,7 @@ public class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("toggleLikeTipPost: 추천 있음 - 게시글 추천 취소")
+    @DisplayName("toggleLikeTipPost: 게시글 추천 취소")
     void toggleLikeTipPost_unlike() {
         //given
         LikeTipPosts likeTipPost = new LikeTipPosts(VALID_ID, VALID_ID);

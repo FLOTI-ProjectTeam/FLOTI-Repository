@@ -31,6 +31,7 @@ public class CommentRepositoryTest {
 
     private User testUser;
     private TipPosts testPost;
+    private Comments testComment;
 
     @BeforeEach
     void setUp() {
@@ -48,23 +49,25 @@ public class CommentRepositoryTest {
                 .content("테스트 내용")
                 .build();
         em.persist(testPost);
+
+        testComment = Comments.builder()
+                .postId(testPost.getId())
+                .author(testUser)
+                .content("첫번째 댓글")
+                .build();
+        commentRepository.save(testComment);
     }
 
     @Test
     @DisplayName("findByPostId: 댓글 있음 - Comments 리스트 반환")
     void findByPostId_exist() {
         //given
-        Comments comment1 = Comments.builder()
-                .postId(testPost.getId())
-                .author(testUser)
-                .content("첫번째 댓글")
-                .build();
-        Comments comment2 = Comments.builder()
+        Comments comment = Comments.builder()
                 .postId(testPost.getId())
                 .author(testUser)
                 .content("두번째 댓글")
                 .build();
-        commentRepository.saveAll(List.of(comment1, comment2));
+        commentRepository.save(comment);
 
         //when
         List<Comments> result = commentRepository.findByPostId(testPost.getId());
@@ -77,14 +80,6 @@ public class CommentRepositoryTest {
     @Test
     @DisplayName("findByPostId: 댓글 없음 - 빈 리스트 반환")
     void findByPostId_empty() {
-        //given
-        Comments comment = Comments.builder()
-                .postId(testPost.getId())
-                .author(testUser)
-                .content("첫번째 댓글")
-                .build();
-        commentRepository.save(comment);
-
         //when
         List<Comments> result = commentRepository.findByPostId(9999L);
 
@@ -95,16 +90,8 @@ public class CommentRepositoryTest {
     @Test
     @DisplayName("findByIdAndPostId: 게시글 댓글 맞음 - Comments 반환")
     void findByIdAndPostId_exist() {
-        //given
-        Comments comment = Comments.builder()
-                .postId(testPost.getId())
-                .author(testUser)
-                .content("첫번째 댓글")
-                .build();
-        commentRepository.save(comment);
-
         //when
-        Optional<Comments> result = commentRepository.findByIdAndPostId(comment.getId(), testPost.getId());
+        Optional<Comments> result = commentRepository.findByIdAndPostId(testComment.getId(), testPost.getId());
 
         //then
         assertTrue(result.isPresent());
@@ -114,16 +101,8 @@ public class CommentRepositoryTest {
     @Test
     @DisplayName("findByIdAndPostId: 게시글 댓글 아님 - 빈 옵셔널 반환")
     void findByIdAndPostId_empty() {
-        //given
-        Comments comment = Comments.builder()
-                .postId(testPost.getId())
-                .author(testUser)
-                .content("첫번째 댓글")
-                .build();
-        commentRepository.save(comment);
-
         //when
-        Optional<Comments> result = commentRepository.findByIdAndPostId(comment.getId(), 9999L);
+        Optional<Comments> result = commentRepository.findByIdAndPostId(testComment.getId(), 9999L);
 
         //then
         assertTrue(result.isEmpty());
