@@ -7,6 +7,10 @@ export interface QnaPostResponse {
     content: string;
     answerCount: number;
     liked: boolean;
+    createdAt: string;
+}
+
+export interface QnaPostDetailResponse extends QnaPostResponse {
     answers: AnswerReponse[];
 }
 
@@ -17,9 +21,10 @@ export interface AnswerRequest {
 export interface AnswerReponse {
     id: number;
     postId: number;
-    author: AuthorResponse;
+    author: AuthorResponse | null;
     content: string;
     likeCount: number;
     accepted: boolean;
     liked: boolean;
+    createdAt: string;
 }
