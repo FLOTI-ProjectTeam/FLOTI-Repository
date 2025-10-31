@@ -2,51 +2,52 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import COLORS from '@/constants/colors';
+import COLOR from '@/constants/colors';
 
-type Props = {
-    title: string;
-    backgroundColor?: string;
-};
+export default function Header({
+  title, commentCount, backgroundColor = 'white'
+}: {
+  title: string;
+  commentCount?: number;
+  backgroundColor?: string;
+}) {
+  const router = useRouter();
 
-export default function Header({ title, backgroundColor = "white" }: Props) {
-    const router = useRouter();
+  // 뒤로 이동
+  const handleIconPress = () => router.back();
 
-    // 아이콘 클릭 이벤트
-    const handlePress = () => router.back();
-
-    return (
-        <View style={[styles.container, { backgroundColor }]}>
-            <Pressable onPress={handlePress} style={styles.iconWrapper}>
-                <IconSymbol name="chevron.left" size={32} color={COLORS.ICON.GRAY_DARK} />
-            </Pressable>
-            <Text style={styles.title}>{title}</Text>
-            <View style={styles.rightPlaceholder} />
-        </View>
-    );
+  return (
+    <View style={[styles.headerContainer, {backgroundColor}]}>
+      <Pressable onPress={handleIconPress} style={styles.iconWrapper}>
+        <IconSymbol name="chevron.left" size={32} color={COLOR.ICON.GRAY_DARK} />
+      </Pressable>
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.commentCount}>{commentCount}</Text>
+      </View>
+      <View style={styles.rightPlaceholder} />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  headerContainer: {
     height: 56,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16
+    paddingHorizontal: 10
   },
   iconWrapper: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center'
+    width: 32, height: 32,
+    justifyContent: 'center'
   },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 20,
-    textAlign: 'center',
-    flex: 1 // 가운데 정렬 유지
+  textContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
   },
-  rightPlaceholder: {
-    width: 24 // 아이콘과 균형 맞추기
-  },
+  title: { fontWeight: 'bold', fontSize: 20 },
+  commentCount: { fontSize: 18, color: COLOR.TEXT.SKY },
+  rightPlaceholder: { width: 24 }
 });

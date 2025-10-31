@@ -1,17 +1,20 @@
-const COLORS = {
+const COLOR = {
   TEXT: {
     GRAY_DARK: '#323232',
     GRAY_CHARCOAL: '#556170',
     GRAY_MEDIUM: '#898989',
     GRAY_LIGHT: '#BDBDBD',
     NAVY: '#405876',
-    SKY: '#4FC3F7'
+    SKY: '#4FC3F7',
+    RED: '#E74C4C'
   },
 
   BACKGROUND: {
     SLATE_LIGHT: '#EBF0F6',
     POWDER_LIGHT: '#E8F6F8'
   },
+
+  OVERLAY: 'rgba(0, 0, 0, 0.5)',
 
   CARD: {
     SLATE_LIGHT: '#EBF0F6',
@@ -20,6 +23,7 @@ const COLORS = {
 
   BUTTON: {
     GRAY: '#DDDDDD',
+    GRAY_LIGHT: '#F3F5F7',
     NAVY: '#153257',
     SLATE_DARK: '#7D98C9',
     SLATE: '#B0C4DE',
@@ -43,4 +47,4 @@ const COLORS = {
   }
 };
 
-export default COLORS;
+export default COLOR;

@@ -3,15 +3,15 @@ import { Tabs } from 'expo-router';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import COLORS from '@/constants/colors';
+import COLOR from '@/constants/colors';
 
 export default function TabLayout() {
   return (
     <Tabs
       initialRouteName="index"  // 홈 화면으로 시작
       screenOptions={{
-        tabBarInactiveTintColor: COLORS.ICON.SLATE_LIGHT, // 기본 탭 색상
-        tabBarActiveTintColor: COLORS.ICON.GRAY_DARK,  // 활성화 탭 색상
+        tabBarInactiveTintColor: COLOR.ICON.SLATE_LIGHT, // 기본 탭 색상
+        tabBarActiveTintColor: COLOR.ICON.GRAY_DARK,  // 활성화 탭 색상
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: Platform.select({
@@ -25,6 +25,7 @@ export default function TabLayout() {
             shadowOpacity: 0 // 그림자 제거
           }
         }),
+        tabBarIconStyle: { marginVertical: 5 }, // 아이콘 가운데 정렬
         tabBarLabel: () => null,  // 라벨 제거
       }}
     >
@@ -43,7 +44,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="house" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="home" color={color} />,
         }}
       />
       <Tabs.Screen

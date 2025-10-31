@@ -1,57 +1,32 @@
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useRouter } from 'expo-router';
 
 import EditorHeader from '@/components/ui/EditorHeader';
-import COLORS from '@/constants/colors';
-import STYLES from '@/constants/styles';
+import { STYLE } from '@/constants/styles';
+import { CreateInputView } from '@/components/InputView';
 
-export default function CreatePost() {
+export default function TipCreateScreen() {
   const router = useRouter();
 
   const handleSave = () => {
-    console.log("임시저장 완료");
+    Toast.show({
+      type: 'custom_success',
+      position: 'bottom',
+      visibilityTime: 1500,
+      props: { message: '임시저장 되었습니다.' }
+    });
   };
 
   const handleSubmit = () => {
-    console.log("등록 완료");
+    console.log('등록 완료');
     router.back(); // 글 작성 후 뒤로 이동
   };
 
   return (
-    <View style={STYLES.CONTAINER}>
-      {/* 헤더 */}
+    <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSave={handleSave} onSubmit={handleSubmit} />
-
-      {/* 제목 입력 */}
-      <TextInput
-        style={styles.input}
-        placeholder="제목을 입력하세요"
-        placeholderTextColor={COLORS.TEXT.GRAY_MEDIUM}
-      />
-
-      {/* 내용 입력 */}
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="내용을 입력하세요"
-        multiline
-        textAlignVertical="top"
-        placeholderTextColor={COLORS.TEXT.GRAY_MEDIUM}
-      />
+      <CreateInputView />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    borderWidth: 0,
-    padding: 12,
-    marginHorizontal: 16,
-    fontSize: 18, // 제목은 18px
-    fontWeight: 'bold', // 굵게
-    backgroundColor: 'white',
-  },
-  textArea: {
-    fontSize: 16, // 본문은 16px
-    fontWeight: 'normal'
-  }
-});

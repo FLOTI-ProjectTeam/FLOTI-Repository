@@ -6,6 +6,8 @@
 
 // 커뮤니티 검색어 상태
 export type CommunitySearchContextType = {
-    search: string;
-    setSearch: (value: string) => void;
+  search: string; // 입력 중인 검색어
+  setSearch: (value: string) => void;
+  searchTrigger: string;  // 실제 사용할 검색어
+  setSearchTrigger: (value: string) => void;
 };

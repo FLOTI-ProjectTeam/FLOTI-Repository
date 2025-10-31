@@ -1,19 +1,22 @@
 import './global.css';
 
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast, { ToastConfig } from 'react-native-toast-message';  // Android & iOS 공용 토스트 메시지
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import 'react-native-reanimated';
 
-import STYLES from '@/constants/styles';
+import COLOR from '@/constants/colors';
 
 // 리소스 로딩이 완료될 때까지 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const insets = useSafeAreaInsets(); // SafeArea 정보
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -26,15 +29,48 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      {/* 상태바 글자를 검은색으로 설정 */}
-      <StatusBar style="dark" />
-      {/* 상단 영역 확보 */}
-      <SafeAreaView style={STYLES.CONTAINER} edges={['top']}>
-        {/* 모든 화면에서 헤더 숨김 */}
-        <Stack screenOptions={{headerShown: false}}>
-          <Stack.Screen name="(tabs)" />
-        </Stack>
-      </SafeAreaView>
+      {/* 스테이터스 바 */}
+      <StatusBar style='light' />
+      <View style={[styles.topSafeArea, { height: insets.top }]} />
+
+      {/* 모든 화면에서 헤더 숨김 */}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+
+      {/* 네비게이션 바 배경 */}
+      {Platform.OS === 'android' && insets.bottom > 0 && (
+        <View style={[styles.bottomSafeArea, { height: insets.bottom }]} />
+      )}
+
+      <Toast config={toastConfig} />
     </SafeAreaProvider>
   );
 }
+
+// 커스텀 토스트 메시지
+const toastConfig: ToastConfig = {
+  custom_success: ({ props }) => (
+    <View style={styles.toastContainer}>
+      <Text style={styles.toastText}>{props.message}</Text>
+    </View>
+  ),
+};
+
+const styles = StyleSheet.create({
+  topSafeArea: { backgroundColor: 'black' },
+  bottomSafeArea: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0, right: 0,
+    backgroundColor: 'black'
+  },
+  toastContainer: {
+    backgroundColor: COLOR.OVERLAY,
+    paddingVertical: 8, paddingHorizontal: 16,
+    marginBottom: 30,
+    borderRadius: 20,
+    alignItems: 'center'
+  },
+  toastText: { color: 'white', fontSize: 14 }
+});

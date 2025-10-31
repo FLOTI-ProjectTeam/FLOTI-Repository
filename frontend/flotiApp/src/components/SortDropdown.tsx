@@ -1,50 +1,45 @@
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { useState } from 'react';
+
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import COLORS from '@/constants/colors';
+import COLOR from '@/constants/colors';
 
 export type SortOption = {
   value: string;
   label: string;
 };
 
-type SortDropdownProps = {
+export default function SortDropdown({ 
+  options, selectedValue, onSelect 
+}: {
   options: SortOption[];
   selectedValue: string;
   onSelect: (value: string) => void;
-};
-
-export default function SortDropdown({ options, selectedValue, onSelect }: SortDropdownProps) {
+}) {
   const [showModal, setShowModal] = useState(false);
-
-  const currentLabel = options.find(opt => opt.value === selectedValue)?.label || options[0].label;
+  const currentLabel = options.find(option => option.value === selectedValue)?.label || options[0].label;
 
   return (
     <>
+      {/* 정렬 버튼 */}
       <View style={styles.sortContainer}>
-        <TouchableOpacity 
+        <TouchableOpacity
+          activeOpacity={1} // 클릭 시 투명도 설정
           style={styles.sortButton}
           onPress={() => setShowModal(true)}
         >
           <Text style={styles.sortText}>{currentLabel}</Text>
-          <IconSymbol name="chevron.down" size={16} color={COLORS.TEXT.NAVY} />
+          <IconSymbol name="chevron.down" size={16} color={COLOR.TEXT.NAVY} />
         </TouchableOpacity>
       </View>
 
-      <Modal
-        visible={showModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowModal(false)}
-        >
+      {/* 정렬 팝업 */}
+      <Modal transparent visible={showModal} onRequestClose={() => setShowModal(false)}>
+        <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={() => setShowModal(false)}>
           <View style={styles.modalContent}>
             {options.map((option) => (
               <TouchableOpacity
+                activeOpacity={0.5}
                 key={option.value}
                 style={styles.sortOption}
                 onPress={() => {
@@ -53,13 +48,13 @@ export default function SortDropdown({ options, selectedValue, onSelect }: SortD
                 }}
               >
                 <Text style={[
-                  styles.sortOptionText,
-                  selectedValue === option.value && styles.sortOptionTextActive
+                  styles.sortText,
+                  selectedValue === option.value && styles.sortTextActive
                 ]}>
                   {option.label}
                 </Text>
                 {selectedValue === option.value && (
-                  <IconSymbol name="check" size={18} color={COLORS.TINT.SLATE} />
+                  <IconSymbol name="check" size={18} color={COLOR.TINT.SLATE} />
                 )}
               </TouchableOpacity>
             ))}
@@ -74,49 +69,29 @@ const styles = StyleSheet.create({
   sortContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    paddingBottom: 12,
+    paddingBottom: 12
   },
   sortButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 4
   },
-  sortText: {
-    fontSize: 14,
-    color: COLORS.TEXT.NAVY,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
-    paddingTop: 120,
-    paddingRight: 16,
-  },
+  overlay: { flex: 1, alignItems: 'flex-end' },
   modalContent: {
+    top: 160,
+    right: 16,
     backgroundColor: 'white',
     borderRadius: 8,
-    minWidth: 120,
+    width: 120,
     shadowColor: 'black',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    paddingVertical: 12, paddingHorizontal: 16,
+    gap: 12
   },
-  sortOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 0,
-  },
-  sortOptionText: {
-    fontSize: 14,
-    color: COLORS.TEXT.NAVY,
-  },
-  sortOptionTextActive: {
-    color: COLORS.TINT.SLATE,
-    fontWeight: '600',
-  },
+  sortOption: { flexDirection: 'row', justifyContent: 'space-between' },
+  sortText: { fontSize: 14, color: COLOR.TEXT.NAVY },
+  sortTextActive: { color: COLOR.TINT.SLATE, fontWeight: 600 }
 });
