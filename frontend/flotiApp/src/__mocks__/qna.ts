@@ -1,0 +1,96 @@
+import { QnaPostResponse, QnaPostDetailResponse } from '@/types/community/qna';
+
+export const dummyPosts: QnaPostResponse[] = [
+  {
+    id: 1,
+    author: { id: 101, nickname: "Alice", profileImage: "https://i.pravatar.cc/50?img=1" },
+    title: "React에서 useEffect는 언제 호출되나요?",
+    content: "useEffect가 호출되는 시점과 의존성 배열의 의미를 알고 싶어요.",
+    answerCount: 2,
+    liked: false,
+    createdAt: "2025.10.25 09:30:00",
+  },
+  {
+    id: 2,
+    author: { id: 102, nickname: "Bob", profileImage: "https://i.pravatar.cc/50?img=2" },
+    title: "TypeScript에서 타입을 확장하는 방법?",
+    content: "인터페이스 상속과 타입 별칭의 차이를 알고 싶습니다.",
+    answerCount: 1,
+    liked: true,
+    createdAt: "2025.10.24 14:15:00",
+  },
+  {
+    id: 3,
+    author: { id: 103, nickname: "Carol", profileImage: "https://i.pravatar.cc/50?img=3" },
+    title: "React Native에서 FlatList 최적화 방법",
+    content: "FlatList 렌더링 최적화와 keyExtractor 사용법을 알고 싶어요.",
+    answerCount: 0,
+    liked: false,
+    createdAt: "2025.10.23 11:45:00",
+  },
+];
+
+export const dummyPostDetails: QnaPostDetailResponse[] = [
+  {
+    id: 1,
+    author: { id: 101, nickname: "Alice", profileImage: "https://i.pravatar.cc/50?img=1" },
+    title: "React에서 useEffect는 언제 호출되나요?",
+    content: "useEffect가 호출되는 시점과 의존성 배열의 의미를 알고 싶어요.",
+    answerCount: 2,
+    liked: false,
+    createdAt: "2025.10.25 09:30:00",
+    answers: [
+      {
+        id: 11,
+        postId: 1,
+        author: { id: 201, nickname: "David", profileImage: "https://i.pravatar.cc/50?img=4" },
+        content: "의존성 배열이 비어있으면 마운트 시 한 번만 호출됩니다.",
+        likeCount: 3,
+        accepted: true,
+        liked: false,
+        createdAt: "2025.10.25 10:00:00",
+      },
+      {
+        id: 12,
+        postId: 1,
+        author: { id: 202, nickname: "Eve", profileImage: "https://i.pravatar.cc/50?img=5" },
+        content: "값이 바뀔 때마다 호출되는 점도 기억하세요.",
+        likeCount: 1,
+        accepted: false,
+        liked: true,
+        createdAt: "2025.10.25 10:20:00",
+      },
+    ],
+  },
+  {
+    id: 2,
+    author: { id: 102, nickname: "Bob", profileImage: "https://i.pravatar.cc/50?img=2" },
+    title: "TypeScript에서 타입을 확장하는 방법?",
+    content: "인터페이스 상속과 타입 별칭의 차이를 알고 싶습니다.",
+    answerCount: 1,
+    liked: true,
+    createdAt: "2025.10.24 14:15:00",
+    answers: [
+      {
+        id: 21,
+        postId: 2,
+        author: { id: 203, nickname: "Frank", profileImage: "https://i.pravatar.cc/50?img=6" },
+        content: "interface 상속은 여러 인터페이스를 확장할 수 있고, 타입 별칭은 union, intersection이 가능합니다.",
+        likeCount: 2,
+        accepted: true,
+        liked: true,
+        createdAt: "2025.10.24 15:00:00",
+      },
+    ],
+  },
+  {
+    id: 3,
+    author: { id: 103, nickname: "Carol", profileImage: "https://i.pravatar.cc/50?img=3" },
+    title: "React Native에서 FlatList 최적화 방법",
+    content: "FlatList 렌더링 최적화와 keyExtractor 사용법을 알고 싶어요.",
+    answerCount: 0,
+    liked: false,
+    createdAt: "2025.10.23 11:45:00",
+    answers: [],
+  },
+];
