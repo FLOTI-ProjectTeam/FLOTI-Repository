@@ -1,8 +1,8 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useRouter, useSegments } from 'expo-router';
+import { Href, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 
-import COLORS from '@/constants/colors';
+import COLOR from '@/constants/colors';
 
 const TAB_ITEMS = [
   { name: 'tip', title: '💡 TIP', path: '/community/tip' },
@@ -13,28 +13,24 @@ const TAB_ITEMS = [
 
 export default function CommunityTabBar() {
   const router = useRouter();
-  const segments = useSegments();
-  
-  // 현재 탭 계산
-  const currentTab = segments[segments.length - 1] || "tip";
+  const segments = useSegments(); // ["(tabs)", "community", "tip"]
+  const currentTab = segments[segments.length - 1] || 'tip';
 
-  // 첫 진입 시 TIP 게시판으로 이동
+  // 첫 진입 시 TIP 탭으로 이동
   useEffect(() => {
-    if (currentTab === "community") {
-      router.replace("/community/tip");
-    }
+    if (currentTab === 'community') router.replace('/community/tip');
   }, [segments]);
 
-  // 탭 클릭 이벤트
-  const handleTabPress = (path: string) => router.push(path as any);
+  // 해당 탭으로 이동
+  const handleTabPress = (path: string) => router.push(path as Href);
 
   return (
-    <View style={styles.tabBarContainer}>
+    <View style={styles.tabContainer}>
       {TAB_ITEMS.map(({ name, title, path }) => {
         const isFocused = currentTab === name;
 
         return (
-          <Pressable key={name} onPress={() => handleTabPress(path)} style={styles.tabItem}>
+          <Pressable key={name} style={styles.tabItem} onPress={() => handleTabPress(path)}>
             <View style={[styles.tabLabelContainer, isFocused && styles.tabLabelContainerActive]}>
               <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{title}</Text>
             </View>
@@ -46,7 +42,7 @@ export default function CommunityTabBar() {
 }
 
 const styles = StyleSheet.create({
-  tabBarContainer: {
+  tabContainer: {
     flexDirection: 'row',
     height: 48,
     marginTop: 10,
@@ -57,19 +53,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  tabLabelContainer: {
-    paddingHorizontal: 12,
-    paddingVertical: 8
-  },
-  tabLabelContainerActive: {
-    backgroundColor: COLORS.TINT.SLATE_LIGHT,
-    borderRadius: 8
-  },
-  tabLabel: {
-    fontSize: 14,
-    color: 'black'
-  },
-  tabLabelActive: {
-    fontWeight: 'bold'
-  }
+  tabLabelContainer: { paddingHorizontal: 12, paddingVertical: 8 },
+  tabLabelContainerActive: { backgroundColor: COLOR.TINT.SLATE_LIGHT, borderRadius: 8 },
+  tabLabel: { fontSize: 14, color: 'black' },
+  tabLabelActive: { fontWeight: 'bold' }
 });

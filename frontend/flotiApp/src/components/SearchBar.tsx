@@ -1,21 +1,27 @@
-import { TextInput, View, Button, StyleSheet } from 'react-native';
+import { TextInput, View, StyleSheet, Pressable } from 'react-native';
 
-import COLORS from '@/constants/colors';
+import COLOR from '@/constants/colors';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
+import { IconSymbol } from './ui/IconSymbol';
 
 export default function SearchBar() {
-  const { search, setSearch } = useCommunitySearch();
+  const { search, setSearch, setSearchTrigger } = useCommunitySearch();
 
   return (
     <View style={styles.searchContainer}>
       <TextInput
-        placeholder="Search"
-        placeholderTextColor={COLORS.TEXT.GRAY_LIGHT}
+        placeholder='Search'
+        placeholderTextColor={COLOR.TEXT.GRAY_LIGHT}
         value={search}
         onChangeText={setSearch}
         style={styles.searchInput}
+        onSubmitEditing={() => setSearchTrigger(search)} // 키보드의 확인 버튼으로 검색
       />
-      <Button title="검색" onPress={() => {/* 검색어 상태 전달 */}} />
+      <Pressable
+        onPress={() => setSearchTrigger(search)}  // 돋보기 아이콘으로 검색
+      >
+        <IconSymbol name='search' color={COLOR.ICON.GRAY_DARK} />
+      </Pressable>
     </View>
   );
 };
@@ -24,17 +30,17 @@ const styles = StyleSheet.create({
   searchContainer: { 
     flexDirection: 'row', 
     marginHorizontal: 20, 
-    marginTop: 16, 
+    marginTop: 16,
+    paddingHorizontal: 14,
     alignItems: 'center', 
-    gap: 8
+    gap: 8,
+    borderRadius: 30,
+    backgroundColor: COLOR.TINT.GRAY_LIGHT
   },
   searchInput: { 
     flex: 1, 
-    height: 40,
+    height: 42,
     paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 30, 
-    color: 'black',
-    backgroundColor: COLORS.TINT.GRAY_LIGHT
+    color: 'black'
   }
 });

@@ -3,11 +3,11 @@ import { Stack } from 'expo-router';
 import 'react-native-reanimated';
 
 import Header from '@/components/ui/Header';
-import STYLES from '@/constants/styles';
+import { STYLE } from '@/constants/styles';
 
 export default function CommunityLayout() {
   return (
-    <SafeAreaView style={STYLES.CONTAINER} edges={['bottom']}>
+    <SafeAreaView style={STYLE.BASE_CONTAINER} edges={['bottom']}>
       <Stack screenOptions={{headerShown: false}}>
         {/* 헤더 적용 */}
         <Stack.Screen name="tip/[id]" 
