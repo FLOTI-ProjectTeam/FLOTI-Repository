@@ -35,10 +35,11 @@ public class TipPostService {
 
     /* 1-1. 조회 */
     public Page<TipPostResponse> getTipPosts(String sort, int page) {
+        Sort.Order baseOrder = Sort.Order.desc("id");
         Sort sortOrder = switch (sort.toLowerCase()) {
-            case "likes" -> Sort.by("likeCount").descending();
-            case "registered" -> Sort.by("id").ascending();
-            default -> Sort.by("id").descending();
+            case "likes" -> Sort.by(Sort.Order.desc("likeCount"), baseOrder);
+            case "registered" -> Sort.by(Sort.Order.asc("id"));
+            default -> Sort.by(baseOrder);
         };
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, sortOrder);

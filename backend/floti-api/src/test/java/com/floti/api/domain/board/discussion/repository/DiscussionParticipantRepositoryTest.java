@@ -3,7 +3,7 @@ package com.floti.api.domain.board.discussion.repository;
 import com.floti.api.config.QuerydslConfig;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.discussion.entity.DiscussionParticipants;
-import com.floti.api.domain.board.discussion.entity.DiscussionPosts;
+import com.floti.api.domain.board.discussion.entity.DiscussionRooms;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +28,7 @@ public class DiscussionParticipantRepositoryTest {
     @Autowired
     private EntityManager em;
 
-    private DiscussionPosts testPost;
+    private DiscussionRooms testRoom;
 
     @BeforeEach
     void setUp() {
@@ -59,27 +59,27 @@ public class DiscussionParticipantRepositoryTest {
         List<User> users = List.of(user1, user2, user3, user4);
         users.forEach(em::persist);
 
-        testPost = DiscussionPosts.builder()
+        testRoom = DiscussionRooms.builder()
                 .author(user1)
                 .title("테스트 제목")
                 .intro("테스트 내용")
                 .maxParticipants(4)
                 .build();
-        em.persist(testPost);
+        em.persist(testRoom);
 
-        DiscussionParticipants dp1 = new DiscussionParticipants(testPost, user2);
-        DiscussionParticipants dp2 = new DiscussionParticipants(testPost, user3);
-        DiscussionParticipants dp3 = new DiscussionParticipants(testPost, user4);
+        DiscussionParticipants dp1 = new DiscussionParticipants(testRoom, user2);
+        DiscussionParticipants dp2 = new DiscussionParticipants(testRoom, user3);
+        DiscussionParticipants dp3 = new DiscussionParticipants(testRoom, user4);
         discussionParticipantRepository.saveAll(List.of(dp1, dp2, dp3));
 
-        for (int i=0; i<4; i++) testPost.incrementParticipantCount();
+        for (int i=0; i<4; i++) testRoom.incrementParticipantCount();
     }
 
     @Test
-    @DisplayName("findByPostId: 참가자 있음 - DiscussionParticipants 리스트 반환")
-    void findByPostId_exist() {
+    @DisplayName("findByRoomId: 참가자 있음 - DiscussionParticipants 리스트 반환")
+    void findByRoomId_exist() {
         //when
-        List<DiscussionParticipants> result = discussionParticipantRepository.findByPostId(testPost.getId());
+        List<DiscussionParticipants> result = discussionParticipantRepository.findByRoomId(testRoom.getId());
 
         //then
         assertEquals(3, result.size());
@@ -87,10 +87,10 @@ public class DiscussionParticipantRepositoryTest {
     }
 
     @Test
-    @DisplayName("findByPostId: 참가자 없음 - 빈 리스트 반환")
-    void findByPostId_empty() {
+    @DisplayName("findByRoomId: 참가자 없음 - 빈 리스트 반환")
+    void findByRoomId_empty() {
         //when
-        List<DiscussionParticipants> result = discussionParticipantRepository.findByPostId(9999L);
+        List<DiscussionParticipants> result = discussionParticipantRepository.findByRoomId(9999L);
 
         //then
         assertTrue(result.isEmpty());

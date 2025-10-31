@@ -27,11 +27,8 @@ public class Comments {
     @JoinColumn(name = "author_id")
     private User author;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String content;
-
-    @Column(nullable = false)
-    private int likeCount;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;

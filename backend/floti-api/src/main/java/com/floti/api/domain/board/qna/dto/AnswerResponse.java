@@ -18,7 +18,7 @@ public class AnswerResponse {
     private final boolean accepted;
     private final boolean liked;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm")
     private LocalDateTime createdAt;
 
     public AnswerResponse(Answers answer) {

@@ -44,7 +44,7 @@ public class MessageServiceTest {
                 Messages.builder().id(VALID_ID).author(testUser).content("두번째 메시지").build()
         );
 
-        when(messageRepository.findTop50ByPostIdAndIdLessThanOrderByIdDesc(anyLong(), anyLong())).thenReturn(messages);
+        when(messageRepository.findTop50ByRoomIdAndIdLessThanOrderByIdDesc(anyLong(), anyLong())).thenReturn(messages);
         when(likeService.getLikedMessageIds(VALID_ID, List.of(VALID_ID, VALID_ID))).thenReturn(Collections.emptySet());
 
         //when
@@ -59,7 +59,7 @@ public class MessageServiceTest {
     @DisplayName("getMessages: 메시지 없음")
     void getMessages_empty() {
         //given
-        when(messageRepository.findTop50ByPostIdAndIdLessThanOrderByIdDesc(anyLong(), anyLong())).thenReturn(Collections.emptyList());
+        when(messageRepository.findTop50ByRoomIdAndIdLessThanOrderByIdDesc(anyLong(), anyLong())).thenReturn(Collections.emptyList());
         when(likeService.getLikedMessageIds(VALID_ID, Collections.emptyList())).thenReturn(Collections.emptySet());
 
         //when

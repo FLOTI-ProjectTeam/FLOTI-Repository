@@ -11,6 +11,6 @@ public class CommentRequest {
     private Long parentId;
 
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 200)
     private String content;
 }

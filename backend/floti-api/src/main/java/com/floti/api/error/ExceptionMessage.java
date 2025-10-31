@@ -8,6 +8,7 @@ public class ExceptionMessage {
 
     /* 404 Not Found */
     public static final String POST_NOT_FOUND = "게시글을 찾을 수 없습니다.";
+    public static final String ROOM_NOT_FOUND = "토론방을 찾을 수 없습니다.";
     public static final String COMMENT_NOT_FOUND = "댓글을 찾을 수 없습니다.";
     public static final String ANSWER_NOT_FOUND = "답변을 찾을 수 없습니다.";
     public static final String MESSAGE_NOT_FOUND = "메시지를 찾을 수 없습니다.";

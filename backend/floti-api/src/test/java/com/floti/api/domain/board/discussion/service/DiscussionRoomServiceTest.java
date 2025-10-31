@@ -1,13 +1,13 @@
 package com.floti.api.domain.board.discussion.service;
 
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.board.discussion.dto.DiscussionPostDetailResponse;
+import com.floti.api.domain.board.discussion.dto.DiscussionRoomDetailResponse;
 import com.floti.api.domain.board.discussion.entity.DiscussionParticipants;
-import com.floti.api.domain.board.discussion.entity.DiscussionPosts;
+import com.floti.api.domain.board.discussion.entity.DiscussionRooms;
 import com.floti.api.domain.board.discussion.entity.Messages;
-import com.floti.api.domain.board.discussion.entity.PostParticipantId;
+import com.floti.api.domain.board.discussion.entity.RoomParticipantId;
 import com.floti.api.domain.board.discussion.repository.DiscussionParticipantRepository;
-import com.floti.api.domain.board.discussion.repository.DiscussionPostRepository;
+import com.floti.api.domain.board.discussion.repository.DiscussionRoomRepository;
 import com.floti.api.domain.board.discussion.repository.MessageRepository;
 import com.floti.api.domain.like.service.LikeService;
 import com.floti.api.error.ExceptionMessage;
@@ -32,15 +32,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DiscussionPostServiceTest {
+public class DiscussionRoomServiceTest {
     @InjectMocks
-    private DiscussionPostService discussionPostService;
+    private DiscussionRoomService discussionRoomService;
 
     @Mock
     private LikeService likeService;
 
     @Mock
-    private DiscussionPostRepository discussionPostRepository;
+    private DiscussionRoomRepository discussionRoomRepository;
 
     @Mock
     private DiscussionParticipantRepository discussionParticipantRepository;
@@ -53,11 +53,11 @@ public class DiscussionPostServiceTest {
 
     private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
     private final User testParticipant = User.builder().id(INVALID_ID).nickname("테스터02").build();
-    private final DiscussionPosts testPost = DiscussionPosts.builder().author(testUser).title("테스트 제목").maxParticipants(2).build();
+    private final DiscussionRooms testRoom = DiscussionRooms.builder().author(testUser).title("테스트 제목").maxParticipants(2).build();
 
     @Test
-    @DisplayName("getDiscussionPost: 참여자와 메시지 있음 - 게시글 상세에 참여자와 메시지 리스트 포함")
-    void getDiscussionPost_exist() {
+    @DisplayName("getDiscussionRoom: 참여자와 메시지 있음 - 게시글 상세에 참여자와 메시지 리스트 포함")
+    void getDiscussionRoom_exist() {
         //given
         List<Messages> messages = List.of(
                 Messages.builder().id(VALID_ID).author(testUser).content("첫번째 메시지").build(),
@@ -65,17 +65,17 @@ public class DiscussionPostServiceTest {
                 Messages.builder().id(INVALID_ID).author(testParticipant).content("세번째 메시지").build()
         );
 
-        testPost.incrementParticipantCount();
+        testRoom.incrementParticipantCount();
 
-        when(discussionPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
-        when(discussionParticipantRepository.findByPostId(anyLong()))
-                .thenReturn(List.of(new DiscussionParticipants(testPost, testParticipant)));
-        when(messageRepository.findTop50ByPostIdOrderByIdDesc(anyLong())).thenReturn(messages);
+        when(discussionRoomRepository.findById(anyLong())).thenReturn(Optional.of(testRoom));
+        when(discussionParticipantRepository.findByRoomId(anyLong()))
+                .thenReturn(List.of(new DiscussionParticipants(testRoom, testParticipant)));
+        when(messageRepository.findTop50ByRoomIdOrderByIdDesc(anyLong())).thenReturn(messages);
         when(likeService.getLikedMessageIds(VALID_ID, List.of(VALID_ID, VALID_ID, INVALID_ID)))
                 .thenReturn(Set.of(VALID_ID));
 
         //when
-        DiscussionPostDetailResponse response = discussionPostService.getDiscussionPost(VALID_ID, VALID_ID);
+        DiscussionRoomDetailResponse response = discussionRoomService.getDiscussionRoom(VALID_ID, VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());
@@ -89,16 +89,16 @@ public class DiscussionPostServiceTest {
     }
 
     @Test
-    @DisplayName("getDiscussionPost: 참여자와 메시지 없음 - 게시글 상세에 빈 리스트 포함")
-    void getDiscussionPost_empty() {
+    @DisplayName("getDiscussionRoom: 참여자와 메시지 없음 - 게시글 상세에 빈 리스트 포함")
+    void getDiscussionRoom_empty() {
         //given
-        when(discussionPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
-        when(discussionParticipantRepository.findByPostId(anyLong())).thenReturn(Collections.emptyList());
-        when(messageRepository.findTop50ByPostIdOrderByIdDesc(anyLong())).thenReturn(Collections.emptyList());
+        when(discussionRoomRepository.findById(anyLong())).thenReturn(Optional.of(testRoom));
+        when(discussionParticipantRepository.findByRoomId(anyLong())).thenReturn(Collections.emptyList());
+        when(messageRepository.findTop50ByRoomIdOrderByIdDesc(anyLong())).thenReturn(Collections.emptyList());
         when(likeService.getLikedMessageIds(VALID_ID, Collections.emptyList())).thenReturn(Collections.emptySet());
 
         //when
-        DiscussionPostDetailResponse response = discussionPostService.getDiscussionPost(VALID_ID, VALID_ID);
+        DiscussionRoomDetailResponse response = discussionRoomService.getDiscussionRoom(VALID_ID, VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());
@@ -111,16 +111,16 @@ public class DiscussionPostServiceTest {
     @DisplayName("toggleJoinDiscussion: 토론 참여")
     void toggleJoinDiscussion_join() {
         //given
-        when(discussionPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
-        when(discussionParticipantRepository.findById(any(PostParticipantId.class))).thenReturn(Optional.empty());
+        when(discussionRoomRepository.findById(anyLong())).thenReturn(Optional.of(testRoom));
+        when(discussionParticipantRepository.findById(any(RoomParticipantId.class))).thenReturn(Optional.empty());
         when(discussionParticipantRepository.save(any(DiscussionParticipants.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        discussionPostService.toggleJoinDiscussion(testParticipant, VALID_ID);
+        discussionRoomService.toggleJoinDiscussion(testParticipant, VALID_ID);
 
         //then
-        assertEquals(2, testPost.getParticipantCount());
+        assertEquals(2, testRoom.getParticipantCount());
     }
 
     @Test
@@ -129,16 +129,16 @@ public class DiscussionPostServiceTest {
         //given
         User participant = User.builder().id(INVALID_ID).nickname("테스터03").build();
 
-        when(discussionPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
-        when(discussionParticipantRepository.findById(any(PostParticipantId.class))).thenReturn(Optional.empty());
+        when(discussionRoomRepository.findById(anyLong())).thenReturn(Optional.of(testRoom));
+        when(discussionParticipantRepository.findById(any(RoomParticipantId.class))).thenReturn(Optional.empty());
         when(discussionParticipantRepository.save(any(DiscussionParticipants.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        discussionPostService.toggleJoinDiscussion(testParticipant, VALID_ID);
+        discussionRoomService.toggleJoinDiscussion(testParticipant, VALID_ID);
 
         //when
         MaxParticipantExceededException exception = assertThrows(MaxParticipantExceededException.class, () -> {
-            discussionPostService.toggleJoinDiscussion(participant, VALID_ID);
+            discussionRoomService.toggleJoinDiscussion(participant, VALID_ID);
         });
 
         //then
@@ -149,34 +149,34 @@ public class DiscussionPostServiceTest {
     @DisplayName("toggleJoinDiscussion: 토론 참여 취소")
     void toggleJoinDiscussion_leave() {
         //given
-        DiscussionParticipants discussionParticipant = new DiscussionParticipants(testPost, testUser);
+        DiscussionParticipants discussionParticipant = new DiscussionParticipants(testRoom, testUser);
 
-        when(discussionPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
-        when(discussionParticipantRepository.findById(any(PostParticipantId.class))).thenReturn(Optional.empty());
+        when(discussionRoomRepository.findById(anyLong())).thenReturn(Optional.of(testRoom));
+        when(discussionParticipantRepository.findById(any(RoomParticipantId.class))).thenReturn(Optional.empty());
         when(discussionParticipantRepository.save(any(DiscussionParticipants.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        discussionPostService.toggleJoinDiscussion(testParticipant, INVALID_ID);
+        discussionRoomService.toggleJoinDiscussion(testParticipant, INVALID_ID);
 
-        when(discussionParticipantRepository.findById(any(PostParticipantId.class))).thenReturn(Optional.of(discussionParticipant));
+        when(discussionParticipantRepository.findById(any(RoomParticipantId.class))).thenReturn(Optional.of(discussionParticipant));
 
         //when
-        discussionPostService.toggleJoinDiscussion(testParticipant, INVALID_ID);
+        discussionRoomService.toggleJoinDiscussion(testParticipant, INVALID_ID);
 
         //then
         verify(discussionParticipantRepository).delete(discussionParticipant);
-        assertEquals(1, testPost.getParticipantCount());
+        assertEquals(1, testRoom.getParticipantCount());
     }
 
     @Test
     @DisplayName("toggleJoinDiscussion: 주최자 토론 참여 쥐소 - AccessDeniedException")
     void toggleJoinDiscussion_fail_hostLeave() {
         //given
-        when(discussionPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(discussionRoomRepository.findById(anyLong())).thenReturn(Optional.of(testRoom));
 
         //when
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            discussionPostService.toggleJoinDiscussion(testUser, VALID_ID);
+            discussionRoomService.toggleJoinDiscussion(testUser, VALID_ID);
         });
 
         //then

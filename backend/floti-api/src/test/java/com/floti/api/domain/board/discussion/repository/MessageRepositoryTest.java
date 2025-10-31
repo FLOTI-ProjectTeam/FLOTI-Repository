@@ -2,7 +2,7 @@ package com.floti.api.domain.board.discussion.repository;
 
 import com.floti.api.config.QuerydslConfig;
 import com.floti.api.domain.auth.entity.User;
-import com.floti.api.domain.board.discussion.entity.DiscussionPosts;
+import com.floti.api.domain.board.discussion.entity.DiscussionRooms;
 import com.floti.api.domain.board.discussion.entity.Messages;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ public class MessageRepositoryTest {
     @Autowired
     private EntityManager em;
 
-    private DiscussionPosts testPost;
+    private DiscussionRooms testRoom;
     private Messages testMessage;
 
     @BeforeEach
@@ -41,31 +41,31 @@ public class MessageRepositoryTest {
                 .build();
         em.persist(testUser);
 
-        testPost = DiscussionPosts.builder()
+        testRoom = DiscussionRooms.builder()
                 .author(testUser)
                 .title("테스트 제목")
                 .intro("테스트 내용")
                 .maxParticipants(2)
                 .build();
-        em.persist(testPost);
+        em.persist(testRoom);
 
         testMessage = Messages.builder()
-                .postId(testPost.getId())
+                .roomId(testRoom.getId())
                 .author(testUser)
                 .content("첫번째 메시지")
                 .build();
         Messages message1 = Messages.builder()
-                .postId(testPost.getId())
+                .roomId(testRoom.getId())
                 .author(testUser)
                 .content("두번째 메시지")
                 .build();
         Messages message2 = Messages.builder()
-                .postId(testPost.getId())
+                .roomId(testRoom.getId())
                 .author(testUser)
                 .content("세번째 메시지")
                 .build();
         Messages message3 = Messages.builder()
-                .postId(testPost.getId())
+                .roomId(testRoom.getId())
                 .author(testUser)
                 .content("네번째 메시지")
                 .build();
@@ -73,10 +73,10 @@ public class MessageRepositoryTest {
     }
 
     @Test
-    @DisplayName("findTop50ByPostIdOrderByIdDesc: 메시지 있음 - Messages 리스트 반환")
-    void findTop50ByPostIdOrderByIdDesc_exist() {
+    @DisplayName("findTop50ByRoomIdOrderByIdDesc: 메시지 있음 - Messages 리스트 반환")
+    void findTop50ByRoomIdOrderByIdDesc_exist() {
         //when
-        List<Messages> result = messageRepository.findTop50ByPostIdOrderByIdDesc(testPost.getId());
+        List<Messages> result = messageRepository.findTop50ByRoomIdOrderByIdDesc(testRoom.getId());
 
         //then
         assertEquals(4, result.size());
@@ -84,21 +84,21 @@ public class MessageRepositoryTest {
     }
 
     @Test
-    @DisplayName("findTop50ByPostIdOrderByIdDesc: 메시지 없음 - 빈 리스트 반환")
-    void findTop50ByPostIdOrderByIdDesc_empty() {
+    @DisplayName("findTop50ByRoomIdOrderByIdDesc: 메시지 없음 - 빈 리스트 반환")
+    void findTop50ByRoomIdOrderByIdDesc_empty() {
         //when
-        List<Messages> result = messageRepository.findTop50ByPostIdOrderByIdDesc(9999L);
+        List<Messages> result = messageRepository.findTop50ByRoomIdOrderByIdDesc(9999L);
 
         //then
         assertTrue(result.isEmpty());
     }
 
     @Test
-    @DisplayName("findTop50ByPostIdAndIdLessThanOrderByIdDesc: 메시지 있음 - 기준 ID 이전의 Messages 리스트 반환")
-    void findTop50ByPostIdAndIdLessThanOrderByIdDesc_exist() {
+    @DisplayName("findTop50ByRoomIdAndIdLessThanOrderByIdDesc: 메시지 있음 - 기준 ID 이전의 Messages 리스트 반환")
+    void findTop50ByRoomIdAndIdLessThanOrderByIdDesc_exist() {
         //when
-        List<Messages> result = messageRepository.findTop50ByPostIdAndIdLessThanOrderByIdDesc(
-                testPost.getId(), testMessage.getId() + 1
+        List<Messages> result = messageRepository.findTop50ByRoomIdAndIdLessThanOrderByIdDesc(
+                testRoom.getId(), testMessage.getId() + 1
         );
 
         //then
@@ -107,11 +107,11 @@ public class MessageRepositoryTest {
     }
 
     @Test
-    @DisplayName("findTop50ByPostIdAndIdLessThanOrderByIdDesc: 메시지 없음 - 빈 리스트 반환")
-    void findTop50ByPostIdAndIdLessThanOrderByIdDesc_empty() {
+    @DisplayName("findTop50ByRoomIdAndIdLessThanOrderByIdDesc: 메시지 없음 - 빈 리스트 반환")
+    void findTop50ByRoomIdAndIdLessThanOrderByIdDesc_empty() {
         //when
-        List<Messages> result = messageRepository.findTop50ByPostIdAndIdLessThanOrderByIdDesc(
-                testPost.getId(), testMessage.getId()
+        List<Messages> result = messageRepository.findTop50ByRoomIdAndIdLessThanOrderByIdDesc(
+                testRoom.getId(), testMessage.getId()
         );
 
         //then

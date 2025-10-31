@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DiscussionPosts {
+public class DiscussionRooms {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
+    @Column(name = "room_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,12 +34,15 @@ public class DiscussionPosts {
     @Column(nullable = false)
     private int participantCount = 1;
 
-    @CreationTimestamp
+    @CreationTimestamp // 엔티티 생성 시, 자동으로 시간 기록
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private LocalDateTime recentActivityAt;
+
     @Builder
-    public DiscussionPosts(User author, String title, String intro, int maxParticipants) {
+    public DiscussionRooms(User author, String title, String intro, int maxParticipants) {
         this.author = author;
         this.title = title;
         this.intro = intro;

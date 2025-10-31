@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter //테스트용
 public class MessageResponse {
     private final Long id;
-    private final Long postId;
+    private final Long roomId;
     private final AuthorResponse author;
     private final String content;
     private final int likeCount;
@@ -21,7 +21,7 @@ public class MessageResponse {
 
     public MessageResponse(Messages message, boolean liked) {
         this.id = message.getId();
-        this.postId = message.getPostId();
+        this.roomId = message.getRoomId();
         this.author = new AuthorResponse(message.getAuthor());
         this.content = message.getContent();
         this.likeCount = message.getLikeCount();

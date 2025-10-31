@@ -38,23 +38,23 @@ public class MessageController {
     private final AuthUtil authUtil;
 
     /* 1. 조회 */
-    @GetMapping("/community/discussions/{postId}/messages")
+    @GetMapping("/community/discussions/{roomId}/messages")
     public ResponseEntity<List<MessageResponse>> getMessages(@AuthenticationPrincipal UserDetails userDetails,
-                                                             @PathVariable Long postId,
+                                                             @PathVariable Long roomId,
                                                              @RequestParam Long last) {
         Long userId = authUtil.resolveUserId(userDetails);
-        List<MessageResponse> messages = messageService.getMessages(userId, postId, last);
+        List<MessageResponse> messages = messageService.getMessages(userId, roomId, last);
         return ResponseEntity.ok(messages);
     }
 
     /* 2. 등록 */
-    @MessageMapping("/community/discussions/{postId}/messages")
-    @SendTo("/topic/community/discussions/{postId}/messages")
+    @MessageMapping("/community/discussions/{roomId}/messages")
+    @SendTo("/topic/community/discussions/{roomId}/messages")
     public MessageResponse createMessage(@AuthenticationPrincipal UserDetails userDetails,
-                                         @DestinationVariable Long postId,
+                                         @DestinationVariable Long roomId,
                                          MessageRequest request) {
         User user = authUtil.resolveUser(userDetails);
-        return messageService.createMessage(user, postId, request);
+        return messageService.createMessage(user, roomId, request);
     }
 
     /* 3. 삭제 */

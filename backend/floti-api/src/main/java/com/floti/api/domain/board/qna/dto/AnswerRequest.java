@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter //테스트용
 public class AnswerRequest {
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 1000)
     private String content;
 }

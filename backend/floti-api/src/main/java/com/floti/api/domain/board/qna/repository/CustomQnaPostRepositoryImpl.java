@@ -28,6 +28,7 @@ public class CustomQnaPostRepositoryImpl implements CustomQnaPostRepository {
                 .or(qna.content.containsIgnoreCase(search));
 
         // 2. 정렬 조건
+        OrderSpecifier<Long> baseOrder = qna.id.desc();
         OrderSpecifier<?>[] sortSpec = switch (sort.toLowerCase()) {
             case "accuracy" -> new OrderSpecifier[]{
                     new CaseBuilder()
@@ -35,9 +36,9 @@ public class CustomQnaPostRepositoryImpl implements CustomQnaPostRepository {
                             .then(0)
                             .otherwise(1)
                             .asc(),
-                    qna.id.desc()
+                    baseOrder
             };
-            default -> new OrderSpecifier[] {qna.id.desc()};
+            default -> new OrderSpecifier[] {baseOrder};
         };
 
         // 3. 총 개수

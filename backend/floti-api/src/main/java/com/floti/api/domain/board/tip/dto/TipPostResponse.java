@@ -18,7 +18,7 @@ public class TipPostResponse {
     private final int likeCount;
     private final boolean liked;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm")
     private final LocalDateTime createdAt;
 
     public TipPostResponse(TipPosts tipPost, String baseUrl) {

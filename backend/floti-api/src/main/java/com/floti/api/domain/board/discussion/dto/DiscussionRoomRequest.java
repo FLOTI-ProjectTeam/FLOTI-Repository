@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter //테스트용
-public class DiscussionPostRequest {
+public class DiscussionRoomRequest {
     @NotBlank
     @Size(max = 100)
     private String title;

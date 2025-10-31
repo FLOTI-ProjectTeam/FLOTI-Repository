@@ -18,7 +18,7 @@ public class QnaPostResponse {
     private final int answerCount;
     private final boolean accepted;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm")
     private final LocalDateTime createdAt;
 
     public QnaPostResponse(QnaPosts qnaPost) {

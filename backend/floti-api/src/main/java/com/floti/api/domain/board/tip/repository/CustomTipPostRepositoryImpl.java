@@ -28,6 +28,7 @@ public class CustomTipPostRepositoryImpl implements CustomTipPostRepository {
                 .or(tip.content.containsIgnoreCase(search));
 
         // 2. 정렬 조건
+        OrderSpecifier<Long> baseOrder = tip.id.desc();
         OrderSpecifier<?>[] sortSpec = switch (sort.toLowerCase()) {
             case "accuracy" -> new OrderSpecifier[]{
                     new CaseBuilder()
@@ -35,10 +36,10 @@ public class CustomTipPostRepositoryImpl implements CustomTipPostRepository {
                             .then(0)
                             .otherwise(1)
                             .asc(),
-                    tip.id.desc()
+                    baseOrder
             };
-            case "likes" -> new OrderSpecifier[] {tip.likeCount.desc(), tip.id.desc()};
-            default -> new OrderSpecifier[] {tip.id.desc()};
+            case "likes" -> new OrderSpecifier[] {tip.likeCount.desc(), baseOrder};
+            default -> new OrderSpecifier[] {baseOrder};
         };
 
         // 4. 총 개수

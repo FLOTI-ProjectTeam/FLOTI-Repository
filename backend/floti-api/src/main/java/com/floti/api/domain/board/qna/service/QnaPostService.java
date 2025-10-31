@@ -38,11 +38,12 @@ public class QnaPostService {
 
     /* 1-1. 조회 */
     public Page<QnaPostResponse> getQnaPosts(String sort, int page, boolean accepted) {
+        Sort.Order baseOrder = Sort.Order.desc("id");
         Sort sortOrder = switch (sort.toLowerCase()) {
             case "answers" -> accepted
-                    ? Sort.by("answerCount").descending()
-                    : Sort.by("answerCount").ascending();
-            default -> Sort.by("id").descending();
+                    ? Sort.by(Sort.Order.desc("answerCount"), baseOrder)
+                    : Sort.by(Sort.Order.asc("answerCount"), baseOrder);
+            default -> Sort.by(baseOrder);
         };
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, sortOrder);

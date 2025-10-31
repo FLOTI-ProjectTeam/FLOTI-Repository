@@ -1,7 +1,7 @@
 package com.floti.api.domain.board.discussion.repository;
 
-import com.floti.api.domain.board.discussion.entity.DiscussionPosts;
-import com.floti.api.domain.board.discussion.entity.QDiscussionPosts;
+import com.floti.api.domain.board.discussion.entity.DiscussionRooms;
+import com.floti.api.domain.board.discussion.entity.QDiscussionRooms;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -10,24 +10,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomDiscussionPostRepositoryImpl implements CustomDiscussionPostRepository {
+public class CustomDiscussionRoomRepositoryImpl implements CustomDiscussionRoomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<DiscussionPosts> searchDiscussionPosts(String search, String sort, Pageable pageable) {
-        QDiscussionPosts discussion = QDiscussionPosts.discussionPost;
+    public Page<DiscussionRooms> searchDiscussionRooms(String search, String sort, Pageable pageable) {
+        QDiscussionRooms discussion = QDiscussionRooms.discussionRoom;
 
         // 1. 검색 조건
         BooleanExpression condition = discussion.title.containsIgnoreCase(search)
                 .or(discussion.intro.containsIgnoreCase(search));
 
         // 2. 정렬 조건
+        OrderSpecifier<Long> baseOrder = discussion.id.desc();
         OrderSpecifier<?>[] sortSpec = switch (sort.toLowerCase()) {
             case "accuracy" -> new OrderSpecifier[]{
                     new CaseBuilder()
@@ -35,9 +37,10 @@ public class CustomDiscussionPostRepositoryImpl implements CustomDiscussionPostR
                             .then(0)
                             .otherwise(1)
                             .asc(),
-                    discussion.id.desc()
+                    discussion.recentActivityAt.desc(), baseOrder
             };
-            default -> new OrderSpecifier[] {discussion.id.desc()};
+            case "latest" -> new OrderSpecifier[] {baseOrder};
+            default -> new OrderSpecifier[] {discussion.recentActivityAt.desc(), baseOrder};
         };
 
         // 3. 총 개수
@@ -50,7 +53,7 @@ public class CustomDiscussionPostRepositoryImpl implements CustomDiscussionPostR
         long total = (totalCount != null) ? totalCount : 0L;
 
         // 4. 실제 데이터
-        List<DiscussionPosts> content = queryFactory.selectFrom(discussion)
+        List<DiscussionRooms> content = queryFactory.selectFrom(discussion)
                 .where(condition)
                 .orderBy(sortSpec)
                 .offset(pageable.getOffset())

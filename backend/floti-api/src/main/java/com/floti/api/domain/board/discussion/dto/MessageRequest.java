@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter //테스트용
 public class MessageRequest {
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 100)
     private String content;
 }

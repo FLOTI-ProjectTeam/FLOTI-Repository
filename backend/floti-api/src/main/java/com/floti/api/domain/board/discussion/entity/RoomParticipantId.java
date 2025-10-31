@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class PostParticipantId {
-    private Long postId;
+public class RoomParticipantId {
+    private Long roomId;
     private Long participantId;
 }

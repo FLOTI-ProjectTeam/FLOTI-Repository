@@ -9,21 +9,21 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@IdClass(PostParticipantId.class)
+@IdClass(RoomParticipantId.class)
 public class DiscussionParticipants {
-    @Id private Long postId;
+    @Id private Long roomId;
     @Id private Long participantId;
 
     @ManyToOne
-    @MapsId("postId") // postId 필드에 엔티티의 id 값을 자동 매핑
-    private DiscussionPosts post;
+    @MapsId("roomId") // roomId 필드에 엔티티의 id 값을 자동 매핑
+    private DiscussionRooms room;
 
     @ManyToOne
     @MapsId("participantId") // participantId 필드에 엔티티의 id 값을 자동 매핑
     private User participant;
 
-    public DiscussionParticipants(DiscussionPosts post, User participant) {
-        this.post = post;
+    public DiscussionParticipants(DiscussionRooms room, User participant) {
+        this.room = room;
         this.participant = participant;
     }
 }

@@ -20,13 +20,13 @@ public class Messages implements LikeableEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long postId;
+    private Long roomId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String content;
 
     @Column(nullable = false)
@@ -37,9 +37,9 @@ public class Messages implements LikeableEntity {
     private LocalDateTime createdAt;
 
     @Builder
-    public Messages(Long id, Long postId, User author, String content) {
+    public Messages(Long id, Long roomId, User author, String content) {
         this.id = id; //테스트용
-        this.postId = postId;
+        this.roomId = roomId;
         this.author = author;
         this.content = content;
     }

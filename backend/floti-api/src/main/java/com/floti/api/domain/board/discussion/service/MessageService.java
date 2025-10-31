@@ -26,8 +26,8 @@ public class MessageService {
     private final LikeService likeService;
 
     /* 1. 조회 */
-    public List<MessageResponse> getMessages(Long userId, Long postId, Long last) {
-        List<Messages> messages = messageRepository.findTop50ByPostIdAndIdLessThanOrderByIdDesc(postId, last);
+    public List<MessageResponse> getMessages(Long userId, Long roomId, Long last) {
+        List<Messages> messages = messageRepository.findTop50ByRoomIdAndIdLessThanOrderByIdDesc(roomId, last);
         List<Long> messageIds = messages.stream().map(Messages::getId).toList();
         Set<Long> likedMessageIds = likeService.getLikedMessageIds(userId, messageIds);
 
@@ -38,10 +38,10 @@ public class MessageService {
 
     /* 2. 등록 */
     @Transactional
-    public MessageResponse createMessage(User user, Long postId, MessageRequest request) {
+    public MessageResponse createMessage(User user, Long roomId, MessageRequest request) {
         Messages message = Messages.builder()
                 .author(user)
-                .postId(postId)
+                .roomId(roomId)
                 .content(request.getContent())
                 .build();
 
