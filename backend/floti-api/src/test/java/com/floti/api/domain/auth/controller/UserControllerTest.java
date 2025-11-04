@@ -7,6 +7,7 @@ import com.floti.api.domain.auth.dto.ChangePasswordRequestDto;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.security.jwt.JwtUtil;
+import com.floti.api.util.AuthUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ class UserControllerTest {
 
     @MockitoBean
     private JwtUtil jwtUtil;
+
+    @MockitoBean
+    private AuthUtil authUtil;
 
     @Test
     @DisplayName("비밀번호 변경 성공(인증된 사용자) → 200")

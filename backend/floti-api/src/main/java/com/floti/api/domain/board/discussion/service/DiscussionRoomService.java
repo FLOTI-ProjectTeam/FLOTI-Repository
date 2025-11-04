@@ -72,12 +72,12 @@ public class DiscussionRoomService {
                 .map(dp -> new AuthorResponse(dp.getParticipant()))
                 .toList();
 
-        /* 메시지별 추천 여부 */
+        /* 메시지별 좋아요 여부 */
         // 1. 모든 메시지 ID
         List<Messages> messages = messageRepository.findTop50ByRoomIdOrderByIdDesc(id);
         List<Long> messageIds = messages.stream().map(Messages::getId).toList();
 
-        // 2. 사용자가 추천한 메시지 ID
+        // 2. 사용자가 좋아요한 메시지 ID
         Set<Long> likedMessageIds = likeService.getLikedMessageIds(userId, messageIds);
 
         List<MessageResponse> messageResponses = messages.stream()

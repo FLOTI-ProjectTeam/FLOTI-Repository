@@ -62,7 +62,7 @@ public class LikeAnswerRepositoryTest {
     }
 
     @Test
-    @DisplayName("findByUserIdAndAnswerIdIn: 추천 있음 - LikeAnswers 리스트 반환")
+    @DisplayName("findByUserIdAndAnswerIdIn: 좋아요 있음 - LikeAnswers 리스트 반환")
     void findByUserIdAndAnswerIdIn_exist() {
         //given
         List<Long> answerIds = List.of(testAnswer.getId());
@@ -76,7 +76,7 @@ public class LikeAnswerRepositoryTest {
     }
 
     @Test
-    @DisplayName("findByUserIdAndAnswerIdIn: 추천 없음 - 빈 리스트 반환")
+    @DisplayName("findByUserIdAndAnswerIdIn: 좋아요 없음 - 빈 리스트 반환")
     void findByUserIdAndAnswerIdIn_empty() {
         //given
         List<Long> answerIds = List.of(9999L);

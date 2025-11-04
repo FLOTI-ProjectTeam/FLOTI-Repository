@@ -44,10 +44,10 @@ public class AnswerServiceTest {
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
 
-    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(10L).nickname("테스터01").build();
     private final QnaPosts testPost = QnaPosts.builder().author(testUser).build();
     private final Answers testAnswer = Answers.builder()
-            .id(VALID_ID).postId(VALID_ID).author(testUser).content("첫번째 답변").build();
+            .id(20L).postId(VALID_ID).author(testUser).content("첫번째 답변").build();
 
     @BeforeEach
     void setUp() {
@@ -106,7 +106,7 @@ public class AnswerServiceTest {
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
         //when
-        AnswerResponse response = answerService.updateAnswer(VALID_ID, VALID_ID, request);
+        AnswerResponse response = answerService.updateAnswer(testUser.getId(), testAnswer.getId(), request);
 
         //then
         assertEquals("수정된 답변", response.getContent());
@@ -122,7 +122,7 @@ public class AnswerServiceTest {
 
         //when
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            answerService.updateAnswer(VALID_ID, INVALID_ID, request);
+            answerService.updateAnswer(testUser.getId(), INVALID_ID, request);
         });
 
         //then
@@ -141,7 +141,7 @@ public class AnswerServiceTest {
 
         //when
         AcceptedAnswerUpdateException exception = assertThrows(AcceptedAnswerUpdateException.class, () -> {
-            answerService.updateAnswer(VALID_ID, INVALID_ID, request);
+            answerService.updateAnswer(testUser.getId(), INVALID_ID, request);
         });
 
         //then
@@ -158,7 +158,7 @@ public class AnswerServiceTest {
         when(qnaPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 
         // when
-        answerService.deleteAnswer(VALID_ID, VALID_ID);
+        answerService.deleteAnswer(testUser.getId(), testAnswer.getId());
 
         //then
         verify(answerRepository).delete(testAnswer);
@@ -175,7 +175,7 @@ public class AnswerServiceTest {
 
         //when
         AcceptedAnswerDeletionException exception = assertThrows(AcceptedAnswerDeletionException.class, () -> {
-            answerService.deleteAnswer(VALID_ID, INVALID_ID);
+            answerService.deleteAnswer(testUser.getId(), INVALID_ID);
         });
 
         //then
@@ -190,7 +190,7 @@ public class AnswerServiceTest {
         when(answerRepository.findById(anyLong())).thenReturn(Optional.of(testAnswer));
 
         //when
-        answerService.acceptAnswer(VALID_ID, VALID_ID, VALID_ID);
+        answerService.acceptAnswer(testUser.getId(), VALID_ID, testAnswer.getId());
 
         //then
         assertTrue(testPost.isAccepted());
@@ -206,7 +206,7 @@ public class AnswerServiceTest {
 
         //when
         AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
-            answerService.acceptAnswer(INVALID_ID, VALID_ID, VALID_ID);
+            answerService.acceptAnswer(INVALID_ID, VALID_ID, testAnswer.getId());
         });
 
         //then
@@ -224,7 +224,7 @@ public class AnswerServiceTest {
 
         //when
         PostAlreadyAcceptedException exception = assertThrows(PostAlreadyAcceptedException.class, () -> {
-            answerService.acceptAnswer(VALID_ID, INVALID_ID, VALID_ID);
+            answerService.acceptAnswer(testUser.getId(), INVALID_ID, testAnswer.getId());
         });
 
         //then

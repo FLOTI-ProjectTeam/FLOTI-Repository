@@ -11,6 +11,7 @@ import com.floti.api.domain.auth.repository.UserRepository;
 import com.floti.api.domain.auth.service.UserService;
 import com.floti.api.security.jwt.JwtUtil;
 import com.floti.api.security.jwt.RefreshTokenService;
+import com.floti.api.util.AuthUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,7 @@ public class AuthControllerTest {
     @MockitoBean private PasswordEncoder passwordEncoder;
     @MockitoBean private InMemoryCodeService codeService;
     @MockitoBean private JwtUtil jwtUtil;
+    @MockitoBean private AuthUtil authUtil;
     @MockitoBean private RefreshTokenService refreshTokenService; // [추가됨]
 
     // ---------- 회원가입 ----------

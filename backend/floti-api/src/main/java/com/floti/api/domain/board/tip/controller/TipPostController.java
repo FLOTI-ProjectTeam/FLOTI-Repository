@@ -25,7 +25,6 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 public class TipPostController {
     private final TipPostService tipPostService;
     private final LikeService likeService;
-
     private final AuthUtil authUtil;
 
     /* 1. 조회 & 검색 */
@@ -79,7 +78,7 @@ public class TipPostController {
         return ResponseEntity.status(NO_CONTENT).build(); // 204 No Content
     }
 
-    /* 6. 추천 토글 */
+    /* 6. 좋아요 토글 */
     @PostMapping("/{id}/like")
     public ResponseEntity<LikeResponse> toggleLikeTipPost(@AuthenticationPrincipal UserDetails userDetails,
                                                           @PathVariable long id) {

@@ -22,7 +22,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 public class AnswerController {
     private final AnswerService answerService;
     private final LikeService likeService;
-
     private final AuthUtil authUtil;
 
     /* 1. 등록 */
@@ -64,7 +63,7 @@ public class AnswerController {
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    /* 5. 추천 토글 */
+    /* 5. 좋아요 토글 */
     @PostMapping("/answers/{id}/like")
     public ResponseEntity<LikeResponse> toggleLikeAnswer(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PathVariable long id) {

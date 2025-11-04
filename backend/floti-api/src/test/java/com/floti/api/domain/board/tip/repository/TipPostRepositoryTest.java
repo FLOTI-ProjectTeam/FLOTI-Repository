@@ -73,6 +73,7 @@ public class TipPostRepositoryTest {
         BooleanExpression condition = tip.title.containsIgnoreCase(search)
                 .or(tip.content.containsIgnoreCase(search));
 
+        OrderSpecifier<Long> baseOrder = tip.id.desc();
         OrderSpecifier<?>[] sortSpec = switch (sort.toLowerCase()) {
             case "accuracy" -> new OrderSpecifier[]{
                     new CaseBuilder()
@@ -80,13 +81,11 @@ public class TipPostRepositoryTest {
                             .then(0)
                             .otherwise(1)
                             .asc(),
-                    tip.id.desc()
+                    baseOrder
             };
-            case "likes" -> new OrderSpecifier[] {tip.likeCount.desc(), tip.id.desc()};
-            default -> new OrderSpecifier[] {tip.id.desc()};
+            case "likes" -> new OrderSpecifier[] {tip.likeCount.desc(), baseOrder};
+            default -> new OrderSpecifier[] {baseOrder};
         };
-
-        System.out.println(sort);
 
         Long totalCount = queryFactory
                 .select(tip.count())
@@ -118,7 +117,7 @@ public class TipPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("searchTipPosts: 추천순 - 추천 많은 TipPosts 페이지 먼저 반환")
+    @DisplayName("searchTipPosts: 좋아요순 - 좋아요 많은 TipPosts 페이지 먼저 반환")
     void searchTipPosts_likes() {
         //given
         testPost.incrementLikeCount();

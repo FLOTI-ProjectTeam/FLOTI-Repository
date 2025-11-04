@@ -30,7 +30,7 @@ public class LikeService {
     private final AnswerRepository answerRepository;
     private final MessageRepository messageRepository;
 
-    /* 추천 토글 */
+    /* 좋아요 토글 */
     public <T> LikeResponse toggleLike(Long userId,
                                        Supplier<LikeableEntity> targetSupplier,
                                        Supplier<T> likeSupplier,
@@ -41,7 +41,7 @@ public class LikeService {
         boolean liked = (likeEntity == null);
 
         if (userId.equals(likeableEntity.getAuthor().getId()))
-            throw new AccessDeniedException("작성자는 추천할 수 없습니다.");
+            throw new AccessDeniedException("작성자는 좋아요할 수 없습니다.");
 
         if (liked) {
             saveLike.run();
@@ -54,7 +54,7 @@ public class LikeService {
         return new LikeResponse(likeableEntity.getId(), liked, likeableEntity.getLikeCount());
     }
 
-    /* 메시지별 추천 여부 반환 */
+    /* 메시지별 좋아요 여부 반환 */
     public Set<Long> getLikedMessageIds(Long userId, List<Long> messageIds) {
         return likeMessageRepository.findByUserIdAndMessageIdIn(userId, messageIds)
                 .stream()
@@ -62,7 +62,7 @@ public class LikeService {
                 .collect(Collectors.toSet());
     }
 
-    /* 1. Tip 게시글 추천 토글 */
+    /* 1. Tip 게시글 좋아요 토글 */
     @Transactional
     public LikeResponse toggleLikeTipPost(Long userId, Long postId) {
         return toggleLike(
@@ -75,7 +75,7 @@ public class LikeService {
         );
     }
 
-    /* 2. 답변 추천 토글 */
+    /* 2. 답변 좋아요 토글 */
     @Transactional
     public LikeResponse toggleLikeAnswer(Long userId, Long answerId) {
         return toggleLike(
@@ -88,7 +88,7 @@ public class LikeService {
         );
     }
 
-    /* 3. 메시지 추천 토글 */
+    /* 3. 메시지 좋아요 토글 */
     @Transactional
     public LikeResponse toggleLikeMessage(Long userId, Long messageId) {
         return toggleLike(

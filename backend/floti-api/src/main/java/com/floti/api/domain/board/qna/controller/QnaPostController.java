@@ -21,7 +21,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/community/qnas")
 public class QnaPostController {
     private final QnaPostService qnaPostService;
-
     private final AuthUtil authUtil;
 
     /* 1. 조회 & 검색 */

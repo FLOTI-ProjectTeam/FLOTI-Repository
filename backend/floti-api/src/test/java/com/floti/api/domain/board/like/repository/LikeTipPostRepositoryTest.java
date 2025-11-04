@@ -49,7 +49,7 @@ public class LikeTipPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByUserIdAndPostId: 추천 있음 - true 반환")
+    @DisplayName("existsByUserIdAndPostId: 좋아요 있음 - true 반환")
     void existsByUserIdAndPostId_true() {
         //given
         LikeTipPosts likeTipPost = new LikeTipPosts(testUser.getId(), testPost.getId());
@@ -63,7 +63,7 @@ public class LikeTipPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByUserIdAndPostId: 추천 없음 - false 반환")
+    @DisplayName("existsByUserIdAndPostId: 좋아요 없음 - false 반환")
     void existsByUserIdAndPostId_false() {
         //when
         boolean result = likeTipPostRepository.existsByUserIdAndPostId(testUser.getId(), testPost.getId());

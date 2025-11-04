@@ -16,6 +16,7 @@ CREATE TABLE refresh_tokens (
 	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+
 -- 태그 관련 --
 CREATE TABLE tags (
 	tag_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -40,6 +41,7 @@ CREATE TABLE user_tags (
 	FOREIGN KEY (tag_id) REFERENCES tags(tag_id)
 );
 
+
 -- TIP 게시판 관련 --
 CREATE TABLE tip_posts (
 	post_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -47,19 +49,18 @@ CREATE TABLE tip_posts (
 	title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
     thumbnail VARCHAR(65), -- tip/thumbnail/날짜_UUID.확장자
-    comment_count INT UNSIGNED DEFAULT 0,
-    like_count INT UNSIGNED DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    comment_count INT UNSIGNED NOT NULL DEFAULT 0,
+    like_count INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_author_id_post_id ON tip_posts(author_id, post_id); -- 사용자 TIP 게시글 조회*
-CREATE INDEX idx_comment_count_post_id ON tip_posts(comment_count, post_id); -- 댓글순 조회*
+CREATE INDEX idx_author_id_post_id ON tip_posts(author_id, post_id); -- 사용자 TIP 게시글 조회**
 CREATE INDEX idx_like_count_post_id ON tip_posts(like_count, post_id); -- 좋아요순 조회
 
 CREATE TABLE like_tip_posts (
-	user_id BIGINT UNSIGNED NOT NULL,
-	post_id BIGINT UNSIGNED NOT NULL,
+	user_id BIGINT UNSIGNED,
+	post_id BIGINT UNSIGNED,
 	PRIMARY KEY (user_id, post_id),
 	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
 	FOREIGN KEY (post_id) REFERENCES tip_posts(post_id) ON DELETE CASCADE
@@ -67,26 +68,20 @@ CREATE TABLE like_tip_posts (
 
 CREATE TABLE comments (
 	comment_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	post_id BIGINT UNSIGNED NOT NULL, -- 직접 삭제
+	post_id BIGINT UNSIGNED NOT NULL,
 	parent_id BIGINT UNSIGNED,
-	author_id BIGINT UNSIGNED NOT NULL,
-	content VARCHAR(255) NOT NULL,
-	like_count INT UNSIGNED DEFAULT 0,
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE,
-	FOREIGN KEY (post_id) REFERENCES tip_posts(post_id) ON DELETE CASCADE
+	author_id BIGINT UNSIGNED, -- 직접 삭제
+	content VARCHAR(200) NOT NULL,
+	like_count INT UNSIGNED NOT NULL DEFAULT 0,
+    is_deleted TINYINT NOT NULL DEFAULT 0, -- 0 = FALSE, 1 = TRUE
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES tip_posts(post_id) ON DELETE CASCADE,
+	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_author_id_comment_id ON comments(author_id, comment_id); -- 게시판별 사용자 댓글 조회**
 CREATE INDEX idx_post_id_comment_id ON comments(post_id, comment_id); -- 게시글별 댓글 조회
 
-CREATE TABLE like_comments (
-	user_id BIGINT UNSIGNED NOT NULL,
-	comment_id BIGINT UNSIGNED NOT NULL,
-	PRIMARY KEY (user_id, comment_id),
-	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-	FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE
-);
 
 -- Q&A 게시판 관련 --
 CREATE TABLE qna_posts (
@@ -94,26 +89,25 @@ CREATE TABLE qna_posts (
 	author_id BIGINT UNSIGNED NOT NULL,
 	title VARCHAR(100) NOT NULL,
 	content TEXT NOT NULL,
-	answer_count INT UNSIGNED DEFAULT 0,
-	is_completed TINYINT DEFAULT 0, -- 0 = FALSE, 1 = TRUE
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	answer_count INT UNSIGNED NOT NULL DEFAULT 0,
+	is_accepted TINYINT NOT NULL DEFAULT 0, -- 0 = FALSE, 1 = TRUE
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_author_id_post_id ON qna_posts(author_id, post_id); -- 사용자 Q&A 게시글 조회*
-CREATE INDEX idx_answer_count_post_id ON qna_posts(answer_count, post_id); -- 답변순 조회
-CREATE INDEX idx_is_completed_post_id ON qna_posts(is_completed, post_id); -- 완료 여부 조회
+CREATE INDEX idx_author_id_post_id ON qna_posts(author_id, post_id); -- 사용자 Q&A 게시글 조회**
+CREATE INDEX idx_is_accepted_answer_count_post_id ON qna_posts(is_accepted, answer_count, post_id); -- 답변순 조회
 
 CREATE TABLE answers (
 	answer_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	post_id BIGINT UNSIGNED NOT NULL, -- 직접 삭제
-	author_id BIGINT UNSIGNED NOT NULL,
-	content VARCHAR(255) NOT NULL,
-	like_count INT UNSIGNED DEFAULT 0,
-	is_accepted TINYINT DEFAULT 0, -- 0 = FALSE, 1 = TRUE
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE,
-	FOREIGN KEY (post_id) REFERENCES qna_posts(post_id) ON DELETE CASCADE
+	post_id BIGINT UNSIGNED NOT NULL,
+	author_id BIGINT UNSIGNED,
+	content VARCHAR(1000) NOT NULL,
+	like_count INT UNSIGNED NOT NULL DEFAULT 0,
+	is_accepted TINYINT NOT NULL DEFAULT 0, -- 0 = FALSE, 1 = TRUE
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES qna_posts(post_id) ON DELETE CASCADE,
+	FOREIGN KEY (author_id) REFERENCES users(user_id)
 );
 
 CREATE INDEX idx_author_id_answer_id ON answers(author_id, answer_id); -- 게시판별 사용자 답변 조회**
@@ -127,6 +121,7 @@ CREATE TABLE like_answers (
 	FOREIGN KEY (answer_id) REFERENCES answers(answer_id) ON DELETE CASCADE
 );
 
+
 -- 챌린지 게시판 관련 --
 CREATE TABLE challenge_posts (
 	post_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -139,7 +134,7 @@ CREATE TABLE challenge_posts (
 	start_date DATETIME NOT NULL,
 	end_date DATETIME NOT NULL,
 	is_completed TINYINT DEFAULT 0, -- 0 = FALSE, 1 = TRUE
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE RESTRICT
 );
 
@@ -164,7 +159,7 @@ CREATE TABLE feeds (
 	challenge_id BIGINT UNSIGNED NOT NULL,
 	author_id BIGINT UNSIGNED NOT NULL,
 	content VARCHAR(255) NOT NULL,
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,  -- 작성 시간
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- 작성 시간
 	FOREIGN KEY (challenge_id) REFERENCES challenge_posts(post_id) ON DELETE CASCADE,
 	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
@@ -173,40 +168,43 @@ CREATE INDEX idx_participant_id_feed_id ON feeds(challenge_id, feed_id); -- 챌�
 CREATE INDEX idx_author_id_feed_id ON feeds(author_id, feed_id); -- 사용자 피드 조회*
 
 -- 토론 게시판 관련 --
-CREATE TABLE discussion_posts (
-	post_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE discussion_rooms (
+	room_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	author_id BIGINT UNSIGNED NOT NULL,
 	title VARCHAR(100) NOT NULL,
 	intro VARCHAR(255) NOT NULL,
 	max_participants TINYINT UNSIGNED CHECK (max_participants BETWEEN 2 AND 5),
-	current_participants TINYINT UNSIGNED DEFAULT 1,
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	participant_count TINYINT UNSIGNED DEFAULT 1,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    recent_activity_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, -- 직접 갱신
 	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE RESTRICT
 );
 
-CREATE INDEX idx_author_id_post_id ON discussion_posts(author_id, post_id); -- 사용자 토론 게시글 조회*
+CREATE INDEX idx_author_id_room_id ON discussion_rooms(author_id, room_id); -- 사용자 토론방 조회*
+CREATE INDEX idx_recent_activity_at_room_id ON discussion_rooms(recent_activity_at, room_id); -- 최근활동순 조회
 
 CREATE TABLE discussion_participants (
-	discussion_id BIGINT UNSIGNED NOT NULL,
+    room_id BIGINT UNSIGNED NOT NULL,
 	participant_id BIGINT UNSIGNED NOT NULL,
-	PRIMARY KEY (discussion_id, participant_id),
-	FOREIGN KEY (discussion_id) REFERENCES discussion_posts(post_id) ON DELETE CASCADE,
+	PRIMARY KEY (room_id, participant_id),
+	FOREIGN KEY (room_id) REFERENCES discussion_rooms(room_id) ON DELETE CASCADE,
 	FOREIGN KEY (participant_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_participant_id_discussion_id ON discussion_participants(participant_id, discussion_id); -- 참여 토론방 조회
+CREATE INDEX idx_participant_id_room_id ON discussion_participants(participant_id, room_id); -- 참여 토론방 조회
 
 CREATE TABLE messages (
 	message_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-	discussion_id BIGINT UNSIGNED NOT NULL,
+	room_id BIGINT UNSIGNED NOT NULL,
 	author_id BIGINT UNSIGNED,
 	content VARCHAR(255) NOT NULL,
 	like_count TINYINT UNSIGNED DEFAULT 0,
 	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE SET NULL
+	FOREIGN KEY (room_id) REFERENCES discussion_rooms(room_id) ON DELETE CASCADE,
+FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_created_at ON messages(discussion_id, created_at); -- 토론방별 메시지 조회
+CREATE INDEX idx_room_id_created_at ON messages(room_id, created_at); -- 토론방별 메시지 조회
 
 CREATE TABLE like_messages (
 	message_id BIGINT UNSIGNED NOT NULL,

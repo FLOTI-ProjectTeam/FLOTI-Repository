@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Optional;
 
@@ -36,15 +37,15 @@ public class LikeServiceTest {
 
     private static final Long VALID_ID = 1L;
 
-    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(10L).nickname("테스터01").build();
     private final TipPosts testPost = TipPosts.builder().author(testUser).build();
 
     @Test
-    @DisplayName("toggleLikeTipPost: 게시글 추천")
+    @DisplayName("toggleLikeTipPost: 게시글 좋아요")
     void toggleLikeTipPost_like() {
         //given
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
-        when(likeTipPostRepository.findById(new UserPostId(VALID_ID, VALID_ID))).thenReturn(Optional.empty());
+        when(likeTipPostRepository.findById(any(UserPostId.class))).thenReturn(Optional.empty());
         when(likeTipPostRepository.save(any(LikeTipPosts.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -57,13 +58,13 @@ public class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("toggleLikeTipPost: 게시글 추천 취소")
+    @DisplayName("toggleLikeTipPost: 게시글 좋아요 취소")
     void toggleLikeTipPost_unlike() {
         //given
         LikeTipPosts likeTipPost = new LikeTipPosts(VALID_ID, VALID_ID);
 
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
-        when(likeTipPostRepository.findById(new UserPostId(VALID_ID, VALID_ID))).thenReturn(Optional.of(likeTipPost));
+        when(likeTipPostRepository.findById(any(UserPostId.class))).thenReturn(Optional.of(likeTipPost));
         doNothing().when(likeTipPostRepository).delete(any(LikeTipPosts.class));
 
         //when
@@ -72,5 +73,21 @@ public class LikeServiceTest {
         //then
         assertEquals(0, response.getLikeCount());
         assertFalse(response.isLiked());
+    }
+
+    @Test
+    @DisplayName("toggleLikeTipPost: 작성자 - AccessDeniedException")
+    void toggleLikeTipPost_fail_postAuthor() {
+        //given
+        when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
+        when(likeTipPostRepository.findById(any(UserPostId.class))).thenReturn(Optional.empty());
+
+        //when
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
+            likeService.toggleLikeTipPost(testUser.getId(), VALID_ID);
+        });
+
+        //then
+        assertEquals("작성자는 좋아요할 수 없습니다.", exception.getMessage());
     }
 }

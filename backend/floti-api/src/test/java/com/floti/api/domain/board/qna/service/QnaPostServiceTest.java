@@ -39,9 +39,8 @@ public class QnaPostServiceTest {
     private LikeAnswerRepository likeAnswerRepository;
 
     private static final Long VALID_ID = 1L;
-    private static final Long INVALID_ID = 9999L;
 
-    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(10L).nickname("테스터01").build();
     private final QnaPosts testPost = QnaPosts.builder().author(testUser).title("테스트 제목").build();
 
     @Test
@@ -50,16 +49,16 @@ public class QnaPostServiceTest {
         //given
         List<Answers> answers = List.of(
                 Answers.builder().id(VALID_ID).author(testUser).content("첫번째 답변").build(),
-                Answers.builder().id(INVALID_ID).author(testUser).content("두번째 답변").build()
+                Answers.builder().id(VALID_ID + 1).author(testUser).content("두번째 답변").build()
         );
-        LikeAnswers likeAnswer = new LikeAnswers(VALID_ID, VALID_ID);
+        LikeAnswers likeAnswer = new LikeAnswers(testUser.getId(), VALID_ID);
 
         when(qnaPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(answerRepository.findByPostId(anyLong())).thenReturn(answers);
         when(likeAnswerRepository.findByUserIdAndAnswerIdIn(anyLong(), anyList())).thenReturn(List.of(likeAnswer));
 
         //when
-        QnaPostDetailResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
+        QnaPostDetailResponse response = qnaPostService.getQnaPost(testUser.getId(), VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());
@@ -79,7 +78,7 @@ public class QnaPostServiceTest {
         when(likeAnswerRepository.findByUserIdAndAnswerIdIn(anyLong(), anyList())).thenReturn(Collections.emptyList());
 
         //when
-        QnaPostDetailResponse response = qnaPostService.getQnaPost(VALID_ID, VALID_ID);
+        QnaPostDetailResponse response = qnaPostService.getQnaPost(testUser.getId(), VALID_ID);
 
         //then
         assertEquals("테스트 제목", response.getTitle());

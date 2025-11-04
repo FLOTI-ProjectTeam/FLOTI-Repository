@@ -21,7 +21,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/community/tips")
 public class CommentController {
     private final CommentService commentService;
-
     private final AuthUtil authUtil;
 
     /* 1. 조회 */

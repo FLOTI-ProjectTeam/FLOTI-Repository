@@ -5,6 +5,7 @@ import com.floti.api.domain.board.common.dto.PostRequest;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
+import com.floti.api.domain.image.service.ImageService;
 import com.floti.api.domain.like.repository.LikeTipPostRepository;
 import com.floti.api.error.ExceptionMessage;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,10 +40,13 @@ public class TipPostServiceTest {
     @Mock
     private LikeTipPostRepository likeTipPostRepository;
 
+    @Mock
+    private ImageService imageService;
+
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
 
-    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(10L).nickname("테스터01").build();
     private final TipPosts testPost = TipPosts.builder()
             .author(testUser).title("테스트 제목").content("테스트 내용").build();
 
@@ -76,14 +80,14 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("getTipPost: 추천 없음 - 게시글 상세 반환 (liked=false)")
+    @DisplayName("getTipPost: 좋아요 없음 - 게시글 상세 반환 (liked=false)")
     void getTipPost_likedFalse() {
         //given
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(likeTipPostRepository.existsByUserIdAndPostId(anyLong(), anyLong())).thenReturn(false);
 
         //when
-        TipPostResponse response = tipPostService.getTipPost(VALID_ID, VALID_ID);
+        TipPostResponse response = tipPostService.getTipPost(testUser.getId(), VALID_ID);
 
         //then
         assertFalse(response.isLiked());
@@ -92,14 +96,14 @@ public class TipPostServiceTest {
     }
 
     @Test
-    @DisplayName("getTipPost: 추천 있음 - 게시글 상세 반환 (liked=true)")
+    @DisplayName("getTipPost: 좋아요 있음 - 게시글 상세 반환 (liked=true)")
     void getTipPost_likedTrue() {
         // given
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
         when(likeTipPostRepository.existsByUserIdAndPostId(anyLong(), anyLong())).thenReturn(true);
 
         // when
-        TipPostResponse response = tipPostService.getTipPost(VALID_ID, VALID_ID);
+        TipPostResponse response = tipPostService.getTipPost(testUser.getId(), VALID_ID);
 
         // then
         assertTrue(response.isLiked());
@@ -115,7 +119,7 @@ public class TipPostServiceTest {
 
         //when
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            tipPostService.getTipPost(VALID_ID, INVALID_ID);
+            tipPostService.getTipPost(testUser.getId(), INVALID_ID);
         });
 
         //then
@@ -153,7 +157,9 @@ public class TipPostServiceTest {
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
-        TipPostResponse response = tipPostService.updateTipPost(testUser, VALID_ID, request, null, false);
+        TipPostResponse response = tipPostService.updateTipPost(
+                testUser, VALID_ID, request, null, false
+        );
 
         //then
         assertEquals("수정된 제목", response.getTitle());
@@ -164,7 +170,7 @@ public class TipPostServiceTest {
     @DisplayName("updateTipPost: 작성자 아님 - AccessDeniedException")
     void updateTipPost_fail_authorMismatch() {
         //given
-        User user = User.builder().id(INVALID_ID).nickname("테스터02").build();
+        User user = User.builder().id(20L).nickname("테스터02").build();
         PostRequest request = new PostRequest();
 
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
@@ -185,7 +191,7 @@ public class TipPostServiceTest {
         when(tipPostRepository.findById(anyLong())).thenReturn(Optional.of(testPost));
 
         //when
-        tipPostService.deleteTipPost(VALID_ID, VALID_ID);
+        tipPostService.deleteTipPost(testUser.getId(), VALID_ID);
 
         //then
         verify(tipPostRepository).delete(testPost);

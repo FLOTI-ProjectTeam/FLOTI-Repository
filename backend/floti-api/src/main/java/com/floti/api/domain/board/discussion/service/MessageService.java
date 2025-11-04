@@ -3,7 +3,9 @@ package com.floti.api.domain.board.discussion.service;
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.discussion.dto.MessageRequest;
 import com.floti.api.domain.board.discussion.dto.MessageResponse;
+import com.floti.api.domain.board.discussion.entity.DiscussionRooms;
 import com.floti.api.domain.board.discussion.entity.Messages;
+import com.floti.api.domain.board.discussion.repository.DiscussionRoomRepository;
 import com.floti.api.domain.board.discussion.repository.MessageRepository;
 import com.floti.api.domain.like.service.LikeService;
 import com.floti.api.error.ExceptionMessage;
@@ -23,6 +25,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class MessageService {
     private final MessageRepository messageRepository;
+    private final DiscussionRoomRepository discussionRoomRepository;
     private final LikeService likeService;
 
     /* 1. 조회 */
@@ -39,6 +42,10 @@ public class MessageService {
     /* 2. 등록 */
     @Transactional
     public MessageResponse createMessage(User user, Long roomId, MessageRequest request) {
+        DiscussionRooms room = discussionRoomRepository.findById(roomId)
+                .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ROOM_NOT_FOUND));
+        room.updateRecentActivity(); // 최근 활동일 갱신
+
         Messages message = Messages.builder()
                 .author(user)
                 .roomId(roomId)

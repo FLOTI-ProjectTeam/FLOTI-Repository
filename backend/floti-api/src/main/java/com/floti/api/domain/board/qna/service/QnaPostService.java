@@ -64,11 +64,11 @@ public class QnaPostService {
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
         List<Answers> answers = answerRepository.findByPostId(id);
 
-        /* 답변별 추천 여부 */
+        /* 답변별 좋아요 여부 */
         // 1. 모든 답변 ID
         List<Long> answerIds = answers.stream().map(Answers::getId).toList();
 
-        // 2. 사용자가 추천한 답변 ID
+        // 2. 사용자가 좋아요한 답변 ID
         Set<Long> likedAnswerIds = likeAnswerRepository.findByUserIdAndAnswerIdIn(userId, answerIds)
                 .stream()
                 .map(LikeAnswers::getAnswerId)

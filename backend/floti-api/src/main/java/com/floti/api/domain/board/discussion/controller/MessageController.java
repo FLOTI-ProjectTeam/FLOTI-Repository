@@ -34,7 +34,6 @@ import java.util.List;
 public class MessageController {
     private final MessageService messageService;
     private final LikeService likeService;
-
     private final AuthUtil authUtil;
 
     /* 1. 조회 */
@@ -67,7 +66,7 @@ public class MessageController {
         return new MessageDeleteResponse(id);
     }
 
-    /* 4. 추천 토글 */
+    /* 4. 좋아요 토글 */
     @MessageMapping("/community/discussions/messages/{id}/like")
     @SendTo("/topic/community/discussions/messages/{id}/like")
     public LikeResponse toggleLike(@AuthenticationPrincipal UserDetails userDetails,

@@ -42,12 +42,12 @@ public class CommentServiceTest {
     private static final Long VALID_ID = 1L;
     private static final Long INVALID_ID = 9999L;
 
-    private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
+    private final User testUser = User.builder().id(10L).nickname("테스터01").build();
     private final TipPosts testPost = TipPosts.builder().author(testUser).build();
     private final Comments testComment = Comments.builder()
-            .id(VALID_ID).postId(VALID_ID).author(testUser).content("첫번째 댓글").build();
+            .id(20L).postId(VALID_ID).author(testUser).content("첫번째 댓글").build();
     private final Comments testReply = Comments.builder()
-            .id(INVALID_ID).postId(VALID_ID).parentId(VALID_ID).author(testUser).content("첫번째 답글").build();
+            .id(21L).postId(VALID_ID).parentId(20L).author(testUser).content("첫번째 답글").build();
 
     @BeforeEach
     void setUp() {
@@ -203,7 +203,7 @@ public class CommentServiceTest {
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testComment));
 
         //when
-        CommentResponse response = commentService.updateComment(VALID_ID, VALID_ID, request);
+        CommentResponse response = commentService.updateComment(testUser.getId(), testComment.getId(), request);
 
         //then
         assertEquals("수정된 댓글", response.getContent());
@@ -219,7 +219,7 @@ public class CommentServiceTest {
         when(tipPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 
         //when
-        commentService.deleteComment(VALID_ID, VALID_ID);
+        commentService.deleteComment(testUser.getId(), testComment.getId());
 
         //then
         assertTrue(testComment.isDeleted());
@@ -236,7 +236,7 @@ public class CommentServiceTest {
         when(tipPostRepository.getReferenceById(anyLong())).thenReturn(testPost);
 
         //when
-        commentService.deleteComment(VALID_ID, VALID_ID);
+        commentService.deleteComment(testUser.getId(), testReply.getId());
 
         //then
         verify(commentRepository).delete(testReply);

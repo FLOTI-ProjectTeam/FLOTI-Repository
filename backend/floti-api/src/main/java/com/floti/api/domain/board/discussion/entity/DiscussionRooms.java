@@ -38,6 +38,7 @@ public class DiscussionRooms {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime recentActivityAt;
 
@@ -53,6 +54,10 @@ public class DiscussionRooms {
         this.title = title;
         this.intro = intro;
         this.maxParticipants = maxParticipants;
+    }
+
+    public void updateRecentActivity() {
+        this.recentActivityAt = LocalDateTime.now();
     }
 
     public void incrementParticipantCount() {
