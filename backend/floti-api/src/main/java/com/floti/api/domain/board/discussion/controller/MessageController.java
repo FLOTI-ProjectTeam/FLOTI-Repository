@@ -57,20 +57,20 @@ public class MessageController {
     }
 
     /* 3. 삭제 */
-    @MessageMapping("/community/discussions/messages/{id}")
-    @SendTo("/topic/community/discussions/messages/{id}")
+    @MessageMapping("/community/discussions/{roomId}/messages/{id}")
+    @SendTo("/topic/community/discussions/{roomId}/messages/{id}")
     public MessageDeleteResponse deleteMessage(@AuthenticationPrincipal UserDetails userDetails,
-                                               @DestinationVariable Long id) {
+                                               @DestinationVariable Long roomId, @DestinationVariable Long id) {
         Long userId = authUtil.resolveUserId(userDetails);
         messageService.deleteMessage(userId, id);
         return new MessageDeleteResponse(id);
     }
 
     /* 4. 좋아요 토글 */
-    @MessageMapping("/community/discussions/messages/{id}/like")
-    @SendTo("/topic/community/discussions/messages/{id}/like")
+    @MessageMapping("/community/discussions/{roomId}/messages/{id}/like")
+    @SendTo("/topic/community/discussions/{roomId}/messages/{id}/like")
     public LikeResponse toggleLike(@AuthenticationPrincipal UserDetails userDetails,
-                                   @DestinationVariable Long id) {
+                                   @DestinationVariable Long roomId, @DestinationVariable Long id) {
         Long userId = authUtil.resolveUserId(userDetails);
         return likeService.toggleLikeMessage(userId, id);
     }

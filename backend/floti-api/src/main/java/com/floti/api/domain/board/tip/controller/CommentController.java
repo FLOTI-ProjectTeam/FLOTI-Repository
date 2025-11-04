@@ -40,9 +40,9 @@ public class CommentController {
     }
 
     /* 3. 수정 */
-    @PutMapping("/comments/{id}")
+    @PutMapping("/{postId}/comments/{id}")
     public ResponseEntity<CommentResponse> updateComment(@AuthenticationPrincipal UserDetails userDetails,
-                                                         @PathVariable long id,
+                                                         @PathVariable long postId, @PathVariable long id,
                                                          @Validated @RequestBody CommentRequest comment) {
         Long userId = authUtil.resolveUserId(userDetails);
         CommentResponse response = commentService.updateComment(userId, id, comment);
@@ -50,9 +50,9 @@ public class CommentController {
     }
 
     /* 4. 삭제 */
-    @DeleteMapping("/comments/{id}")
+    @DeleteMapping("/{postId}/comments/{id}")
     public ResponseEntity<Void> deleteComment(@AuthenticationPrincipal UserDetails userDetails,
-                                              @PathVariable long id) {
+                                              @PathVariable long postId, @PathVariable long id) {
         Long userId = authUtil.resolveUserId(userDetails);
         commentService.deleteComment(userId, id);
         return ResponseEntity.noContent().build(); // 204 No Content

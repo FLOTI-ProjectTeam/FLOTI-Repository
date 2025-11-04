@@ -35,19 +35,19 @@ public class AnswerController {
     }
 
     /* 2. 수정 */
-    @PutMapping("/answers/{id}")
+    @PutMapping("/{postId}/answers/{id}")
     public ResponseEntity<AnswerResponse> updateAnswer(@AuthenticationPrincipal UserDetails userDetails,
                                                        @Validated @RequestBody AnswerRequest Answer,
-                                                       @PathVariable long id) {
+                                                       @PathVariable long postId, @PathVariable long id) {
         Long userId = authUtil.resolveUserId(userDetails);
         AnswerResponse response = answerService.updateAnswer(userId, id, Answer);
         return ResponseEntity.ok(response); // 200 Ok
     }
 
     /* 3. 삭제 */
-    @DeleteMapping("/answers/{id}")
+    @DeleteMapping("/{postId}/answers/{id}")
     public ResponseEntity<Void> deleteAnswer(@AuthenticationPrincipal UserDetails userDetails,
-                                             @PathVariable long id) {
+                                             @PathVariable long postId, @PathVariable long id) {
         Long userId = authUtil.resolveUserId(userDetails);
         answerService.deleteAnswer(userId, id);
         return ResponseEntity.noContent().build(); // 204 No Content
@@ -56,17 +56,16 @@ public class AnswerController {
     /* 4. 채택 */
     @PatchMapping("/{postId}/answers/{id}/accept")
     public ResponseEntity<Void> acceptAnswer(@AuthenticationPrincipal UserDetails userDetails,
-                                             @PathVariable long postId,
-                                             @PathVariable long id) {
+                                             @PathVariable long postId, @PathVariable long id) {
         Long userId = authUtil.resolveUserId(userDetails);
         answerService.acceptAnswer(userId, postId, id);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
     /* 5. 좋아요 토글 */
-    @PostMapping("/answers/{id}/like")
+    @PostMapping("/{postId}/answers/{id}/like")
     public ResponseEntity<LikeResponse> toggleLikeAnswer(@AuthenticationPrincipal UserDetails userDetails,
-                                                         @PathVariable long id) {
+                                                         @PathVariable long postId, @PathVariable long id) {
         Long userId = authUtil.resolveUserId(userDetails);
         LikeResponse response = likeService.toggleLikeAnswer(userId, id);
         return ResponseEntity.ok(response); // 200 Ok
