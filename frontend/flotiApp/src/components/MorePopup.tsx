@@ -2,25 +2,28 @@ import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-nativ
 import React from 'react';
 
 export default function MorePopup({ 
-    actions, popupStyle 
+    actions, style 
 }: {
     actions: { 
         label: string; 
         onPress: () => void;
     }[];
-    popupStyle: ViewStyle;
+    style: ViewStyle;
 }) {
     return (
-        <View style={[styles.popup, popupStyle]}>
+        <View style={[styles.popup, style]}>
             {actions.map((action, idx) => (
             <React.Fragment key={idx}>
-                <TouchableOpacity activeOpacity={0.5} onPress={() => action.onPress()}>
-                <Text style={[
-                    styles.menuText, 
-                    actions.length - 1 === idx && styles.redText  // 마지막 메뉴는 빨간색으로 지정정
-                ]}>
-                    {action.label}
-                </Text>
+                <TouchableOpacity
+                    activeOpacity={0.5} // 클릭 시 투명도 설정
+                    onPress={() => action.onPress()}
+                >
+                    <Text style={[
+                        styles.menuText, 
+                        actions.length - 1 === idx && styles.lastText  // 마지막 메뉴는 빨간색으로 지정
+                    ]}>
+                        {action.label}
+                    </Text>
                 </TouchableOpacity>
             </React.Fragment>
             ))}
@@ -34,6 +37,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 8,
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        width: 110,
+        gap: 18,
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
@@ -42,5 +49,5 @@ const styles = StyleSheet.create({
         paddingVertical: 12, paddingHorizontal: 16
     },
     menuText: { fontSize: 16 },
-    redText: { color: 'red' }
+    lastText: { color: 'red' }
 });

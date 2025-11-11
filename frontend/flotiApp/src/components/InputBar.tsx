@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Keyboard } from 'react-native';
+import { useEffect, useState } from 'react';
+
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import COLOR from '@/constants/colors';
 
 export type ReplyTo = {
-  id: number; // 댓글 ID
+  commentId: number;
   nickname: string
 };
 
@@ -15,8 +16,8 @@ export default function InputBar({
   onChangeText: (text: string) => void;
   onSend: () => void;
   placeholder: string;
-  replyTo: ReplyTo | null;
-  onCancelReply: () => void;
+  replyTo?: ReplyTo | null;
+  onCancelReply?: () => void;
 }) {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -47,7 +48,11 @@ export default function InputBar({
               <Text style={[styles.replyText, styles.replyToText]}>{replyTo.nickname}</Text>
               <Text style={styles.replyText}> 님에 대한 답글</Text>
             </View>
-            <TouchableOpacity activeOpacity={0.7} onPress={onCancelReply} style={styles.replyCancelButton}>
+            <TouchableOpacity
+              activeOpacity={0.7} // 클릭 시 투명도 설정
+              onPress={onCancelReply}
+              style={styles.replyCancelButton}
+            >
               <IconSymbol name="x" size={20} color={COLOR.ICON.GRAY_DARK}/>
             </TouchableOpacity>
           </View>
@@ -102,7 +107,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     width: 45, height: 45,
-    borderRadius: 45,
+    borderRadius: 22,
     backgroundColor: COLOR.BUTTON.GRAY_LIGHT,
     alignItems: 'center',
     justifyContent: 'center'

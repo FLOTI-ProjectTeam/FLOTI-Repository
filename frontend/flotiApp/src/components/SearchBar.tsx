@@ -1,8 +1,8 @@
 import { TextInput, View, StyleSheet, Pressable } from 'react-native';
 
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import COLOR from '@/constants/colors';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
-import { IconSymbol } from './ui/IconSymbol';
 
 export default function SearchBar() {
   const { search, setSearch, setSearchTrigger } = useCommunitySearch();
@@ -15,6 +15,7 @@ export default function SearchBar() {
         value={search}
         onChangeText={setSearch}
         style={styles.searchInput}
+        returnKeyType='search'  // 키보드 엔터키를 검색 아이콘으로 변경
         onSubmitEditing={() => setSearchTrigger(search)} // 키보드의 확인 버튼으로 검색
       />
       <Pressable

@@ -3,8 +3,8 @@ import Toast from 'react-native-toast-message';
 import { useRouter } from 'expo-router';
 
 import EditorHeader from '@/components/ui/EditorHeader';
-import { STYLE } from '@/constants/styles';
 import { CreateInputView } from '@/components/InputView';
+import { STYLE } from '@/constants/styles';
 
 export default function TipCreateScreen() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function TipCreateScreen() {
 
   const handleSubmit = () => {
     console.log('등록 완료');
-    router.back(); // 글 작성 후 뒤로 이동
+    router.back();
   };
 
   return (

@@ -6,7 +6,7 @@ export interface QnaPostResponse {
     title: string;
     content: string;
     answerCount: number;
-    liked: boolean;
+    accepted: boolean;
     createdAt: string;
 }
 

@@ -5,8 +5,7 @@ const COLOR = {
     GRAY_MEDIUM: '#898989',
     GRAY_LIGHT: '#BDBDBD',
     NAVY: '#405876',
-    SKY: '#4FC3F7',
-    RED: '#E74C4C'
+    SKY: '#4FC3F7'
   },
 
   BACKGROUND: {
@@ -24,6 +23,7 @@ const COLOR = {
   BUTTON: {
     GRAY: '#DDDDDD',
     GRAY_LIGHT: '#F3F5F7',
+    RED: '#FF5356',
     NAVY: '#153257',
     SLATE_DARK: '#7D98C9',
     SLATE: '#B0C4DE',
@@ -32,13 +32,14 @@ const COLOR = {
 
   ICON: {
     GRAY_DARK: '#556170',
-    SLATE_LIGHT: '#B0C4DE'
+    SLATE_LIGHT: '#B0C4DE',
+    RED: '#FF5356',
+    BLUE: '#4F8EF7'
   },
 
   TINT: {
     GRAY: '#DDDDDD',
     GRAY_LIGHT: '#F3F5F7',
-    RED: '#FF5356',
     SLATE: '#B0C4DE',
     SLATE_SOFT: '#D7E1EE',
     SLATE_LIGHT: '#EBF0F6',

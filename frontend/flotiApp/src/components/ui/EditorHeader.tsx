@@ -5,11 +5,11 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import COLOR from '@/constants/colors';
 
 export default function EditorHeader({
-  onSave, onSubmit, submitLabel = '등록'
+  onSave, onSubmit, submitText = '등록'
 }: {
   onSave?: () => void;
   onSubmit: () => void;
-  submitLabel?: string;
+  submitText?: string;
 }) {
   const router = useRouter();
 
@@ -29,7 +29,7 @@ export default function EditorHeader({
         )}
         {onSubmit && (
           <TouchableOpacity activeOpacity={0.8} onPress={onSubmit} style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>{submitLabel}</Text>
+            <Text style={styles.submitButtonText}>{submitText}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -45,10 +45,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16
   },
-  iconWrapper: {
-    width: 32, height: 32,
-    justifyContent: 'center'
-  },
+  iconWrapper: { width: 32, height: 32, justifyContent: 'center' },
   rightWrapper: { flexDirection: 'row', alignItems: 'center' },
   saveButtonText: { fontSize: 14, color: COLOR.TEXT.GRAY_CHARCOAL },
   submitButton: {
@@ -57,9 +54,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 6, paddingHorizontal: 14
   },
-  submitButtonText: {
-    fontSize: 15,
-    color: 'white',
-    fontWeight: 600
-  }
+  submitButtonText: { fontSize: 15, color: 'white', fontWeight: 600 }
 });
