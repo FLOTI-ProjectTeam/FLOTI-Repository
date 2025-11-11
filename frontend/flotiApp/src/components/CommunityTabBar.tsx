@@ -13,7 +13,7 @@ const TAB_ITEMS = [
 
 export default function CommunityTabBar() {
   const router = useRouter();
-  const segments = useSegments(); // ["(tabs)", "community", "tip"]
+  const segments = useSegments(); // ['(tabs)', 'community', 'tip']
   const currentTab = segments[segments.length - 1] || 'tip';
 
   // 첫 진입 시 TIP 탭으로 이동
@@ -48,11 +48,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginHorizontal: 10
   },
-  tabItem: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
+  tabItem: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   tabLabelContainer: { paddingHorizontal: 12, paddingVertical: 8 },
   tabLabelContainerActive: { backgroundColor: COLOR.TINT.SLATE_LIGHT, borderRadius: 8 },
   tabLabel: { fontSize: 14, color: 'black' },

@@ -1,4 +1,5 @@
 import { StyleSheet, ViewStyle } from 'react-native';
+
 import COLOR from '@/constants/colors';
 
 const COMMON = {
@@ -18,7 +19,8 @@ export const STYLE = StyleSheet.create({
     BASE_CONTAINER: { flex: 1, backgroundColor: 'white' },
     CONTENT_CONTAINER: {
         ...COMMON.WRAPPER,
-        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT
+        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
+        gap: 12
     },
     WRAPPER: { ...COMMON.WRAPPER },
 
@@ -26,7 +28,6 @@ export const STYLE = StyleSheet.create({
     CARD: {
         padding: 12,
         marginBottom: 8,
-        borderWidth: 0,
         borderRadius: 10,
         backgroundColor: 'white',
         gap: 8
@@ -50,4 +51,6 @@ export const STYLE = StyleSheet.create({
     /* LAYOUT HELPERS */
     ROW: { flexDirection: 'row' },
     CENTER: { ...COMMON.CENTER },
+    FLEX: { flex: 1 },
+    NO_PADDING_BOTTOM: { paddingBottom: 0 },
 });

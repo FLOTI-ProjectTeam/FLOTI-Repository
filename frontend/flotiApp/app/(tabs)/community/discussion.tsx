@@ -3,15 +3,13 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyPosts } from '@/__mocks__/tip';
-import SortDropdown, { SortOption } from '@/components/SortDropdown';
+import FilterBar, { SortType, SortOption } from '@/components/FilterBar';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { LoadingView, EmptyView } from '@/components/CommunityStateView';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
 import { TipPostResponse } from '@/types/community/tip';
-
-type SortType = 'latest' | 'registered' | 'recentActivity';
 
 const SORT_OPTIONS: SortOption[] = [
   { value: 'recentActivity', label: '최근활동순' },
@@ -20,19 +18,20 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 export default function DiscussionListScreen() {
-  const { searchTrigger } = useCommunitySearch();
-  const [posts, setPosts] = useState<TipPostResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [sortType, setSortType] = useState<SortType>('recentActivity');
   const router = useRouter();
+  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<TipPostResponse[]>([]);
+  const [sortType, setSortType] = useState<SortType>('recentActivity');
+  const [isChecked, setIsChecked] = useState(false);  // 체크 여부
 
   const fetchPosts = async () => {
     setLoading(true);
     
     // 더미 데이터 호출
     setTimeout(() => {
-      const filtered = dummyPosts.filter(post => post.title.includes(searchTrigger));  // 검색어 필터링
-      setPosts(filtered); // 서버에서 정렬 처리
+      const filtered = dummyPosts.filter(post => post.title.includes(searchTrigger));
+      setPosts(filtered);
       setLoading(false);
     }, 500);
   };
@@ -44,13 +43,11 @@ export default function DiscussionListScreen() {
   if (loading) return <LoadingView />
   if (posts.length === 0) return <EmptyView />
 
-  // 토론 게시글 목록
   return (
     <View style={STYLE.CONTENT_CONTAINER}>
-      <SortDropdown 
-        options={SORT_OPTIONS}
-        selectedValue={sortType}
-        onSelect={(value) => setSortType(value as SortType)}
+      <FilterBar
+        sort={{ options: SORT_OPTIONS, value: sortType, onChange: setSortType }}
+        check={{ label: '참여 토론만 보기', value: isChecked, onChange: setIsChecked }}
       />
 
       <FlatList
@@ -87,31 +84,10 @@ export default function DiscussionListScreen() {
 }
 
 const styles = StyleSheet.create({
-  info: {
-    flex: 1,
-    gap: 4,
-    justifyContent: 'space-between'
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 4
-  },
-  content: {
-    marginBottom: 2,
-    fontSize: 12,
-    color: COLOR.TEXT.GRAY_MEDIUM
-  },
-  stats: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: 12 
-  },
+  info: { flex: 1, justifyContent: 'space-between', gap: 4 },
+  title: { fontSize: 16, fontWeight: 'bold', color: 'black' },
+  content: { marginBottom: 2, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
+  stats: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   statItem: { flexDirection: 'row', alignItems: 'center' },
-  statText: {
-    color: COLOR.TEXT.GRAY_MEDIUM,
-    fontSize: 12,
-    marginLeft: 4
-  }
+  statText: { marginLeft: 4, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM }
 });

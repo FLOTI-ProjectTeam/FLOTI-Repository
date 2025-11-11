@@ -2,16 +2,14 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
-import { dummyPosts } from '@/__mocks__/tip';
-import SortDropdown, { SortOption } from '@/components/SortDropdown';
+import { dummyPosts } from '@/__mocks__/qna';
+import FilterBar, { SortType, SortOption } from '@/components/FilterBar';
+import { LoadingView, EmptyView } from '@/components/CommunityStateView';
+import { STYLE } from '@/constants/styles';
 import COLOR from '@/constants/colors';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
-import { TipPostResponse } from '@/types/community/tip';
-import { LoadingView, EmptyView } from '@/components/CommunityStateView';
-import { formatRelative } from '@/utils/time';
-import { STYLE } from '@/constants/styles';
-
-type SortType = 'latest' | 'registered' | 'comments';
+import { QnaPostResponse } from '@/types/community/qna';
+import { formatRelativeTime } from '@/utils/time';
 
 const SORT_OPTIONS: SortOption[] = [
   { value: 'latest', label: '최신순' },
@@ -20,19 +18,20 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 export default function QnaListScreen() {
-  const { searchTrigger } = useCommunitySearch();
-  const [posts, setPosts] = useState<TipPostResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [sortType, setSortType] = useState<SortType>('latest');
   const router = useRouter();
+  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<QnaPostResponse[]>([]);
+  const [sortType, setSortType] = useState<SortType>('latest');
+  const [isChecked, setIsChecked] = useState(false);  // 체크 여부
 
   const fetchPosts = async () => {
     setLoading(true);
     
     // 더미 데이터 호출
     setTimeout(() => {
-      const filtered = dummyPosts.filter(post => post.title.includes(searchTrigger));  // 검색어 필터링
-      setPosts(filtered); // 서버에서 정렬 처리
+      const filtered = dummyPosts.filter(post => post.title.includes(searchTrigger));
+      setPosts(filtered);
       setLoading(false);
     }, 500);
   };
@@ -46,10 +45,9 @@ export default function QnaListScreen() {
 
   return (
     <View style={STYLE.CONTENT_CONTAINER}>
-      <SortDropdown 
-        options={SORT_OPTIONS}
-        selectedValue={sortType}
-        onSelect={(value) => setSortType(value as SortType)}
+      <FilterBar
+        sort={{ options: SORT_OPTIONS, value: sortType, onChange: setSortType }}
+        check={{ label: '미채택 글만 보기', value: isChecked, onChange: setIsChecked }}
       />
 
       <FlatList
@@ -57,20 +55,24 @@ export default function QnaListScreen() {
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingBottom: 16 }}
         renderItem={({ item }) => (
-          <TouchableOpacity activeOpacity={0.7} onPress={() => router.push(`../../community/qna/${item.id}`)}>
+          <TouchableOpacity 
+            activeOpacity={0.7} // 클릭 시 투명도 설정
+            onPress={() => router.push(`../../community/qna/${item.id}`)} // 상세 화면 이동
+          >
             <View style={[STYLE.CARD, STYLE.ROW]}>
               <View style={styles.info}>
-                <Text style={styles.title} numberOfLines={1}>
-                  {item.title}
-                </Text>
+                {/* 제목 */}
+                <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
 
+                {/* 작성자 & 시간 */}
                 <Text style={styles.authorInfo}>
-                  {item.author.nickname} • {formatRelative(item.createdAt)}
+                  {item.author.nickname} • {formatRelativeTime(item.createdAt)}
                 </Text>
-                
-                <View style={styles.commentBadge}>
-                  <Text style={styles.commentCount}>{item.commentCount}</Text>
-                </View>
+              </View>
+
+              {/* 답변수 */}
+              <View style={styles.answerBadge}>
+                <Text style={styles.answerCount}>{item.answerCount}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -81,35 +83,16 @@ export default function QnaListScreen() {
 }
 
 const styles = StyleSheet.create({
-  info: {
-    flex: 1,
-    gap: 4,
-    justifyContent: 'space-between'
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black'
-  },
-  authorInfo: {
-    marginBottom: 2,
-    fontSize: 12,
-    color: COLOR.TEXT.GRAY_MEDIUM
-  },
-  commentBadge: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    borderColor: COLOR.TINT.GRAY,
-    borderWidth: 1,
-    borderRadius: 28,
-    width: 28, height: 28,
+  info: { flex: 1, justifyContent: 'space-between', gap: 4 },
+  title: { fontSize: 16, fontWeight: 'bold', color: 'black' },
+  authorInfo: { marginBottom: 2, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
+  answerBadge: {
     justifyContent: 'center',
     alignItems: 'center',
+    width: 28, height: 28,
+    borderWidth: 1,
+    borderColor: COLOR.TINT.GRAY,
+    borderRadius: 14
   },
-  commentCount: {
-    color: COLOR.TEXT.NAVY,
-    fontSize: 12,
-    fontWeight: 600,
-  }
+  answerCount: { fontSize: 12, fontWeight: 'bold', color: COLOR.TEXT.NAVY }
 });

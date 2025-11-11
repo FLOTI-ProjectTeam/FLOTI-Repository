@@ -23,20 +23,24 @@ const MAPPING = {
   'mypage': { lib: 'Ionicons', name: 'happy' },
 
   // 커뮤니티
-  'thumbs': { lib: 'FontAwesome', name: 'thumbs-o-up' },
-  'thumbs.fill': { lib: 'FontAwesome', name: 'thumbs-up' },
-  'comment': { lib: 'FontAwesome6', name: 'commenting' },
+  'heart': { lib: 'Ionicons', name: 'heart-outline' },
+  'heart.fill': { lib: 'Ionicons', name: 'heart-sharp' },
+  'comment': { lib: 'Ionicons', name: 'chatbox-ellipses-outline' },
   'time': { lib: 'MaterialIcons', name: 'access-time' },
   'people': { lib: 'Ionicons', name: 'people' },
   'send': { lib: 'FontAwesome', name: 'send' },
   'search': { lib: 'Feather', name: 'search' },
+  'trash': { lib: 'FontAwesome', name: 'trash' },
 
   // 공통
   'chevron.left': { lib: 'Feather', name: 'chevron-left' },
   'chevron.right': { lib: 'Feather', name: 'chevron-right' },
+  'chevron.up': { lib: 'Feather', name: 'chevron-up' },
   'chevron.down': { lib: 'Feather', name: 'chevron-down' },
   'x': { lib: 'Feather', name: 'x' },
   'check': { lib: 'Feather', name: 'check' },
+  'check.bold': { lib: 'FontAwesome', name: 'check' },
+  'pen' : {lib: 'MaterialCommunityIcons', name: 'pencil' },
   'plus.pen' : {lib: 'MaterialCommunityIcons', name: 'pencil-plus' },
   'more.horizontal': { lib: 'MaterialIcons', name: 'more-horiz' },
 } as const

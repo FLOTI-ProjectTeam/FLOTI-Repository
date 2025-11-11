@@ -17,9 +17,9 @@ export default function BottomBar({ post }: {
   // 수정 화면으로 이동
   const goToPostUpdateScreen = () => {
     router.push({
-      pathname: '/community/tip/update/[id]',
+      pathname: '/community/tip/update/[postId]',
       params: { 
-        id: String(post.id),
+        postId: String(post.id),
         title: post.title, 
         content: post.content 
       }
@@ -46,19 +46,19 @@ export default function BottomBar({ post }: {
 
   return (
     <View style={styles.bottomBar}>
-      {/* 댓글 & 추천 정보 */}
+      {/* 좋아요 & 댓글 정보 */}
       <View style={styles.leftActions}>
+        <Pressable style={styles.actionButton}>
+          <IconSymbol name="heart" color={COLOR.ICON.GRAY_DARK} />
+          <Text style={styles.bottomText}>{post.likeCount}</Text>
+        </Pressable>
+
         <Pressable 
           style={styles.actionButton} 
-          onPress={() => router.push(`/community/tip/${post.id}/comments`)}
+          onPress={() => router.push(`/community/tip/${post.id}/comment`)}
         >
           <IconSymbol name="comment" color={COLOR.ICON.GRAY_DARK} />
           <Text style={styles.bottomText}>{post.commentCount}</Text>
-        </Pressable>
-
-        <Pressable style={styles.actionButton}>
-          <IconSymbol name="thumbs" color={COLOR.ICON.GRAY_DARK} />
-          <Text style={styles.bottomText}>{post.likeCount}</Text>
         </Pressable>
       </View>
 
@@ -68,23 +68,21 @@ export default function BottomBar({ post }: {
           <IconSymbol name="more.horizontal" color={COLOR.ICON.GRAY_DARK} />
         </Pressable>
 
+        {/* 더보기 팝업 */}
         {menuVisible && (
           <Modal transparent visible={menuVisible} animationType='fade' onRequestClose={() => setMenuVisible(false)}>
             <Pressable style={styles.overlay} onPress={() => setMenuVisible(false)} />
-
-            {/* 더보기 팝업 */}
             <MorePopup
               actions={[
-                { label: '수정하기', onPress: goToPostUpdateScreen },
-                { label: '삭제하기', onPress: showDeleteConfirmModal },
+                { label: '수정', onPress: goToPostUpdateScreen },
+                { label: '삭제', onPress: showDeleteConfirmModal },
               ]}
-              popupStyle={{ bottom: 46, right: 8, width: 100, gap: 14 }}
+              style={{ bottom: 46, right: 8 }}
             />
           </Modal>
         )}
       </View>
 
-      {/* 삭제 확인 모달 */}
       <DeleteConfirmModal
         visible={confirmVisible}
         title='게시글을 삭제하시겠습니까?'
@@ -106,21 +104,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: COLOR.TINT.GRAY
   },
-  bottomText: {
-    fontSize: 14,
-    marginLeft: 8,
-    color: COLOR.TEXT.GRAY_MEDIUM
-  },
+  bottomText: { marginLeft: 6, fontSize: 16, color: COLOR.TEXT.GRAY_MEDIUM },
   leftActions: { flexDirection: 'row' },
   actionButton: {
+    marginRight: 16,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16
+    alignItems: 'center'
   },
-  overlay: { 
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end'
-  }
+  overlay: { flex: 1, justifyContent: 'flex-end', alignItems: 'flex-end' }
 });

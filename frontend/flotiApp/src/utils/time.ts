@@ -8,12 +8,11 @@ dayjs.extend(customParseFormat);
 dayjs.locale('ko');
 
 // 입력된 날짜를 기준으로 상대 시간으로 변환
-export function formatRelative(createdAt: string): string {
-    return dayjs(createdAt, 'YYYY.MM.DD HH:mm:ss').fromNow();
-}
+export const formatRelativeTime = (createdAt: string) =>
+    dayjs(createdAt, 'YYYY.MM.DD HH:mm:ss').fromNow();
 
 // 입력된 날짜가 24시간 이내면 상대 시간으로 변환
-export function formatRelativeOrDate(createdAt: string): string {
+export const formatSmartTime = (createdAt: string) => {
     const date = dayjs(createdAt, 'YYYY.MM.DD HH:mm:ss');
     const diffHours = dayjs().diff(date, 'hour');
   

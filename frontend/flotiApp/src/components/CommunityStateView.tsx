@@ -1,4 +1,5 @@
 import { View, Text, ActivityIndicator } from 'react-native';
+
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 

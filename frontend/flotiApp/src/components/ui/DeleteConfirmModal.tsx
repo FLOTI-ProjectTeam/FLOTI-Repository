@@ -51,16 +51,8 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: 'center'
     },
-    modalTitle: {
-        fontSize: 16,
-        fontWeight: 600,
-        marginVertical: 25
-    },
-    modalActions: {
-        flexDirection: 'row',
-        width: '100%',
-        gap: 2
-    },
+    modalTitle: { fontSize: 16, fontWeight: 600, marginVertical: 25 },
+    modalActions: { flexDirection: 'row', width: '100%', gap: 2 },
     modalButton: {
         flex: 1,
         justifyContent: 'center',
@@ -70,5 +62,5 @@ const styles = StyleSheet.create({
         borderRadius: 12
     },
     buttonText: { fontSize: 16 },
-    actionText: { color: COLOR.TEXT.RED }
+    actionText: { color: 'red' }
 });

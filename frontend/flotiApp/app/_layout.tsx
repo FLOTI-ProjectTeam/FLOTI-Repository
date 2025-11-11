@@ -43,6 +43,7 @@ export default function RootLayout() {
         <View style={[styles.bottomSafeArea, { height: insets.bottom }]} />
       )}
 
+      {/* 토스트 메시지 */}
       <Toast config={toastConfig} />
     </SafeAreaProvider>
   );
@@ -66,11 +67,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'black'
   },
   toastContainer: {
-    backgroundColor: COLOR.OVERLAY,
-    paddingVertical: 8, paddingHorizontal: 16,
     marginBottom: 30,
+    paddingVertical: 8, paddingHorizontal: 16,
+    alignItems: 'center',
     borderRadius: 20,
-    alignItems: 'center'
+    backgroundColor: COLOR.OVERLAY
   },
-  toastText: { color: 'white', fontSize: 14 }
+  toastText: { fontSize: 14, color: 'white' }
 });

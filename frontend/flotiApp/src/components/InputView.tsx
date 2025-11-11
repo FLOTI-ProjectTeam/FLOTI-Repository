@@ -1,15 +1,19 @@
-import { TextInput, StyleSheet } from "react-native";
+import { TextInput, StyleSheet, Pressable } from 'react-native';
 
-import COLOR from "@/constants/colors";
+import COLOR from '@/constants/colors';
 
-export function CreateInputView() {
+export function CreateInputView({ isAnswer = false }: {
+    isAnswer?: boolean
+}) {
     return (
         <>
-            <TextInput
-                style={styles.input}
-                placeholder='제목을 입력하세요'
-                placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
-            />
+            {!isAnswer && (
+                <TextInput
+                    style={styles.input}
+                    placeholder='제목을 입력하세요'
+                    placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
+                />
+            )}
             <TextInput
                 style={[styles.input, styles.textArea]}
                 placeholder='내용을 입력하세요'
@@ -60,9 +64,5 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         backgroundColor: 'white'
     },
-    textArea: { 
-        flex: 1,
-        fontSize: 15,
-        fontWeight: 'normal'
-    }
-  });
+    textArea: { flex: 1, fontSize: 15, fontWeight: 'normal' }
+});

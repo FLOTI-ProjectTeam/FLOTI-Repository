@@ -1,4 +1,4 @@
-import { AuthorResponse } from "./common";
+import { AuthorResponse } from '@/types/community/common';
 
 export interface DiscussionRoomRequest {
     title: string;
