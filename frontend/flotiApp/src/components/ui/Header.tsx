@@ -16,7 +16,7 @@ export default function Header({
   return (
     <View style={[styles.headerContainer, {backgroundColor}]}>
       <Pressable onPress={() => router.back()} style={styles.iconWrapper}>
-        <IconSymbol name="chevron.left" size={32} color={COLOR.ICON.GRAY_DARK} />
+        <IconSymbol name="chevron.left" size={32} color={COLOR.TINT.GRAY_DARK} />
       </Pressable>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{title}</Text>
@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
   iconWrapper: { width: 32, height: 32, justifyContent: 'center' },
   titleContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: { fontWeight: 'bold', fontSize: 20 },
-  commentCount: { color: COLOR.TEXT.SKY },
+  commentCount: { color: 'skyblue' },
   rightPlaceholder: { width: 24 }
 });

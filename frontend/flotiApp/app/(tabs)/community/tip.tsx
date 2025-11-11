@@ -3,14 +3,15 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyPosts } from '@/__mocks__/tip';
+import { getTipPosts } from '@/api/community/tipApi';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { LoadingView, EmptyView } from '@/components/CommunityStateView';
 import FilterBar, { SortType, SortOption } from '@/components/FilterBar';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import COLOR from '@/constants/colors';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
-import { TipPostResponse } from '@/types/community/tip';
 import { formatRelativeTime } from '@/utils/time';
+import { TipPostResponse } from '@/types/community/tip';
 import { STYLE } from '@/constants/styles';
+import COLOR from '@/constants/colors';
 
 const SORT_OPTIONS: SortOption[] = [
   { value: 'latest', label: '최신순' },
@@ -20,32 +21,41 @@ const SORT_OPTIONS: SortOption[] = [
 
 export default function TipListScreen() {
   const router = useRouter();
-  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
+
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<TipPostResponse[]>([]);
-  const [sortType, setSortType] = useState<SortType>('latest');
+  
+  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
+  const [sortType, setSortType] = useState<SortType>('latest'); // 정렬순
 
-  const fetchPosts = async () => {
-    setLoading(true);
-    
-    // 더미 데이터 호출
-    setTimeout(() => {
+  /* API 호출 */
+  const fetchPosts = async () => {  
+    try {
+      setLoading(true);
+      const response = await getTipPosts(searchTrigger);
+      setPosts(response.data.content);
+    } catch (error) {
+      // 서버 호출 실패 시 더미 데이터로 대체
       const filtered = dummyPosts.filter(post => post.title.includes(searchTrigger));
       setPosts(filtered);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
-  // 검색 또는 정렬순 변경 시 fetchPosts 호출
+  // 검색하거나 정렬순 변경 시 실행
   useEffect(() => {
     fetchPosts();
   }, [searchTrigger, sortType]);
+
+  /* 이벤트 핸들러 */
+  const handleGoToTipDetail = (postId: number) => router.push(`/community/tip/${postId}`);
 
   if (loading) return <LoadingView />
   if (posts.length === 0) return <EmptyView />
 
   return (
-    <View style={STYLE.CONTENT_CONTAINER}>
+    <View style={STYLE.FLEX}>
       <FilterBar
         sort={{ options: SORT_OPTIONS, value: sortType, onChange: setSortType }}
       />
@@ -53,18 +63,19 @@ export default function TipListScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ paddingBottom: 16 }}
+        style={STYLE.CONTENT_CONTAINER}
+        contentContainerStyle={{ paddingBottom: 8 }}
         renderItem={({ item }) => (
           <TouchableOpacity 
             activeOpacity={0.7} // 클릭 시 투명도 설정
-            onPress={() => router.push(`../../community/tip/${item.id}`)} // 상세 화면 이동
+            onPress={() => handleGoToTipDetail(item.id)}
           >
             <View style={[STYLE.CARD, STYLE.ROW]}>
               <View style={styles.info}>
                 {/* 제목 */}
                 <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
 
-                {/* 작성자 & 시간 */}
+                {/* 작성자 & 작성일 */}
                 <Text style={styles.authorInfo}>
                   {item.author.nickname} • {formatRelativeTime(item.createdAt)}
                 </Text>
@@ -72,11 +83,11 @@ export default function TipListScreen() {
                 {/* 좋아요수 & 댓글수 */}  
                 <View style={styles.stats}>
                   <View style={styles.statItem}>
-                    <IconSymbol name="heart" size={16} color={COLOR.ICON.GRAY_DARK} />
+                    <IconSymbol name="heart" size={16} color={COLOR.TINT.GRAY_DARK} />
                     <Text style={styles.statText}>{item.likeCount}</Text>
                   </View>
                   <View style={styles.statItem}>
-                    <IconSymbol name="comment" size={16} color={COLOR.ICON.GRAY_DARK} />
+                    <IconSymbol name="comment" size={16} color={COLOR.TINT.GRAY_DARK} />
                     <Text style={styles.statText}>{item.commentCount}</Text>
                   </View>
                 </View>

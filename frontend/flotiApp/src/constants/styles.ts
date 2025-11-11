@@ -3,7 +3,7 @@ import { StyleSheet, ViewStyle } from 'react-native';
 import COLOR from '@/constants/colors';
 
 const COMMON = {
-    WRAPPER: { flex: 1, padding: 16 },
+    WRAPPER: { flex: 1, paddingHorizontal: 16 },
     CENTER: { justifyContent: 'center', alignItems: 'center' } as ViewStyle,
     SHADOW: {
         shadowColor: 'black',
@@ -15,16 +15,18 @@ const COMMON = {
 };
 
 export const STYLE = StyleSheet.create({
-    /* CONTAINERS */
+    /* Container */
     BASE_CONTAINER: { flex: 1, backgroundColor: 'white' },
-    CONTENT_CONTAINER: {
+    CONTENT_CONTAINER: { 
         ...COMMON.WRAPPER,
-        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
-        gap: 12
+        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT 
     },
     WRAPPER: { ...COMMON.WRAPPER },
 
-    /* BOXS */
+    /* Text */
+    EMPTY_TEXT: { fontSize: 16, color: COLOR.TEXT.GRAY_MEDIUM },
+
+    /* Box */
     CARD: {
         padding: 12,
         marginBottom: 8,
@@ -33,7 +35,7 @@ export const STYLE = StyleSheet.create({
         gap: 8
     },
 
-    /* BUTTONS */
+    /* Button */
     FAD: {
         position: 'absolute',
         bottom: 24,
@@ -45,12 +47,8 @@ export const STYLE = StyleSheet.create({
         ...COMMON.SHADOW
     },
 
-    /* TEXTS */
-    EMPTY_TEXT: { fontSize: 16, color: COLOR.TEXT.GRAY_MEDIUM },
-
-    /* LAYOUT HELPERS */
+    /* Layout Helper */
     ROW: { flexDirection: 'row' },
     CENTER: { ...COMMON.CENTER },
     FLEX: { flex: 1 },
-    NO_PADDING_BOTTOM: { paddingBottom: 0 },
 });

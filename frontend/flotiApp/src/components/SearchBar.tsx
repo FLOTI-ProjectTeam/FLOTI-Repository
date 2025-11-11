@@ -1,8 +1,8 @@
 import { TextInput, View, StyleSheet, Pressable } from 'react-native';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import COLOR from '@/constants/colors';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
+import COLOR from '@/constants/colors';
 
 export default function SearchBar() {
   const { search, setSearch, setSearchTrigger } = useCommunitySearch();
@@ -21,7 +21,7 @@ export default function SearchBar() {
       <Pressable
         onPress={() => setSearchTrigger(search)}  // 돋보기 아이콘으로 검색
       >
-        <IconSymbol name='search' color={COLOR.ICON.GRAY_DARK} />
+        <IconSymbol name='search' color={COLOR.TINT.GRAY_DARK} />
       </Pressable>
     </View>
   );

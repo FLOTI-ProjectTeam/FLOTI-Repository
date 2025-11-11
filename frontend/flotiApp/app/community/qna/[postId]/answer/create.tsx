@@ -1,32 +1,38 @@
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import { createAnswer } from '@/api/community/qnaApi';
 import EditorHeader from '@/components/ui/EditorHeader';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { CreateInputView } from '@/components/InputView';
+import BreakAllText from '@/components/ui/BreakAllText';
+import InputView from '@/components/InputView';
+import { showToast } from '@/utils/toast';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
-import BreakAllText from '@/components/ui/BreakAllText';
 
-export default function QnaCreateScreen() {
+export default function AnswerCreateScreen() {
   const router = useRouter();
-  const { postId, title, content } = useLocalSearchParams();
+  const { postId, postTitle, postContent } = useLocalSearchParams();  // URL에서 게시글 정보 가져오기
+
+  const [content, setContent] = useState('');
   const [expanded, setExpanded] = useState(false);  // 펼침 여부
 
+  /* API 호출 */
+  const callCreateAnswer = () => createAnswer(Number(postId), { content });
+
+  /* 이벤트 핸들러 */
   const handleSave = () => {
-    Toast.show({
-      type: 'custom_success',
-      position: 'bottom',
-      visibilityTime: 1500,
-      props: { message: '임시저장 되었습니다.' }
-    });
+    showToast('임시저장 되었습니다.');
   };
 
-  const handleSubmit = () => {
-    console.log('등록 완료');
-    router.back();
+  const handleSubmit = async () => {
+    try {
+      await callCreateAnswer();
+      router.back();
+    } catch (error) {
+      showToast('등록 중 오류가 발생했습니다.', 'error');
+    }
   };
 
   return (
@@ -35,8 +41,8 @@ export default function QnaCreateScreen() {
 
       {/* 게시글 정보 */}
       <View style={styles.postContainer}>
-        <BreakAllText style={styles.postTitle}>{title as string}</BreakAllText>
-        {expanded && <BreakAllText style={styles.postContent}>{content as string}</BreakAllText>}
+        <BreakAllText style={styles.postTitle}>{String(postTitle)}</BreakAllText>
+        {expanded && <BreakAllText style={styles.postContent}>{String(postContent)}</BreakAllText>}
 
         <TouchableOpacity
           activeOpacity={0.7} // 클릭 시 투명도 설정
@@ -45,15 +51,15 @@ export default function QnaCreateScreen() {
         >
           <View style={styles.iconWrapper}>
             <IconSymbol
-              name={expanded ? 'chevron.up' : 'chevron.down'} // 펼침 여부에 따라 아이콘 변경
+              name={expanded ? "chevron.up" : "chevron.down"} // 펼침 여부에 따라 아이콘 변경
               size={20}
-              color={COLOR.ICON.GRAY_DARK}
+              color={COLOR.TINT.GRAY_DARK}
             />
           </View>
         </TouchableOpacity>
       </View>
 
-      <CreateInputView isAnswer={true} />
+      <InputView onChangeContent={setContent} />
     </View>
   );
 }

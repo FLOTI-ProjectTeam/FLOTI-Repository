@@ -1,33 +1,61 @@
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyPosts } from '@/__mocks__/tip';
+import { getTipPost, toggleLikeTipPost } from '@/api/community/tipApi';
 import BreakAllText from '@/components/ui/BreakAllText';
 import BottomBar from '@/components/BottomBar';
 import { LoadingView, EmptyView } from '@/components/CommunityStateView';
+import { TipPostResponse } from '@/types/community/tip';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
-import { TipPostResponse } from '@/types/community/tip';
+import { showToast } from '@/utils/toast';
 
 export default function TipDetailScreen() {
-  const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
   const [loading, setLoading] = useState(true);
+  const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
   const [post, setPost] = useState<TipPostResponse>();
-  const [isScrollable, setIsScrollable] = useState(false);  // 스크롤 가능 여부
-  const screenHeight = Dimensions.get('window').height; // 화면에 표시되는 영역의 높이
 
-  // ScrollView 콘텐츠 높이가 화면보다 크면 스크롤 가능 상태로 설정
-  const handleContentSizeChange = (contentWidth: number, contentHeight: number) => {
-    setIsScrollable(contentHeight > screenHeight);
-  };
+  /* API 호출 */
+  const fetchPost = async () => {
+    try {
+      const response = await getTipPost(Number(postId));
+      setPost(response.data);
+    } catch (error) {
+      // 서버 호출 실패 시 더미 데이터로 대체
+      const filtered = dummyPosts.find((post) => post.id.toString() === postId);
+      setPost(filtered);
+    } finally {
+      setLoading(false);
+    }
+  }
 
+  const callToggleLikeTipPost = () => toggleLikeTipPost(post!.id);
+
+  // 게시글 ID 변경 시 실행
   useEffect(() => {
-    // 더미 데이터 호출
-    const found = dummyPosts.find((p) => p.id.toString() === postId);
-    setPost(found);
-    setLoading(false);
+    fetchPost();
   }, [postId]);
+
+  const handleToggleLike = async () => {
+    try {
+      await callToggleLikeTipPost();
+
+      setPost(prev =>
+        prev
+          ? { 
+            ...prev,
+              liked: !prev.liked,
+              likeCount: prev.likeCount + (prev.liked ? -1 : 1)
+            }
+          : prev
+      );
+    } catch (error) {
+      const action = post!.liked ? '좋아요 취소' : '좋아요';
+      showToast(`${action} 중 오류가 발생했습니다.`, 'error');
+    }
+  }
 
   if (loading) return <LoadingView />
   if (!post) return <EmptyView text='게시글을 찾을 수 없습니다.' />;
@@ -36,10 +64,9 @@ export default function TipDetailScreen() {
     <View style={STYLE.BASE_CONTAINER}>
       <ScrollView 
         style={STYLE.WRAPPER} 
-        onContentSizeChange={handleContentSizeChange}
         contentContainerStyle={{ 
-          flexGrow: 1, // ScrollView가 화면 전체 높이 차지
-          paddingBottom: isScrollable ? 32 : 0 // 스크롤 가능한 경우에만 하단 여백 추가
+          flexGrow: 1, // 화면 전체 높이 차지
+          paddingBottom: 16
         }}
       >
         {/* 제목 */}
@@ -55,7 +82,7 @@ export default function TipDetailScreen() {
         </View>
       </ScrollView>
 
-      <BottomBar post={post}/>
+      <BottomBar post={post} onToggleLike={handleToggleLike} />
     </View>
   );
 }

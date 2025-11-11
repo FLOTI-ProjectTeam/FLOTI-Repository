@@ -10,8 +10,8 @@ export default function TabLayout() {
     <Tabs
       initialRouteName="index"  // 홈 화면으로 시작
       screenOptions={{
-        tabBarInactiveTintColor: COLOR.ICON.SLATE_LIGHT, // 기본 탭 색상
-        tabBarActiveTintColor: COLOR.ICON.GRAY_DARK,  // 활성화 탭 색상
+        tabBarInactiveTintColor: COLOR.TINT.SLATE, // 기본 탭 색상
+        tabBarActiveTintColor: COLOR.TINT.GRAY_DARK,  // 활성화 탭 색상
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: Platform.select({

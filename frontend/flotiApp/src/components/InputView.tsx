@@ -1,47 +1,28 @@
-import { TextInput, StyleSheet, Pressable } from 'react-native';
+import { TextInput, StyleSheet } from 'react-native';
 
 import COLOR from '@/constants/colors';
 
-export function CreateInputView({ isAnswer = false }: {
-    isAnswer?: boolean
+export default function InputView({ 
+    title, content, file, onChangeTitle, onChangeContent, onChangeFile 
+}: {
+    title?: string;
+    content?: string;
+    file?: File;
+    onChangeTitle?: (title: string) => void;
+    onChangeContent: (content: string) => void;
+    onChangeFile?: (file: File) => void;
 }) {
     return (
         <>
-            {!isAnswer && (
+            {onChangeTitle && (
                 <TextInput
                     style={styles.input}
+                    value={title}
+                    onChangeText={onChangeTitle}
                     placeholder='제목을 입력하세요'
                     placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
                 />
             )}
-            <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder='내용을 입력하세요'
-                multiline
-                textAlignVertical='top'
-                placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
-            />
-      </>
-    );
-}
-
-export function UpdateInputView({
-    title, content, onChangeTitle, onChangeContent
-}: {
-    title: string;
-    content: string;
-    onChangeTitle: (title: string) => void;
-    onChangeContent: (content: string) => void;
-}) {
-    return (
-        <>
-            <TextInput
-                style={styles.input}
-                value={title}
-                onChangeText={onChangeTitle}
-                placeholder='제목을 입력하세요'
-                placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
-            />
             <TextInput
                 style={[styles.input, styles.textArea]}
                 value={content}
@@ -51,7 +32,7 @@ export function UpdateInputView({
                 textAlignVertical='top'
                 placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
             />
-        </>
+      </>
     );
 }
 

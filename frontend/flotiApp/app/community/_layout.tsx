@@ -1,6 +1,5 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
-import 'react-native-reanimated';
 
 import Header from '@/components/ui/Header';
 import { STYLE } from '@/constants/styles';

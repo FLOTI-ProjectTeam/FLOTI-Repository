@@ -36,7 +36,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
     author: { id: 101, nickname: "Alice", profileImage: "https://i.pravatar.cc/50?img=1" },
     title: "React에서 useEffect는 언제 호출되나요?",
     content: "useEffect가 호출되는 시점과 의존성 배열의 의미를 알고 싶어요.",
-    answerCount: 3,
+    answerCount: 2,
     accepted: false,
     createdAt: "2025.10.25 09:30:00",
     answers: [
@@ -52,16 +52,6 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
       },
       {
         id: 12,
-        postId: 1,
-        author: { id: 202, nickname: "Eve", profileImage: "https://i.pravatar.cc/50?img=5" },
-        content: "값이 바뀔 때마다 호출되는 점도 기억하세요.",
-        likeCount: 1,
-        accepted: false,
-        liked: true,
-        createdAt: "2025.10.25 10:20:00",
-      },
-      {
-        id: 20,
         postId: 1,
         author: { id: 202, nickname: "Eve", profileImage: "https://i.pravatar.cc/50?img=5" },
         content: "값이 바뀔 때마다 호출되는 점도 기억하세요.",

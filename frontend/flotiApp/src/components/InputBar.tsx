@@ -10,11 +10,11 @@ export type ReplyTo = {
 };
 
 export default function InputBar({ 
-  value, onChangeText, onSend, placeholder, replyTo, onCancelReply
+  content, onChangeText, onSubmit, placeholder, replyTo, onCancelReply
 }: {
-  value: string;
+  content: string;
   onChangeText: (text: string) => void;
-  onSend: () => void;
+  onSubmit: () => void;
   placeholder: string;
   replyTo?: ReplyTo | null;
   onCancelReply?: () => void;
@@ -43,20 +43,16 @@ export default function InputBar({
   return (
     <>
       {replyTo && (
-          <View style={styles.replyBanner}>
-            <View style={styles.replyTextRow}>
-              <Text style={[styles.replyText, styles.replyToText]}>{replyTo.nickname}</Text>
-              <Text style={styles.replyText}> 님에 대한 답글</Text>
-            </View>
-            <TouchableOpacity
-              activeOpacity={0.7} // 클릭 시 투명도 설정
-              onPress={onCancelReply}
-              style={styles.replyCancelButton}
-            >
-              <IconSymbol name="x" size={20} color={COLOR.ICON.GRAY_DARK}/>
-            </TouchableOpacity>
+        <View style={styles.replyBanner}>
+          <View style={styles.replyTextRow}>
+            <Text style={[styles.replyText, styles.replyToText]}>{replyTo.nickname}</Text>
+            <Text style={styles.replyText}> 님에 대한 답글</Text>
           </View>
-        )}
+          <TouchableOpacity activeOpacity={0.7} onPress={onCancelReply} style={styles.replyCancelButton}>
+            <IconSymbol name="x" size={20} color={COLOR.TINT.GRAY_DARK}/>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={[
         styles.inputContainer, 
@@ -65,13 +61,13 @@ export default function InputBar({
         <TextInput
           placeholder={placeholder}
           placeholderTextColor={COLOR.TEXT.GRAY_LIGHT}
-          value={value}
+          value={content}
           onChangeText={onChangeText}
           style={styles.input}
           multiline
         />
-        <TouchableOpacity activeOpacity={0.7} style={styles.sendButton} onPress={onSend}>
-          <IconSymbol name='send' color={COLOR.ICON.GRAY_DARK} />
+        <TouchableOpacity activeOpacity={0.7} style={styles.sendButton} onPress={onSubmit}>
+          <IconSymbol name='send' color={COLOR.TINT.GRAY_DARK} />
         </TouchableOpacity>
       </View>
     </>

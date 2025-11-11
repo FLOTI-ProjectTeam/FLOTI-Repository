@@ -4,8 +4,7 @@ const COLOR = {
     GRAY_CHARCOAL: '#556170',
     GRAY_MEDIUM: '#898989',
     GRAY_LIGHT: '#BDBDBD',
-    NAVY: '#405876',
-    SKY: '#4FC3F7'
+    NAVY: '#405876'
   },
 
   BACKGROUND: {
@@ -14,11 +13,6 @@ const COLOR = {
   },
 
   OVERLAY: 'rgba(0, 0, 0, 0.5)',
-
-  CARD: {
-    SLATE_LIGHT: '#EBF0F6',
-    POWDER_LIGHT: '#E8F6F8'
-  },
 
   BUTTON: {
     GRAY: '#DDDDDD',
@@ -30,14 +24,8 @@ const COLOR = {
     POWDER: '#B0E0E6'
   },
 
-  ICON: {
-    GRAY_DARK: '#556170',
-    SLATE_LIGHT: '#B0C4DE',
-    RED: '#FF5356',
-    BLUE: '#4F8EF7'
-  },
-
   TINT: {
+    GRAY_DARK: '#556170',
     GRAY: '#DDDDDD',
     GRAY_LIGHT: '#F3F5F7',
     SLATE: '#B0C4DE',

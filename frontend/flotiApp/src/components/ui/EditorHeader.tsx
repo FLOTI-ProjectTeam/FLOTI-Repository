@@ -5,11 +5,10 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import COLOR from '@/constants/colors';
 
 export default function EditorHeader({
-  onSave, onSubmit, submitText = '등록'
+  onSave, onSubmit
 }: {
   onSave?: () => void;
   onSubmit: () => void;
-  submitText?: string;
 }) {
   const router = useRouter();
 
@@ -17,7 +16,7 @@ export default function EditorHeader({
     <View style={styles.headerContainer}>
       {/* 취소 버튼 */}
       <Pressable onPress={() => router.back()} style={styles.iconWrapper}>
-        <IconSymbol name="x" size={28} color={COLOR.ICON.GRAY_DARK} />
+        <IconSymbol name="x" size={28} color={COLOR.TINT.GRAY_DARK} />
       </Pressable>
 
       {/* 임시저장 & 저장 버튼 */}
@@ -29,7 +28,7 @@ export default function EditorHeader({
         )}
         {onSubmit && (
           <TouchableOpacity activeOpacity={0.8} onPress={onSubmit} style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>{submitText}</Text>
+            <Text style={styles.submitButtonText}>{onSave ? '등록' : '수정'}</Text>
           </TouchableOpacity>
         )}
       </View>

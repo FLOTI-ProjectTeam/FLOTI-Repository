@@ -3,13 +3,12 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import COLOR from '@/constants/colors';
 
 export default function DeleteConfirmModal({
-    visible, title, onCancel, onDelete, onDeleteComment
+    visible, title, onCancel, onDelete
 }: {
     visible: boolean;
     title: string;
     onCancel: () => void;
-    onDelete?: () => void;
-    onDeleteComment?: () => void;
+    onDelete: () => void;
 }) {
     return (
         <Modal visible={visible}  transparent animationType='fade' onRequestClose={onCancel}>
@@ -24,10 +23,7 @@ export default function DeleteConfirmModal({
                         <TouchableOpacity
                             activeOpacity={0.5}
                             style={styles.modalButton}
-                            onPress={() => {
-                                if (onDelete) onDelete();
-                                else if (onDeleteComment) onDeleteComment();
-                            }}
+                            onPress={onDelete}
                         >
                             <Text style={[styles.buttonText, styles.actionText]}>예</Text>
                         </TouchableOpacity>

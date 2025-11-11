@@ -1,8 +1,9 @@
+import { IMessage } from '@stomp/stompjs';
+
 import socketClient from '@/api/socketClient';
 import { DISCUSSION_API } from '@/constants/endpoints';
 import { ErrorMessage } from '@/types/community/common';
 import { MessageRequest, MessageResponse } from '@/types/community/discussion';
-import { IMessage } from '@stomp/stompjs';
 
 // 메시지 구독
 export const subscribeMessages = (

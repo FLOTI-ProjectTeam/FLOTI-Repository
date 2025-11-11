@@ -14,13 +14,10 @@ export default function MorePopup({
         <View style={[styles.popup, style]}>
             {actions.map((action, idx) => (
             <React.Fragment key={idx}>
-                <TouchableOpacity
-                    activeOpacity={0.5} // 클릭 시 투명도 설정
-                    onPress={() => action.onPress()}
-                >
+                <TouchableOpacity activeOpacity={0.5} onPress={() => action.onPress()}>
                     <Text style={[
                         styles.menuText, 
-                        actions.length - 1 === idx && styles.lastText  // 마지막 메뉴는 빨간색으로 지정
+                        actions.length - 1 === idx && styles.lastText  // 마지막 메뉴인 경우
                     ]}>
                         {action.label}
                     </Text>

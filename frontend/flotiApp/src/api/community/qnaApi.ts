@@ -5,8 +5,8 @@ import { QnaPostResponse, AnswerRequest, AnswerReponse, QnaPostDetailResponse } 
 
 /* 게시글 API */
 // 조회 & 검색
-export const getQnaPosts = (search?: string, sort: string = 'latest', page: number = 0, accepted: boolean = false) =>
-    apiClient.get<Page<QnaPostResponse>>(QNA_API.BASE, { params: { search, sort, page, accepted } });
+export const getQnaPosts = (search?: string, sort: string = 'latest', page: number = 0, unaccepted: boolean = false) =>
+    apiClient.get<Page<QnaPostResponse>>(QNA_API.BASE, { params: { search, sort, page, unaccepted } });
 
 // 상세 조회
 export const getQnaPost = (postId: number) => 

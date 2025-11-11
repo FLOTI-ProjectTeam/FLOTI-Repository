@@ -1,63 +1,79 @@
-import { View, Text, StyleSheet, Pressable, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 
+import { deleteTipPost } from '@/api/community/tipApi';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal';
-import MorePopup from '@/components/MorePopup';
-import COLOR from '@/constants/colors';
+import MorePopup from '@/components/ui/MorePopup';
+import { showToast } from '@/utils/toast';
 import { TipPostResponse } from '@/types/community/tip';
+import COLOR from '@/constants/colors';
 
-export default function BottomBar({ post }: {
+export default function BottomBar({ 
+  post, onToggleLike
+}: {
   post: TipPostResponse;
+  onToggleLike: () => void;
 }) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
-  // 수정 화면으로 이동
-  const goToPostUpdateScreen = () => {
+  /* API 호출 */
+  const callDeleteTipPost = () => deleteTipPost(post.id);
+
+  /* 이벤트 핸들러 */
+  const handleGoToTipUpdate = () => {
     router.push({
       pathname: '/community/tip/update/[postId]',
       params: { 
-        postId: String(post.id),
+        postId: post.id,
         title: post.title, 
-        content: post.content 
+        content: post.content
       }
     });
     setMenuVisible(false);
   };
+
+  const handleGoToCommentList = () => {
+    router.push({
+      pathname: '/community/tip/[postId]/comment',
+      params: { 
+        postId: post.id,
+        commentCount: post.commentCount
+      }
+    });
+  }
   
-  // 삭제 확인 모달 표시
-  const showDeleteConfirmModal = () => {
+  const handleShowDeleteConfirm = () => {
     setMenuVisible(false);
     setConfirmVisible(true);
   };
 
-  // 삭제 처리
-  const handleDelete = async (id: number) => {
+  const handleDelete = async () => {
     try {
       setConfirmVisible(false);
+      await callDeleteTipPost();
       router.back();
     } catch (error) {
-      console.error(error);
-      Alert.alert('삭제 실패', '잠시 후 다시 시도해주세요.');
+      showToast('삭제 중 오류가 발생했습니다.', 'error');
     }
   };
 
   return (
     <View style={styles.bottomBar}>
-      {/* 좋아요 & 댓글 정보 */}
+      {/* 좋아요수 & 댓글수 */}
       <View style={styles.leftActions}>
-        <Pressable style={styles.actionButton}>
-          <IconSymbol name="heart" color={COLOR.ICON.GRAY_DARK} />
+        <Pressable style={styles.actionButton} onPress={onToggleLike}>
+          <IconSymbol 
+            name={post.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
+            color={post.liked ? 'tomato' : COLOR.TINT.GRAY_DARK} // 좋아요 여부에 따라 색상 변경
+          />
           <Text style={styles.bottomText}>{post.likeCount}</Text>
         </Pressable>
 
-        <Pressable 
-          style={styles.actionButton} 
-          onPress={() => router.push(`/community/tip/${post.id}/comment`)}
-        >
-          <IconSymbol name="comment" color={COLOR.ICON.GRAY_DARK} />
+        <Pressable style={styles.actionButton} onPress={handleGoToCommentList}>
+          <IconSymbol name="comment" color={COLOR.TINT.GRAY_DARK} />
           <Text style={styles.bottomText}>{post.commentCount}</Text>
         </Pressable>
       </View>
@@ -65,7 +81,7 @@ export default function BottomBar({ post }: {
       {/* 더보기 버튼 */}
       <View>
         <Pressable onPress={() => setMenuVisible(!menuVisible)}>
-          <IconSymbol name="more.horizontal" color={COLOR.ICON.GRAY_DARK} />
+          <IconSymbol name="more.horizontal" color={COLOR.TINT.GRAY_DARK} />
         </Pressable>
 
         {/* 더보기 팝업 */}
@@ -74,8 +90,8 @@ export default function BottomBar({ post }: {
             <Pressable style={styles.overlay} onPress={() => setMenuVisible(false)} />
             <MorePopup
               actions={[
-                { label: '수정', onPress: goToPostUpdateScreen },
-                { label: '삭제', onPress: showDeleteConfirmModal },
+                { label: '수정', onPress: handleGoToTipUpdate },
+                { label: '삭제', onPress: handleShowDeleteConfirm },
               ]}
               style={{ bottom: 46, right: 8 }}
             />
@@ -87,7 +103,7 @@ export default function BottomBar({ post }: {
         visible={confirmVisible}
         title='게시글을 삭제하시겠습니까?'
         onCancel={() => setConfirmVisible(false)}
-        onDelete={() => handleDelete(post.id)}
+        onDelete={handleDelete}
       />
     </View>
   );

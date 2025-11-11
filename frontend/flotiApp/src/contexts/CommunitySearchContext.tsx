@@ -3,7 +3,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 import { CommunitySearchContextType } from '@/types/context';
 
 // Context 생성
-const CommunitySearchContext = createContext<CommunitySearchContextType | undefined>(undefined);
+const CommunitySearchContext = createContext<CommunitySearchContextType | null>(null);
 
 // Provider 컴포넌트 생성: 하위 화면에 검색어 상태 공유
 export const CommunitySearchProvider = ({ children }: { children: ReactNode }) => {
