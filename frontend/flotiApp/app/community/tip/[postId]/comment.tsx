@@ -4,10 +4,12 @@ import { useLocalSearchParams } from 'expo-router';
 
 import { dummyComments } from '@/__mocks__/tip';
 import { createComment, deleteComment, getComments, updateComment } from '@/api/community/tipApi';
-import Header from '@/components/ui/Header';
-import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal';
-import InputBar, { ReplyTo } from '@/components/InputBar';
-import CommentItem from '@/components/CommentItem';
+import { Header } from '@/components/ui/Header';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import InputBar, { ReplyTo } from '@/components/feature/community/InputBar';
+import CommentItem from '@/components/feature/community/tip/CommentItem';
+import { useMenuInteraction } from '@/hooks/useMenuInteraction';
+import { useModal } from '@/hooks/useModal';
 import { showToast } from '@/utils/toast';
 import { CommentResponse } from '@/types/community/tip';
 import { STYLE } from '@/constants/styles';
@@ -15,14 +17,13 @@ import COLOR from '@/constants/colors';
 
 export default function CommentListScreen() {
   const [loading, setLoading] = useState(true);
-  const { postId, commentCount: initialCommentCount } = useLocalSearchParams(); // URL에서 게시글 정보 가져오기
+  const { postId, initialCommentCount } = useLocalSearchParams(); // URL에서 게시글 정보 가져오기
   
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [commentCount, setCommentCount] = useState(Number(initialCommentCount || 0));
 
-  const [menuCommentId, setMenuCommentId] = useState<number | null>(null); // 열린 메뉴 댓글 ID
-  const [confirmVisible, setConfirmVisible] = useState(false);
-  const [targetComment, setTargetComment] = useState<CommentResponse | null>(null); // 삭제할 댓글
+  const { target: targetComment, ...commentTools } = useMenuInteraction<CommentResponse>(); // 선택 댓글 처리
+  const { modalVisible, openModal, closeModal } = useModal();
 
   const [content, setContent] = useState(''); // 작성 중인 댓글 내용
   const [replyTo, setReplyTo] = useState<ReplyTo | null>(null); // 답글 대상
@@ -33,7 +34,7 @@ export default function CommentListScreen() {
       const response = await getComments(Number(postId));
       setComments(response.data);
     } catch (error) {
-      // 서버 호출 실패 시 더미 데이터로 대체
+      // 테스트용
       const filtered = dummyComments.filter(comment => comment.postId.toString() === postId);
       setComments(filtered);
     } finally {
@@ -42,16 +43,10 @@ export default function CommentListScreen() {
   }
 
   const callCreateComment = () =>
-    createComment(
-      Number(postId),
-      { parentId: replyTo?.commentId ?? null, content }
-    );
+    createComment(Number(postId), { parentId: replyTo?.commentId ?? null, content });
 
   const callUpdateComment = (comment: CommentResponse) =>
-    updateComment(
-      Number(postId), comment.id,
-      { parentId: comment.parentId, content: String(comment.content) }
-    );
+    updateComment(Number(postId), comment.id, { parentId: comment.parentId, content: String(comment.content) });
 
   const callDeleteComment = (comment: CommentResponse) => deleteComment(Number(postId), comment.id);
 
@@ -66,7 +61,7 @@ export default function CommentListScreen() {
       if (!content.trim()) return;
       const response = await callCreateComment();
     
-      // 답글이면 부모 댓글의 replies 뒤쪽에 추가
+      // 답글이면 부모 댓글의 replies에 추가
       if (replyTo) {
         setComments(prev =>
           prev.map(comment => {
@@ -80,20 +75,20 @@ export default function CommentListScreen() {
           })
         );
       }
-      // 일반 댓글이면 comments 뒤쪽에 추가
+      // 일반 댓글이면 comments에 추가
       else setComments(prev => [...prev, response.data]);
 
       setCommentCount(prev => prev + 1);  // 댓글수 증가
       setContent('');
       setReplyTo(null); // 답글 모드 종료
     } catch (error) {
-      showToast('전송 중 오류가 발생했습니다.', 'error');
+      showToast('전송 실패', 'error');
     }
   };
 
   const handleUpdateSubmit = async (target: CommentResponse) => {
     try {
-      setMenuCommentId(null);
+      commentTools.setOpenMenuId(null);
       await callUpdateComment(target);
 
       setComments(prev =>
@@ -107,9 +102,7 @@ export default function CommentListScreen() {
             return {
               ...comment,
               replies: comment.replies.map(reply =>
-                reply.id === target.id
-                  ? { ...reply, content: target.content }
-                  : reply
+                reply.id === target.id ? { ...reply, content: target.content } : reply
               )
             };
           }
@@ -118,14 +111,13 @@ export default function CommentListScreen() {
         })
       );
     } catch (error) {
-      showToast('수정 중 오류가 발생했습니다.', 'error');
+      throw error;  // 하위 컴포넌트에 에러 전달
     }
   };
 
-  const handleShowConfirm = (target: CommentResponse) => {
-    setTargetComment(target);
-    setMenuCommentId(null);
-    setConfirmVisible(true);
+  const handleShowDeleteConfirm = (target: CommentResponse) => {
+    commentTools.selectTarget(target);
+    openModal();
   };
 
   const handleDelete = async () => {
@@ -134,14 +126,14 @@ export default function CommentListScreen() {
       await callDeleteComment(targetComment);
 
       setComments(prev => {
-        // 부모 댓글 삭제
+        // 부모 댓글이면 soft 삭제
         if (!targetComment.parentId) {
           return prev.map(comment =>
             comment.id === targetComment.id ? { ...comment, deleted: true } : comment
           );
         }
 
-        // 답글 삭제
+        // 답글이면 hard 삭제
         return prev.map(comment =>
           comment.id === targetComment.parentId
             ? { ...comment, replies: comment.replies.filter(reply => reply.id !== targetComment.id) }
@@ -151,16 +143,16 @@ export default function CommentListScreen() {
 
       setCommentCount(prev => prev - 1);  // 댓글수 감소
     } catch (error) {
-      showToast('삭제 중 오류가 발생했습니다.', 'error');
+      showToast('삭제 실패', 'error');
     } finally {
-      setConfirmVisible(false);
-      setTargetComment(null);
+      closeModal();
+      commentTools.setOpenMenuId(null);
     }
   };
 
   const handleReply = (comment: CommentResponse) => {
     if (comment.author) setReplyTo({ commentId: comment.id, nickname: comment.author.nickname });
-    setMenuCommentId(null);
+    commentTools.setOpenMenuId(null);
   };
 
   if (loading) {
@@ -181,7 +173,7 @@ export default function CommentListScreen() {
       <FlatList
         data={comments}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ flexGrow: 1 }} // ScrollView가 화면 전체 높이 차지
+        contentContainerStyle={{ flexGrow: 1 }}
         ListEmptyComponent={
           <View style={[STYLE.CENTER, STYLE.FLEX]}>
             <Text style={STYLE.EMPTY_TEXT}>댓글이 없습니다.</Text>
@@ -190,10 +182,10 @@ export default function CommentListScreen() {
         renderItem={({ item }) => (
           <CommentItem
             comment={item}
-            menuId={menuCommentId}
-            onChangeMenuId={setMenuCommentId}
+            menuId={commentTools.openMenuId}
+            onChangeMenuId={commentTools.setOpenMenuId}
             onUpdate={handleUpdateSubmit}
-            onDeleteConfirm={handleShowConfirm}
+            onDeleteConfirm={handleShowDeleteConfirm}
             onReply={handleReply}
           />
         )}
@@ -208,11 +200,11 @@ export default function CommentListScreen() {
         onCancelReply={() => setReplyTo(null)}
       />
 
-      <DeleteConfirmModal
-        visible={confirmVisible}
+      <ConfirmModal
+        visible={modalVisible}
         title='댓글을 삭제하시겠습니까?'
-        onCancel={() => setConfirmVisible(false)}
-        onDelete={handleDelete}
+        onClose={closeModal}
+        onAction={handleDelete}
       />
     </View>
   );

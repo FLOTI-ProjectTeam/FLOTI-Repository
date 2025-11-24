@@ -52,5 +52,5 @@ const styles = StyleSheet.create({
   tabLabelContainer: { paddingHorizontal: 12, paddingVertical: 8 },
   tabLabelContainerActive: { backgroundColor: COLOR.TINT.SLATE_LIGHT, borderRadius: 8 },
   tabLabel: { fontSize: 14, color: 'black' },
-  tabLabelActive: { fontWeight: 'bold' }
+  tabLabelActive: { fontWeight: 700 }
 });

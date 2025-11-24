@@ -3,8 +3,14 @@ import { StyleSheet, ViewStyle } from 'react-native';
 import COLOR from '@/constants/colors';
 
 const COMMON = {
-    WRAPPER: { flex: 1, paddingHorizontal: 16 },
     CENTER: { justifyContent: 'center', alignItems: 'center' } as ViewStyle,
+    CARD: { 
+        padding: 12,
+        marginBottom: 12,
+        borderRadius: 10,
+        backgroundColor: 'white',
+        gap: 8
+    },
     SHADOW: {
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 4 },
@@ -17,25 +23,24 @@ const COMMON = {
 export const STYLE = StyleSheet.create({
     /* Container */
     BASE_CONTAINER: { flex: 1, backgroundColor: 'white' },
-    CONTENT_CONTAINER: { 
-        ...COMMON.WRAPPER,
-        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT 
-    },
-    WRAPPER: { ...COMMON.WRAPPER },
+    CONTENT_CONTAINER: { flex: 1, backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT },
+    WRAPPER: { flex: 1, paddingHorizontal: 16 },
 
     /* Text */
     EMPTY_TEXT: { fontSize: 16, color: COLOR.TEXT.GRAY_MEDIUM },
 
     /* Box */
-    CARD: {
-        padding: 12,
-        marginBottom: 8,
-        borderRadius: 10,
-        backgroundColor: 'white',
-        gap: 8
-    },
+    CARD: { ...COMMON.CARD },
+    CARD_OUTLINE: { ...COMMON.CARD, borderWidth: 1, borderColor: COLOR.TINT.SLATE_SOFT },
 
     /* Button */
+    BUTTON: {
+        ...COMMON.CENTER,
+        flexDirection: 'row',
+        paddingVertical: 10,
+        borderRadius: 12,
+        backgroundColor: COLOR.BUTTON.NAVY
+    },
     FAD: {
         position: 'absolute',
         bottom: 24,
@@ -49,6 +54,7 @@ export const STYLE = StyleSheet.create({
 
     /* Layout Helper */
     ROW: { flexDirection: 'row' },
+    COLUMN: { flexDirection: 'column' },
     CENTER: { ...COMMON.CENTER },
     FLEX: { flex: 1 },
 });

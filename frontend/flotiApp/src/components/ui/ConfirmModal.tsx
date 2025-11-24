@@ -1,35 +1,36 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Pressable } from 'react-native';
 
 import COLOR from '@/constants/colors';
 
-export default function DeleteConfirmModal({
-    visible, title, onCancel, onDelete
+export default function ConfirmModal({
+    visible, title, onClose, onAction
 }: {
     visible: boolean;
     title: string;
-    onCancel: () => void;
-    onDelete: () => void;
+    onClose: () => void;
+    onAction?: () => void;
 }) {
     return (
-        <Modal visible={visible}  transparent animationType='fade' onRequestClose={onCancel}>
-            <TouchableOpacity activeOpacity={1} style={styles.modalOverlay} onPress={onCancel}>
+        <Modal visible={visible} transparent animationType='fade' onRequestClose={onClose}>
+            <Pressable style={styles.modalOverlay} onPress={onClose}>
                 <View style={styles.modalBox}>
                     <Text style={styles.modalTitle}>{title}</Text>
-        
                     <View style={styles.modalActions}>
-                        <TouchableOpacity activeOpacity={0.5} style={styles.modalButton} onPress={onCancel}>
-                            <Text style={styles.buttonText}>아니요</Text>
+                        <TouchableOpacity activeOpacity={0.5} style={styles.modalButton} onPress={onClose}>
+                            <Text style={styles.buttonText}>{onAction ? '아니요' : '확인'}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            style={styles.modalButton}
-                            onPress={onDelete}
-                        >
-                            <Text style={[styles.buttonText, styles.actionText]}>예</Text>
-                        </TouchableOpacity>
+                        {onAction && (
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                style={styles.modalButton}
+                                onPress={onAction}
+                            >
+                                <Text style={[styles.buttonText, styles.actionText]}>예</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
-            </TouchableOpacity>
+            </Pressable>
         </Modal>
     );
 }

@@ -31,6 +31,7 @@ const MAPPING = {
   'send': { lib: 'FontAwesome', name: 'send' },
   'search': { lib: 'Feather', name: 'search' },
   'trash': { lib: 'FontAwesome', name: 'trash' },
+  'crown': { lib: 'MaterialCommunityIcons', name: 'crown' },
 
   // 공통
   'chevron.left': { lib: 'Feather', name: 'chevron-left' },
@@ -43,6 +44,7 @@ const MAPPING = {
   'pen' : {lib: 'MaterialCommunityIcons', name: 'pencil' },
   'plus.pen' : {lib: 'MaterialCommunityIcons', name: 'pencil-plus' },
   'more.horizontal': { lib: 'MaterialIcons', name: 'more-horiz' },
+  'menu': { lib: 'Feather', name: 'menu' },
 } as const
 
 export type IconSymbolName = keyof typeof MAPPING;

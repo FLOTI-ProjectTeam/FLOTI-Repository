@@ -5,8 +5,8 @@ import { DiscussionRoomDetailResponse, DiscussionRoomRequest, DiscussionRoomResp
 
 /* 토론방 API */
 // 조회 & 검색
-export const getDiscussionRooms = (search?: string, sort: string = 'recentActivity', page: number = 0) =>
-    apiClient.get<Page<DiscussionRoomResponse>>(DISCUSSION_API.BASE, { params: { search, sort, page } });
+export const getDiscussionRooms = (search?: string, sort: string = 'recentActivity', page: number = 0, joined: boolean = false) =>
+    apiClient.get<Page<DiscussionRoomResponse>>(DISCUSSION_API.BASE, { params: { search, sort, page, joined } });
 
 // 상세 조회
 export const getDiscussionRoom = (roomId: number) => 

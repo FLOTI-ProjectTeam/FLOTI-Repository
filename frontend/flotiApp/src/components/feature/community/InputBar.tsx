@@ -1,7 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Keyboard } from 'react-native';
-import { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 import COLOR from '@/constants/colors';
 
 export type ReplyTo = {
@@ -19,26 +19,7 @@ export default function InputBar({
   replyTo?: ReplyTo | null;
   onCancelReply?: () => void;
 }) {
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-
-  useEffect(() => {
-    // 키보드가 나타나면 키보드 높이 저장
-    const showSub = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      (e) => setKeyboardHeight(e.endCoordinates.height)
-    );
-
-    // 키보드가 닫히면 0으로 초기화
-    const hideSub = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => setKeyboardHeight(0)
-    );
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
+  const marginBottom = useKeyboardHeight(); // 키보드 높이를 하단 여백으로 사용
 
   return (
     <>
@@ -54,10 +35,7 @@ export default function InputBar({
         </View>
       )}
 
-      <View style={[
-        styles.inputContainer, 
-        { marginBottom: keyboardHeight ? keyboardHeight : 0 } // 키보드가 나타나면 하단 여백 설정
-      ]}>
+      <View style={[styles.inputContainer, { marginBottom }]}>
         <TextInput
           placeholder={placeholder}
           placeholderTextColor={COLOR.TEXT.GRAY_LIGHT}
@@ -82,7 +60,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12
   },
   replyText: { color: COLOR.TEXT.GRAY_CHARCOAL },
-  replyToText: { fontWeight: 'bold' },
+  replyToText: { fontWeight: 600 },
   replyCancelButton: { paddingVertical: 8 },
   replyTextRow: { flex: 1, flexDirection: 'row' },
   inputContainer: {
@@ -105,7 +83,7 @@ const styles = StyleSheet.create({
     width: 45, height: 45,
     borderRadius: 22,
     backgroundColor: COLOR.BUTTON.GRAY_LIGHT,
-    alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });

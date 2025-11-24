@@ -6,7 +6,7 @@ export default function InputView({
     title, content, file, onChangeTitle, onChangeContent, onChangeFile 
 }: {
     title?: string;
-    content?: string;
+    content: string;
     file?: File;
     onChangeTitle?: (title: string) => void;
     onChangeContent: (content: string) => void;
@@ -28,9 +28,9 @@ export default function InputView({
                 value={content}
                 onChangeText={onChangeContent}
                 placeholder='내용을 입력하세요'
-                multiline
-                textAlignVertical='top'
                 placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
+                textAlignVertical='top'
+                multiline
             />
       </>
     );
@@ -38,12 +38,11 @@ export default function InputView({
 
 const styles = StyleSheet.create({
     input: {
-        borderWidth: 0,
         paddingVertical: 12,
         marginHorizontal: 24,
         fontSize: 20,
-        fontWeight: 'bold',
+        fontWeight: 600,
         backgroundColor: 'white'
     },
-    textArea: { flex: 1, fontSize: 15, fontWeight: 'normal' }
+    textArea: { flex: 1, fontSize: 15, fontWeight: '400' }
 });

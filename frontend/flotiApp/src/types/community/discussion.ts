@@ -2,18 +2,19 @@ import { AuthorResponse } from '@/types/community/common';
 
 export interface DiscussionRoomRequest {
     title: string;
-    intro: string;
-    maxParticipants: number;
+    content: string;
+    maxParticipantCount: number;
 }
 
 export interface DiscussionRoomResponse {
     id: number;
     author: AuthorResponse;
     title: string;
-    intro: string;
-    maxParticipants: number;
+    content: string;
+    maxParticipantCount: number;
     participantCount: number;
     createdAt: string;
+    recentActivityAt: string;
 }
 
 export interface DiscussionRoomDetailResponse extends DiscussionRoomResponse {
@@ -22,7 +23,7 @@ export interface DiscussionRoomDetailResponse extends DiscussionRoomResponse {
 }
 
 export interface MessageRequest {
-    content: number;
+    content: string;
 }
 
 export interface MessageResponse {
@@ -32,6 +33,7 @@ export interface MessageResponse {
     content: string;
     likeCount: number;
     liked: boolean;
+    createdAt: string;
 }
 
 export interface MessageDeleteResponse {

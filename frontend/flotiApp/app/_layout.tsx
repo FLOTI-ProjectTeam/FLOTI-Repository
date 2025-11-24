@@ -6,8 +6,10 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import { useEffect } from 'react';
+
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 // 리소스 로딩이 완료될 때까지 스플래시 화면 유지
 SplashScreen.preventAutoHideAsync();
@@ -20,7 +22,7 @@ const toastConfig: ToastConfig = {
     </View>
   ),
   custom_error: ({ props }) => (
-    <View style={[styles.toastContainer, styles.toastErrorBackground]}>
+    <View style={[styles.toastContainer, styles.toastError]}>
       <Text style={styles.toastText}>{props.message}</Text>
     </View>
   )
@@ -28,7 +30,7 @@ const toastConfig: ToastConfig = {
 
 export default function RootLayout() {
   const insets = useSafeAreaInsets(); // SafeArea 정보
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardHeight = useKeyboardHeight();
 
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -37,25 +39,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) SplashScreen.hideAsync();
   }, [loaded]);
-
-  useEffect(() => {
-    // 키보드가 나타나면 키보드 높이 저장
-    const showSub = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      (e) => setKeyboardHeight(e.endCoordinates.height)
-    );
-
-    // 키보드가 닫히면 0으로 초기화
-    const hideSub = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => setKeyboardHeight(0)
-    );
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   if (!loaded) return null;
 
@@ -100,5 +83,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray'
   },
   toastText: { fontSize: 14, color: 'white' },
-  toastErrorBackground: { backgroundColor: 'tomato' }
+  toastError: { backgroundColor: 'tomato' }
 });

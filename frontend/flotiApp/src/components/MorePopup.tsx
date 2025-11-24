@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-nativ
 import React from 'react';
 
 export default function MorePopup({ 
-    actions, style 
+    actions, style
 }: {
     actions: { 
         label: string; 
@@ -10,8 +10,10 @@ export default function MorePopup({
     }[];
     style: ViewStyle;
 }) {
+    const width = (actions.length == 1 ? 60 : 110); // 메뉴 개수에 따라 너비 조절
+
     return (
-        <View style={[styles.popup, style]}>
+        <View style={[styles.popup, style, { width }]}>
             {actions.map((action, idx) => (
             <React.Fragment key={idx}>
                 <TouchableOpacity activeOpacity={0.5} onPress={() => action.onPress()}>
@@ -36,7 +38,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         flexDirection: 'row', 
         justifyContent: 'center', 
-        width: 110,
         gap: 18,
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },

@@ -3,8 +3,8 @@ import { useRouter, Href, useSegments } from 'expo-router';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import HiddenTab from '@/components/ui/HiddenTab';
-import SearchBar from '@/components/SearchBar';
-import CommunityTabBar from '@/components/CommunityTabBar'
+import SearchBar from '@/components/feature/community/SearchBar';
+import CommunityTabBar from '@/components/feature/community/CommunityTabBar'
 import { CommunitySearchProvider } from '@/contexts/CommunitySearchContext';
 import { STYLE } from '@/constants/styles';
 
@@ -23,7 +23,7 @@ export default function CommunityLayout() {
         <CommunityTabBar />
         <HiddenTab />
         
-        {/* 작성(등록) 버튼 */}
+        {/* 등록 버튼 */}
         <TouchableOpacity 
           style={STYLE.FAD} 
           activeOpacity={0.8} // 클릭 시 투명도 설정

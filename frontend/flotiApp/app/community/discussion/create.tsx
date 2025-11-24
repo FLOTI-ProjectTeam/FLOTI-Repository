@@ -1,25 +1,25 @@
-import { View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { createTipPost } from '@/api/community/tipApi';
+import { createDiscussionRoom } from '@/api/community/discussionApi';
 import { EditorHeader } from '@/components/ui/Header';
-import InputView from '@/components/feature/community/InputView';
+import { DiscussionInputView } from '@/components/feature/community/TopicInputView';
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
-export default function TipCreateScreen() {
+export default function DiscussionCreateScreen() {
   const router = useRouter();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [file, setFile] = useState<File | undefined>(undefined);
+  const [maxParticipantCount, setMaxParticipantCount] = useState(2);
 
-  const STORAGE_KEY = '@tip_save';
+  const STORAGE_KEY = '@discussuin_save';
 
   /* API 호출 */
-  const callCreateTipPost = () => createTipPost({ title, content }, file);
+  const callCreateDiscussionRoom= () => createDiscussionRoom({ title, content, maxParticipantCount });
 
   // 화면 로드 시 임시저장 로드
   useEffect(() => {
@@ -27,9 +27,10 @@ export default function TipCreateScreen() {
       try {
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
         if (saved) {
-          const { title: savedTitle, content: savedContent } = JSON.parse(saved);
+          const { title: savedTitle, content: savedContent, maxParticipantCount: savedMaxParticipantCount } = JSON.parse(saved);
           setTitle(savedTitle);
           setContent(savedContent);
+          setMaxParticipantCount(savedMaxParticipantCount);
         }
       } catch (error) {
         showToast('임시저장 불러오기 실패', 'error');
@@ -43,7 +44,7 @@ export default function TipCreateScreen() {
     try {
       await AsyncStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ title, content })
+        JSON.stringify({ title, content, maxParticipantCount })
       );
       showToast('임시저장 성공');
     } catch (error) {
@@ -53,23 +54,26 @@ export default function TipCreateScreen() {
 
   const handleSubmit = async () => {
     try {
-      const response = await callCreateTipPost();
+      const response = await callCreateDiscussionRoom();
       await AsyncStorage.removeItem(STORAGE_KEY); // 등록 성공 시 임시저장 삭제
-      router.push(`/community/tip/${response.data.id}`);
+      router.push(`/community/discussion/${response.data.id}`)
     } catch (error) {
       showToast('등록 실패', 'error');
     }
   };
 
   return (
-    <View style={STYLE.BASE_CONTAINER}>
+    <ScrollView style={STYLE.CONTENT_CONTAINER}>
       <EditorHeader onSave={handleSave} onSubmit={handleSubmit} />
-      <InputView 
-        title={title} 
-        content={content} 
-        onChangeTitle={setTitle} 
+
+      <DiscussionInputView
+        title={title}
+        content={content}
+        maxParticipantCount={maxParticipantCount}
+        onChangeTitle={setTitle}
         onChangeContent={setContent}
+        onChangeMaxParticipantCount={setMaxParticipantCount}
       />
-    </View>
+    </ScrollView>
   );
 }

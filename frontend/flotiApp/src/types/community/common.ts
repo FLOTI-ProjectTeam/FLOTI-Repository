@@ -11,7 +11,7 @@ export interface Page<T> {
 export interface AuthorResponse {
     id: number;
     nickname: string;
-    profileImage: string;
+    profileImage: string | null;
 }
 
 export interface PostRequest {

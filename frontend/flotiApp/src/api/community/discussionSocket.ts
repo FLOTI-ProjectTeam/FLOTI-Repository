@@ -26,7 +26,7 @@ export const subscribeErrors = (callback: (error: ErrorMessage) => void) => {
 
 /* 메시지 API */
 // 전송
-export const sendMessage = (roomId: number, message: MessageRequest) => {
+export const createMessage = (roomId: number, message: MessageRequest) => {
     socketClient.publish({
         destination: DISCUSSION_API.WS_SEND(roomId),
         body: JSON.stringify(message)
@@ -41,7 +41,7 @@ export const deleteMessage = (roomId: number, messageId: number) => {
 };
   
 // 좋아요 토글
-export const toggleLike = (roomId: number, messageId: number) => {
+export const toggleLikeMessage = (roomId: number, messageId: number) => {
     socketClient.publish({
         destination: DISCUSSION_API.WS_LIKE(roomId, messageId)
     });

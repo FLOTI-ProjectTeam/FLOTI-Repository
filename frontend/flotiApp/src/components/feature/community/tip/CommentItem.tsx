@@ -2,9 +2,10 @@ import { formatSmartTime } from '@/utils/time';
 import { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { View, Text, Pressable, Modal, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
 
+import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import BreakAllText from '@/components/ui/BreakAllText';
-import MorePopup from '@/components/ui/MorePopup';
+import { showToast } from '@/utils/toast';
 import { CommentResponse } from '@/types/community/tip';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
@@ -28,16 +29,20 @@ export default function CommentItem({
   const handleOpenMenu = () => {
     if (buttonRef.current) {
       buttonRef.current.measure((x, y, width, height, pageX, pageY) => {
-        setMenuPosition({ x: pageX, y: pageY });  // 컴포넌트의 레퍼런스에 따라 메뉴 위치 변경
+        setMenuPosition({ x: pageX - 90, y: pageY });  // 컴포넌트의 레퍼런스에 따라 메뉴 위치 변경
         onChangeMenuId(comment.id);
       });
     }
   };
 
-  const handleSubmit = () => {
-    onUpdate({ ...comment, content: editText });
-    setEditing(false);
-    onChangeMenuId(null);
+  const handleSubmit = async () => {
+    try {
+      onChangeMenuId(null);
+      await onUpdate({ ...comment, content: editText });
+      setEditing(false);
+    } catch (error) {
+      showToast('수정 실패', 'error');
+    }
   };
 
   const handleCancel = () => {
@@ -66,7 +71,7 @@ export default function CommentItem({
         )}
       </View>
 
-      {/* 내용 & 수정 모드 */}
+      {/* 읽기·수정 모드 */}
       {editing ? (
         <View>
           <TextInput
@@ -123,7 +128,7 @@ export default function CommentItem({
               { label: '수정', onPress: () => setEditing(true) },
               { label: '삭제', onPress: () => onDeleteConfirm(comment) },
             ]}
-            style={{ top: menuPosition.y, left: menuPosition.x - 90 }}  // 더보기 버튼 위치
+            style={{ top: menuPosition.y, left: menuPosition.x }}  // 더보기 팝업 위치
           />
         </Modal>
       )}
@@ -146,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 4, 
     gap: 6
   },
-  author: { fontSize: 14, color: COLOR.TEXT.GRAY_DARK, fontWeight: 'bold' },
+  author: { fontSize: 14, color: COLOR.TEXT.GRAY_DARK, fontWeight: 600 },
   time: { fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   content: { fontSize: 15 },
   replyButton: { marginTop: 4 , fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
@@ -173,5 +178,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 4, paddingHorizontal: 12
   },
-  submitButtonText: { fontSize: 15, fontWeight: 'bold', color: 'white' }
+  submitButtonText: { fontSize: 15, fontWeight: 700, color: 'white' }
 });

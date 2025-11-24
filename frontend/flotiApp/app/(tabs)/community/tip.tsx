@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { dummyPosts } from '@/__mocks__/tip';
 import { getTipPosts } from '@/api/community/tipApi';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { LoadingView, EmptyView } from '@/components/CommunityStateView';
-import FilterBar, { SortType, SortOption } from '@/components/FilterBar';
+import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
 import { formatRelativeTime } from '@/utils/time';
 import { TipPostResponse } from '@/types/community/tip';
@@ -35,7 +35,7 @@ export default function TipListScreen() {
       const response = await getTipPosts(searchTrigger);
       setPosts(response.data.content);
     } catch (error) {
-      // 서버 호출 실패 시 더미 데이터로 대체
+      // 테스트용
       const filtered = dummyPosts.filter(post => post.title.includes(searchTrigger));
       setPosts(filtered);
     } finally {
@@ -55,7 +55,7 @@ export default function TipListScreen() {
   if (posts.length === 0) return <EmptyView />
 
   return (
-    <View style={STYLE.FLEX}>
+    <View style={STYLE.CONTENT_CONTAINER}>
       <FilterBar
         sort={{ options: SORT_OPTIONS, value: sortType, onChange: setSortType }}
       />
@@ -63,7 +63,7 @@ export default function TipListScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id.toString()}
-        style={STYLE.CONTENT_CONTAINER}
+        style={STYLE.WRAPPER}
         contentContainerStyle={{ paddingBottom: 8 }}
         renderItem={({ item }) => (
           <TouchableOpacity 
@@ -75,12 +75,12 @@ export default function TipListScreen() {
                 {/* 제목 */}
                 <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
 
-                {/* 작성자 & 작성일 */}
+                {/* 작성자, 작성일 */}
                 <Text style={styles.authorInfo}>
                   {item.author.nickname} • {formatRelativeTime(item.createdAt)}
                 </Text>
 
-                {/* 좋아요수 & 댓글수 */}  
+                {/* 좋아요·댓글수 */}  
                 <View style={styles.stats}>
                   <View style={styles.statItem}>
                     <IconSymbol name="heart" size={16} color={COLOR.TINT.GRAY_DARK} />
@@ -94,9 +94,10 @@ export default function TipListScreen() {
               </View>
 
               {/* 섬네일 */}
-              {item.thumbnail ? (
-                <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
-              ) : null}
+              {item.thumbnail 
+                ? <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
+                : <View style={[styles.thumbnail, { backgroundColor: 'lightgray' }]} />
+              }
             </View>
           </TouchableOpacity>
         )}
@@ -107,7 +108,7 @@ export default function TipListScreen() {
 
 const styles = StyleSheet.create({
   info: { flex: 1, justifyContent: 'space-between', gap: 4 },
-  title: { fontSize: 16, fontWeight: 'bold', color: 'black' },
+  title: { fontSize: 16, fontWeight: 700, color: 'black' },
   authorInfo: { marginBottom: 2, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   stats: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   statItem: { flexDirection: 'row', alignItems: 'center' },

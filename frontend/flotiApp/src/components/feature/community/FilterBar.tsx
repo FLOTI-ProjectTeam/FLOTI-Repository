@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, Pressable } from 'react-native';
 import { useState } from 'react';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -34,10 +34,8 @@ export default function FilterBar({
       styles.filterContainer, 
       !check && styles.sortJustify  // 정렬 박스만 있는 경우
     ]}>
-      {check &&
-        <CheckBox label={check.label} value={check.value} onChange={check.onChange} />  // 체크 박스 표시
-      }
-      <SortBox options={sort.options} value={sort.value} onChange={sort.onChange} />
+      {check && <CheckBox label={check.label} value={check.value} onChange={check.onChange} /> }
+      <SortDropdown options={sort.options} value={sort.value} onChange={sort.onChange} />
     </View>
   );
 };
@@ -45,47 +43,47 @@ export default function FilterBar({
 function CheckBox({ label, value, onChange }: CheckProps) {
   return(
     <>
-      <TouchableOpacity activeOpacity={1} style={styles.checkButton} onPress={() => onChange(!value)}>
+      <Pressable style={styles.checkButton} onPress={() => onChange(!value)}>
         <IconSymbol
           name="check.bold"
           size={18}
           color={value ? 'skyblue' : COLOR.TINT.SLATE}  // 체크 여부에 따라 아이콘 색상 변경
         />
         <Text style={styles.checkLabel}>{label}</Text>
-      </TouchableOpacity>
+      </Pressable>
     </>
   )
 }
 
-function SortBox({ options, value, onChange }: SortProps) {
-  const [showModal, setShowModal] = useState(false);
+function SortDropdown({ options, value, onChange }: SortProps) {
+  const [popupVisible, setPopupVisible] = useState(false);
   const currentLabel = options.find(option => option.value === value)?.label || options[0].label;
 
   return (
     <>
-      {/* 정렬 버튼 */}
-      <TouchableOpacity activeOpacity={1} style={styles.sortButton} onPress={() => setShowModal(true)}>
-        <Text style={styles.sortText}>{currentLabel}</Text>
+      {/* 버튼 */}
+      <Pressable style={styles.sortButton} onPress={() => setPopupVisible(true)}>
+        <Text style={styles.optionText}>{currentLabel}</Text>
         <IconSymbol name="chevron.down" size={16} color={COLOR.TEXT.NAVY} />
-      </TouchableOpacity>
+      </Pressable>
 
-      {/* 정렬 팝업 */}
-      <Modal transparent visible={showModal} onRequestClose={() => setShowModal(false)}>
-        <TouchableOpacity activeOpacity={1} style={styles.overlay} onPress={() => setShowModal(false)}>
+      {/* 팝업 */}
+      <Modal transparent visible={popupVisible} onRequestClose={() => setPopupVisible(false)}>
+        <Pressable style={styles.overlay} onPress={() => setPopupVisible(false)}>
           <View style={styles.modalContent}>
             {options.map((option) => (
               <TouchableOpacity
                 activeOpacity={0.5}
                 key={option.value}
-                style={styles.sortOption}
+                style={styles.option}
                 onPress={() => {
                   onChange(option.value);
-                  setShowModal(false);
+                  setPopupVisible(false);
                 }}
               >
                 <Text style={[
-                  styles.sortText,
-                  value === option.value && styles.sortTextActive  // 선택 여부에 따라 스타일 변경
+                  styles.optionText,
+                  value === option.value && styles.optionTextActive  // 선택 여부에 따라 스타일 추가
                 ]}>
                   {option.label}
                 </Text>
@@ -95,7 +93,7 @@ function SortBox({ options, value, onChange }: SortProps) {
               </TouchableOpacity>
             ))}
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </Modal>
     </>
   );
@@ -127,7 +125,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12, paddingHorizontal: 16,
     gap: 12
   },
-  sortOption: { flexDirection: 'row', justifyContent: 'space-between' },
-  sortText: { fontSize: 14, color: COLOR.TEXT.NAVY },
-  sortTextActive: { color: COLOR.TINT.SLATE, fontWeight: 600 }
+  option: { flexDirection: 'row', justifyContent: 'space-between' },
+  optionText: { fontSize: 14, color: COLOR.TEXT.NAVY },
+  optionTextActive: { color: COLOR.TINT.SLATE, fontWeight: 600 }
 });

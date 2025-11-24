@@ -3,12 +3,14 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 
 import { deleteTipPost } from '@/api/community/tipApi';
+import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal';
-import MorePopup from '@/components/ui/MorePopup';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import { useModal } from '@/hooks/useModal';
 import { showToast } from '@/utils/toast';
 import { TipPostResponse } from '@/types/community/tip';
 import COLOR from '@/constants/colors';
+import { STYLE } from '@/constants/styles';
 
 export default function BottomBar({ 
   post, onToggleLike
@@ -17,7 +19,7 @@ export default function BottomBar({
   onToggleLike: () => void;
 }) {
   const [menuVisible, setMenuVisible] = useState(false);
-  const [confirmVisible, setConfirmVisible] = useState(false);
+  const { modalVisible, openModal, closeModal } = useModal();
 
   /* API 호출 */
   const callDeleteTipPost = () => deleteTipPost(post.id);
@@ -28,8 +30,8 @@ export default function BottomBar({
       pathname: '/community/tip/update/[postId]',
       params: { 
         postId: post.id,
-        title: post.title, 
-        content: post.content
+        initialTitle: post.title, 
+        initialContent: post.content
       }
     });
     setMenuVisible(false);
@@ -40,41 +42,41 @@ export default function BottomBar({
       pathname: '/community/tip/[postId]/comment',
       params: { 
         postId: post.id,
-        commentCount: post.commentCount
+        initialCommentCount: post.commentCount
       }
     });
   }
   
   const handleShowDeleteConfirm = () => {
     setMenuVisible(false);
-    setConfirmVisible(true);
+    openModal();
   };
 
   const handleDelete = async () => {
     try {
-      setConfirmVisible(false);
+      closeModal();
       await callDeleteTipPost();
       router.back();
     } catch (error) {
-      showToast('삭제 중 오류가 발생했습니다.', 'error');
+      showToast('삭제 실패', 'error');
     }
   };
 
   return (
     <View style={styles.bottomBar}>
-      {/* 좋아요수 & 댓글수 */}
+      {/* 좋아요·댓글수 */}
       <View style={styles.leftActions}>
         <Pressable style={styles.actionButton} onPress={onToggleLike}>
           <IconSymbol 
             name={post.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
             color={post.liked ? 'tomato' : COLOR.TINT.GRAY_DARK} // 좋아요 여부에 따라 색상 변경
           />
-          <Text style={styles.bottomText}>{post.likeCount}</Text>
+          <Text style={styles.actionButtonText}>{post.likeCount}</Text>
         </Pressable>
 
         <Pressable style={styles.actionButton} onPress={handleGoToCommentList}>
           <IconSymbol name="comment" color={COLOR.TINT.GRAY_DARK} />
-          <Text style={styles.bottomText}>{post.commentCount}</Text>
+          <Text style={styles.actionButtonText}>{post.commentCount}</Text>
         </Pressable>
       </View>
 
@@ -87,23 +89,23 @@ export default function BottomBar({
         {/* 더보기 팝업 */}
         {menuVisible && (
           <Modal transparent visible={menuVisible} animationType='fade' onRequestClose={() => setMenuVisible(false)}>
-            <Pressable style={styles.overlay} onPress={() => setMenuVisible(false)} />
+            <Pressable style={STYLE.FLEX} onPress={() => setMenuVisible(false)} />
             <MorePopup
               actions={[
                 { label: '수정', onPress: handleGoToTipUpdate },
                 { label: '삭제', onPress: handleShowDeleteConfirm },
               ]}
-              style={{ bottom: 46, right: 8 }}
+              style={{ bottom: 46, right: 16 }}
             />
           </Modal>
         )}
       </View>
 
-      <DeleteConfirmModal
-        visible={confirmVisible}
+      <ConfirmModal
+        visible={modalVisible}
         title='게시글을 삭제하시겠습니까?'
-        onCancel={() => setConfirmVisible(false)}
-        onDelete={handleDelete}
+        onClose={closeModal}
+        onAction={handleDelete}
       />
     </View>
   );
@@ -118,9 +120,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     backgroundColor: 'white',
     borderTopWidth: 1,
-    borderColor: COLOR.TINT.GRAY
+    borderTopColor: COLOR.TINT.GRAY
   },
-  bottomText: { marginLeft: 6, fontSize: 16, color: COLOR.TEXT.GRAY_MEDIUM },
   leftActions: { flexDirection: 'row' },
   actionButton: {
     marginRight: 16,
@@ -128,5 +129,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  overlay: { flex: 1, justifyContent: 'flex-end', alignItems: 'flex-end' }
+  actionButtonText: { marginLeft: 6, fontSize: 16, color: COLOR.TEXT.GRAY_MEDIUM },
 });

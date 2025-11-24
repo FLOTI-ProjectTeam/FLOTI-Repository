@@ -3,12 +3,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyPostDetails } from '@/__mocks__/qna';
-import { deleteAnswer, deleteQnaPost, getQnaPost, toggleLikeAnswer } from '@/api/community/qnaApi';
+import { deleteAnswer, deleteQnaPost, getQnaPost, acceptAnswer, toggleLikeAnswer } from '@/api/community/qnaApi';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import BreakAllText from '@/components/ui/BreakAllText';
-import DeleteConfirmModal from '@/components/ui/DeleteConfirmModal';
-import { LoadingView, EmptyView } from '@/components/CommunityStateView';
-import AnswerItem from '@/components/AnswerItem';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import { Header } from '@/components/ui/Header';
+import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+import AnswerItem from '@/components/feature/community/qna/AnswerItem';
+import QnaDetailHeader from '@/components/feature/community/qna/QnaDetailHeader';
+import { useMenuInteraction } from '@/hooks/useMenuInteraction';
+import { useModal } from '@/hooks/useModal';
 import { showToast } from '@/utils/toast';
 import { AnswerReponse, QnaPostDetailResponse } from '@/types/community/qna';
 import COLOR from '@/constants/colors';
@@ -19,12 +22,10 @@ export default function QnaDetailScreen() {
   const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
 
   const [post, setPost] = useState<QnaPostDetailResponse>();
-  const [confirmVisible, setConfirmVisible] = useState(false);  // 삭제 확인 모달 표시 여부
-
   const [answers, setAnswers] = useState<AnswerReponse[]>([]);
-  const [menuAnswerId, setMenuAnswerId] = useState<number | null>(null); // 열린 메뉴 댓글 ID
-  const [answerConfirmVisible, setAnswerConfirmVisible] = useState(false);  // 답변 삭제 확인 모달 표시 여부
-  const [targetAnswerId, setTargetAnswerId] = useState<number | null>(null); // 삭제할 답변 ID
+
+  const { target: targetAnswerId, ...answerTools } = useMenuInteraction(); // 선택 답변 처리
+  const { modalVisible, type, openModal, closeModal } = useModal<'postDelete' | 'answerDelete' | 'answerAccept'>();
 
   /* API 호출 */
   const fetchPost = async () => {
@@ -33,7 +34,7 @@ export default function QnaDetailScreen() {
       setPost(response.data);
       setAnswers(response.data.answers);
     } catch (error) {
-      // 서버 호출 실패 시 더미 데이터로 대체
+      // 테스트용
       const filtered = dummyPostDetails.find((post) => post.id.toString() === postId);
       setPost(filtered);
       setAnswers(filtered!.answers);
@@ -44,7 +45,8 @@ export default function QnaDetailScreen() {
 
   const callDeleteQnaPost = () => deleteQnaPost(post!.id);
   const callDeleteAnswer = (answerId: number) => deleteAnswer(post!.id, answerId);
-  const callToggleLikeAnswer = (answerId: number) => toggleLikeAnswer(post!.id, answerId)
+  const callAcceptAnswer = (answerId: number) => acceptAnswer(post!.id, answerId);
+  const callToggleLikeAnswer = (answerId: number) => toggleLikeAnswer(post!.id, answerId);
 
   // 게시글 ID 변경 시 실행
   useEffect(() => {
@@ -57,8 +59,8 @@ export default function QnaDetailScreen() {
       pathname: '/community/qna/update/[postId]',
       params: { 
         postId: post!.id,
-        title: post!.title, 
-        content: post!.content 
+        initialTitle: post!.title, 
+        initialContent: post!.content 
       }
     });
   };
@@ -74,38 +76,37 @@ export default function QnaDetailScreen() {
     });
   };
 
-  const goToAnswerUpdate = (answer: AnswerReponse) => {
+  const handleGoToAnswerUpdate = ({ id, content }: AnswerReponse) => {
     router.push({
       pathname: '/community/qna/[postId]/answer/[answerId]/update',
       params: { 
           postId: post!.id,
-          answerId: answer.id,
+          answerId: id,
           postTitle: post!.title, 
           postContent: post!.content,
-          content: answer.content
+          initialContent: content
       }
     });
-
-    setMenuAnswerId(null);
+    answerTools.setOpenMenuId(null);
   };
 
-  const handleShowConfirm = () => {
-    setConfirmVisible(true);
+  const handleShowAnswerDeleteConfirm = (targetId: number) => {
+    answerTools.selectTarget(targetId);
+    openModal('answerDelete');
   };
 
-  const showAnswerConfirm = (answerId: number) => {
-    setTargetAnswerId(answerId);
-    setMenuAnswerId(null);
-    setAnswerConfirmVisible(true);
+  const handleShowAnswerAcceptConfirm = (targetId: number) => {
+    answerTools.selectTarget(targetId);
+    openModal('answerAccept');
   };
 
   const handleDelete = async () => {
     try {
-      setConfirmVisible(false);
+      closeModal();
       await callDeleteQnaPost();
       router.back();
     } catch (error) {
-      showToast('삭제 중 오류가 발생했습니다.', 'error');
+      showToast('삭제 실패', 'error');
     }
   };
 
@@ -116,10 +117,32 @@ export default function QnaDetailScreen() {
       setAnswers(prev => prev.filter(answer => answer.id !== targetAnswerId)); // 답변 삭제
       setPost(prev => prev ? { ...prev, answerCount: prev.answerCount - 1 } : prev);  // 답변수 감소
     } catch (error) {
-      showToast('삭제 중 오류가 발생했습니다.', 'error');
+      showToast('삭제 실패', 'error');
     } finally {
-      setAnswerConfirmVisible(false);
-      setTargetAnswerId(null);
+      closeModal();
+      answerTools.clearTarget();
+    }
+  }
+
+  const handleAcceptAnswer = async () => {
+    try {
+      if (!targetAnswerId) return;
+      await callAcceptAnswer(targetAnswerId);
+
+      // 답변 채택
+      setAnswers(prev =>
+        prev.map(answer => {
+          if (answer.id === targetAnswerId)
+            return { ...answer, accepted: true };
+          return answer;
+        })
+      );
+      setPost(prev => prev ? { ...prev, accepted: true } : prev);
+    } catch (error) {
+      showToast('채택 실패', 'error');
+    } finally {
+      closeModal();
+      answerTools.clearTarget();
     }
   }
 
@@ -127,6 +150,7 @@ export default function QnaDetailScreen() {
     try {
       await callToggleLikeAnswer(id);
 
+      // 좋아요 갱신
       setAnswers(prev =>
         prev.map(answer => {
           if (answer.id === id) {
@@ -136,50 +160,46 @@ export default function QnaDetailScreen() {
               likeCount: answer.likeCount + (answer.liked ? -1 : 1)
             };
           }
-
           return answer;
         })
       );
     } catch (error) {
-      const action = liked ? '좋아요 취소' : '좋아요';
-      showToast(`${action} 중 오류가 발생했습니다.`, 'error');
+      if (liked) showToast('좋아요 취소 실패', 'error');
+      else showToast('좋아요 실패', 'error');
     }
   }
+
+  /* 모달 정보 */
+  const modalTitle = {
+    postDelete: '게시글을 삭제하시겠습니까?',
+    answerDelete: '답변을 삭제하시겠습니까?',
+    answerAccept: '답변을 채택하시겠습니까?'
+  };
+
+  const modalAction = {
+    postDelete: handleDelete,
+    answerDelete: handleDeleteAnswer,
+    answerAccept: handleAcceptAnswer
+  };
 
   if (loading) return <LoadingView />
   if (!post) return <EmptyView />
 
   return (
     <View style={STYLE.BASE_CONTAINER}>
+      <Header title="Q&A" />
+
       {/* 답변 목록 */}
       <FlatList
         data={answers}
         keyExtractor={(item) => item.id.toString()}
         style={STYLE.WRAPPER}
         contentContainerStyle={{ 
-          flexGrow: 1, // ScrollView가 화면 전체 높이 차지,
+          flexGrow: 1, // ScrollView가 화면 전체 높이 차지
           paddingBottom: 60 
         }}
-        ListHeaderComponent={
-          <>
-            {/* 제목 */}
-            <BreakAllText style={styles.title}>{post.title}</BreakAllText>
-
-            {/* 작성자 & 시간 */}
-            <Text style={styles.author}>{post.author.nickname}</Text>
-            <Text style={styles.time}>{post.createdAt}</Text>
-
-            {/* 본문 */}
-            <View style={styles.contentContainer}>
-              <BreakAllText style={styles.content}>{post.content}</BreakAllText>
-            </View>
-
-            {/* 답변수 */}
-            <View style={styles.answerHeader}>
-              <Text style={styles.answerLabel}>답변 </Text>
-              <Text style={[styles.answerLabel, styles.answerCount]}>{post.answerCount}</Text>
-            </View>
-          </>
+        ListHeaderComponent={ 
+          <QnaDetailHeader post={post} /> 
         }
         ListEmptyComponent={
           <View style={[STYLE.WRAPPER, STYLE.CENTER]}>
@@ -189,115 +209,62 @@ export default function QnaDetailScreen() {
         renderItem={({ item }) => (
           <AnswerItem
             answer={item}
-            menuId={menuAnswerId}
-            onChangeMenuId={setMenuAnswerId}
-            onGoToUpdate={goToAnswerUpdate}
-            onDeleteConfirm={showAnswerConfirm}
+            menuId={answerTools.openMenuId}
+            accepted={post.accepted}
+            onChangeMenuId={answerTools.setOpenMenuId}
+            onGoToUpdate={handleGoToAnswerUpdate}
+            onDeleteConfirm={handleShowAnswerDeleteConfirm}
+            onAcceptConfirm={handleShowAnswerAcceptConfirm}
             onToggleLike={handleToggleLike}
           />
         )}
       />
 
-      {/* 답변 버튼 */}
-      <TouchableOpacity activeOpacity={0.8} style={styles.answerButton} onPress={handleGoToAnswerCreate}>
-        <IconSymbol name="plus.pen" size={24} color='white' />
-        <Text style={styles.answerButtonText}>답변하기</Text>
-      </TouchableOpacity>
-
-      {/* 수정 & 삭제 버튼 */}
-      {/* <View style={styles.bottomButtonRow}>
-        <TouchableOpacity style={styles.updateButton} onPress={handleGoToUpdate}>
+      {/* 수정·삭제·답변 버튼 */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity activeOpacity={0.8} style={styles.updateButton} onPress={handleGoToUpdate}>
           <IconSymbol name="pen" size={24} color='white' />
-          <Text style={styles.answerButtonText}>수정하기</Text>
+          <Text style={styles.buttonText}>수정하기</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteButton} onPress={handleShowConfirm}>
+        <TouchableOpacity activeOpacity={0.8} style={styles.deleteButton} onPress={() => openModal('postDelete')}>
           <IconSymbol name="trash" size={24} color='white' />
         </TouchableOpacity>
-      </View> */}
+        {/* <TouchableOpacity activeOpacity={0.8} style={styles.answerButton} onPress={handleGoToAnswerCreate}>
+          <IconSymbol name="plus.pen" size={24} color='white' />
+          <Text style={styles.buttonText}>답변하기</Text>
+        </TouchableOpacity> */}
+      </View>
 
-      {/* 삭제 확인 모달 */}
-      <DeleteConfirmModal
-        visible={confirmVisible}
-        title='게시글을 삭제하시겠습니까?'
-        onCancel={() => setConfirmVisible(false)}
-        onDelete={handleDelete}
-      />
-      <DeleteConfirmModal
-        visible={answerConfirmVisible}
-        title='답변을 삭제하시겠습니까?'
-        onCancel={() => setAnswerConfirmVisible(false)}
-        onDelete={handleDeleteAnswer}
+      <ConfirmModal
+        visible={modalVisible}
+        title={modalTitle[type!]}
+        onClose={closeModal}
+        onAction={() => modalAction[type!]()}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: 8,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black'
-  },
-  author: { fontSize: 14, fontWeight: 'bold', color: COLOR.TEXT.GRAY_DARK },
-  time: { fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
-  contentContainer: {
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT
-  },
-  content: { fontSize: 15, lineHeight: 22, color: COLOR.TEXT.GRAY_DARK },
-  answerHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderColor: COLOR.TINT.GRAY
-  },
-  answerLabel: { fontSize: 18, fontWeight: 'bold', color: COLOR.TEXT.GRAY_DARK },
-  answerCount: { color: 'skyblue' },
-  bottomButtonRow: {
+  buttonContainer: {
     position: 'absolute',
     flexDirection: 'row',
     bottom: 16,
     left: 16, right: 16,
     gap: 8
   },
-  updateButton: {
-    width: '80%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLOR.BUTTON.NAVY,
-    paddingVertical: 10,
-    borderRadius: 16
+  updateButton: { ...STYLE.BUTTON, width: '80%' },
+  deleteButton: { 
+    ...STYLE.BUTTON, 
+    flex: 1, 
+    backgroundColor: COLOR.BUTTON.RED, 
+    paddingHorizontal: 16 
   },
-  deleteButton: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLOR.BUTTON.RED,
-    paddingVertical: 10, paddingHorizontal: 16,
-    borderRadius: 16
-  },
-  answerButton: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16, right: 16,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLOR.BUTTON.NAVY,
-    paddingVertical: 10,
-    borderRadius: 16
-  },
-  answerButtonText: {
+  answerButton: { ...STYLE.BUTTON, flex: 1 },
+  buttonText: {
     marginLeft: 8,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: 700,
     color: 'white'
   }
 });
