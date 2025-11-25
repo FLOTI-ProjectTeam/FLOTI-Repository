@@ -12,8 +12,8 @@ public class DiscussionRoomResponse {
     private final Long id;
     private final AuthorResponse author;
     private final String title;
-    private final String intro;
-    private final int maxParticipants;
+    private final String content;
+    private final int maxParticipantCount;
     private final int participantCount;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -23,8 +23,8 @@ public class DiscussionRoomResponse {
         this.id = discussionRoom.getId();
         this.author = new AuthorResponse(discussionRoom.getAuthor());
         this.title = discussionRoom.getTitle();
-        this.intro = discussionRoom.getIntro();
-        this.maxParticipants = discussionRoom.getMaxParticipants();
+        this.content = discussionRoom.getContent();
+        this.maxParticipantCount = discussionRoom.getMaxParticipantCount();
         this.participantCount = discussionRoom.getParticipantCount();
         this.recentActivityAt = discussionRoom.getRecentActivityAt();
     }

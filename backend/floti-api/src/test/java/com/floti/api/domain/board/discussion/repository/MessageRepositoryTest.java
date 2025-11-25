@@ -44,8 +44,8 @@ public class MessageRepositoryTest {
         testRoom = DiscussionRooms.builder()
                 .author(testUser)
                 .title("테스트 제목")
-                .intro("테스트 내용")
-                .maxParticipants(2)
+                .content("테스트 내용")
+                .maxParticipantCount(2)
                 .build();
         em.persist(testRoom);
 

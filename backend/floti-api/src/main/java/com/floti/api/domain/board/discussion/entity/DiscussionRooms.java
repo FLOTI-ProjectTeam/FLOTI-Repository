@@ -26,10 +26,10 @@ public class DiscussionRooms {
     private String title;
 
     @Column(nullable = false)
-    private String intro;
+    private String content;
 
     @Column(nullable = false)
-    private int maxParticipants;
+    private int maxParticipantCount;
 
     @Column(nullable = false)
     private int participantCount = 1;
@@ -43,17 +43,17 @@ public class DiscussionRooms {
     private LocalDateTime recentActivityAt;
 
     @Builder
-    public DiscussionRooms(User author, String title, String intro, int maxParticipants) {
+    public DiscussionRooms(User author, String title, String content, int maxParticipantCount) {
         this.author = author;
         this.title = title;
-        this.intro = intro;
-        this.maxParticipants = maxParticipants;
+        this.content = content;
+        this.maxParticipantCount = maxParticipantCount;
     }
 
-    public void update(String title, String intro, int maxParticipants) {
+    public void update(String title, String content, int maxParticipantCount) {
         this.title = title;
-        this.intro = intro;
-        this.maxParticipants = maxParticipants;
+        this.content = content;
+        this.maxParticipantCount = maxParticipantCount;
     }
 
     public void updateRecentActivity() {

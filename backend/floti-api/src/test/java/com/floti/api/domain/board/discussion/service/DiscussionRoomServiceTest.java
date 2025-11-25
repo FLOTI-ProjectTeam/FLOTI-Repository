@@ -53,7 +53,7 @@ public class DiscussionRoomServiceTest {
 
     private final User testUser = User.builder().id(VALID_ID).nickname("테스터01").build();
     private final User testParticipant = User.builder().id(INVALID_ID).nickname("테스터02").build();
-    private final DiscussionRooms testRoom = DiscussionRooms.builder().author(testUser).title("테스트 제목").maxParticipants(2).build();
+    private final DiscussionRooms testRoom = DiscussionRooms.builder().author(testUser).title("테스트 제목").maxParticipantCount(2).build();
 
     @Test
     @DisplayName("getDiscussionRoom: 참여자와 메시지 있음 - 게시글 상세에 참여자와 메시지 리스트 포함")

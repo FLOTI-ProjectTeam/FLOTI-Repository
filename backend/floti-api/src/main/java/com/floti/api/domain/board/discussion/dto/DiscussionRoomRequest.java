@@ -16,8 +16,8 @@ public class DiscussionRoomRequest {
 
     @NotBlank
     @Size(max = 255)
-    private String intro;
+    private String content;
 
     @Min(2) @Max(5)
-    private int maxParticipants;
+    private int maxParticipantCount;
 }

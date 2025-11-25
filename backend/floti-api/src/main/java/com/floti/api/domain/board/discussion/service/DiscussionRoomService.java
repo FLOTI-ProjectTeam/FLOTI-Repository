@@ -93,7 +93,7 @@ public class DiscussionRoomService {
         DiscussionRooms DiscussionRoom = DiscussionRooms.builder()
                 .author(user)
                 .title(request.getTitle())
-                .intro(request.getIntro())
+                .content(request.getContent())
                 .build();
 
         return new DiscussionRoomResponse(discussionRoomRepository.save(DiscussionRoom));
@@ -108,7 +108,7 @@ public class DiscussionRoomService {
         if (!userId.equals(discussionRoom.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        discussionRoom.update(request.getTitle(), request.getIntro(), request.getMaxParticipants());
+        discussionRoom.update(request.getTitle(), request.getContent(), request.getMaxParticipantCount());
         return new DiscussionRoomResponse(discussionRoom);
     }
 
@@ -141,7 +141,7 @@ public class DiscussionRoomService {
             discussionParticipantRepository.delete(discussionParticipant.get());
             discussionRoom.decrementParticipantCount();
         } else {
-            if (discussionRoom.getParticipantCount() == discussionRoom.getMaxParticipants())
+            if (discussionRoom.getParticipantCount() == discussionRoom.getMaxParticipantCount())
                 throw new MaxParticipantExceededException();
 
             discussionParticipantRepository.save(new DiscussionParticipants(discussionRoom, user));

@@ -62,8 +62,8 @@ public class DiscussionParticipantRepositoryTest {
         testRoom = DiscussionRooms.builder()
                 .author(user1)
                 .title("테스트 제목")
-                .intro("테스트 내용")
-                .maxParticipants(4)
+                .content("테스트 내용")
+                .maxParticipantCount(4)
                 .build();
         em.persist(testRoom);
 

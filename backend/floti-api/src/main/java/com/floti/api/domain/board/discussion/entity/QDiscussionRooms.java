@@ -13,9 +13,8 @@ public class QDiscussionRooms extends EntityPathBase<DiscussionRooms> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
     public final StringPath title = createString("title");
-    public final StringPath intro = createString("intro");
-    public final DateTimePath<LocalDateTime> recentActivityAt
-            = createDateTime("recentActivityAt", LocalDateTime.class);
+    public final StringPath content = createString("content");
+    public final DateTimePath<LocalDateTime> recentActivityAt = createDateTime("recentActivityAt", LocalDateTime.class);
 
     public QDiscussionRooms(String variable) {
         super(DiscussionRooms.class, PathMetadataFactory.forVariable(variable));

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class CustomDiscussionRoomRepositoryImpl implements CustomDiscussionRoomR
 
         // 1. 검색 조건
         BooleanExpression condition = discussion.title.containsIgnoreCase(search)
-                .or(discussion.intro.containsIgnoreCase(search));
+                .or(discussion.content.containsIgnoreCase(search));
 
         // 2. 정렬 조건
         OrderSpecifier<Long> baseOrder = discussion.id.desc();
