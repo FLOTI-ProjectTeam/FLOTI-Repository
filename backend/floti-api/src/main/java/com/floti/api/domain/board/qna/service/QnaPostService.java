@@ -37,17 +37,16 @@ public class QnaPostService {
     private static final int PAGE_SIZE = 20;
 
     /* 1-1. 조회 */
-    public Page<QnaPostResponse> getQnaPosts(String sort, int page, boolean accepted) {
+    public Page<QnaPostResponse> getQnaPosts(String sort, int page, boolean unaccepted) {
         Sort.Order baseOrder = Sort.Order.desc("id");
         Sort sortOrder = switch (sort.toLowerCase()) {
-            case "answers" -> accepted
-                    ? Sort.by(Sort.Order.desc("answerCount"), baseOrder)
-                    : Sort.by(Sort.Order.asc("answerCount"), baseOrder);
+            case "answers_asc"  -> Sort.by(Sort.Order.asc("answerCount"), baseOrder);
+            case "answers_desc" -> Sort.by(Sort.Order.desc("answerCount"), baseOrder);
             default -> Sort.by(baseOrder);
         };
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, sortOrder);
-        Page<QnaPosts> qnaPostPage = qnaPostRepository.findByAccepted(accepted, pageable);
+        Page<QnaPosts> qnaPostPage = qnaPostRepository.findAll(unaccepted, pageable);
         return qnaPostPage.map(QnaPostResponse::new);
     }
 

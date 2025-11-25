@@ -82,7 +82,7 @@ public class QnaPostRepositoryTest {
         Pageable pageable = PageRequest.of(0, 20, Sort.by("id").descending());
 
         // when
-        Page<QnaPosts> result = qnaPostRepository.findByAccepted(false, pageable);
+        Page<QnaPosts> result = qnaPostRepository.findAll(true, pageable);
 
         // then
         assertEquals(2, result.getTotalElements());
@@ -91,13 +91,13 @@ public class QnaPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("getQnaPosts: 미채택 답변순 - 답변 적은 QnaPosts 페이지 먼저 반환")
-    void getQnaPosts_answers_notAccepted() {
+    @DisplayName("findAll: 미채택 답변적은순 - 답변 적은 QnaPosts 페이지 먼저 반환")
+    void findAll_answersAsc_notAccepted() {
         // given
         Pageable pageable = PageRequest.of(0, 20, Sort.by("answerCount").ascending());
 
         // when
-        Page<QnaPosts> result = qnaPostRepository.findByAccepted(false, pageable);
+        Page<QnaPosts> result = qnaPostRepository.findAll(true, pageable);
 
         // then
         assertEquals(2, result.getTotalElements());
@@ -106,32 +106,17 @@ public class QnaPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("getQnaPosts: 채택 최신순 - 최신 QnaPosts 페이지 먼저 반환")
-    void getQnaPosts_latest_accepted() {
-        // given
-        Pageable pageable = PageRequest.of(0, 20, Sort.by("id").descending());
-
-        // when
-        Page<QnaPosts> result = qnaPostRepository.findByAccepted(true, pageable);
-
-        // then
-        assertEquals(2, result.getTotalElements());
-        assertEquals(5, result.getContent().get(0).getAnswerCount());
-        assertTrue(result.getContent().stream().allMatch(QnaPosts::isAccepted));
-    }
-
-    @Test
-    @DisplayName("getQnaPosts: 채택 답변순 - 답변 많은 QnaPosts 페이지 먼저 반환")
-    void getQnaPosts_answers_accepted() {
+    @DisplayName("findAll: 미채택 답변많은순 - 답변 많은 QnaPosts 페이지 먼저 반환")
+    void findAll_answersDesc_notAccepted() {
         // given
         Pageable pageable = PageRequest.of(0, 20, Sort.by("answerCount").descending());
 
         // when
-        Page<QnaPosts> result = qnaPostRepository.findByAccepted(true, pageable);
+        Page<QnaPosts> result = qnaPostRepository.findAll(true, pageable);
 
         // then
         assertEquals(2, result.getTotalElements());
-        assertEquals(10, result.getContent().get(0).getAnswerCount());
-        assertTrue(result.getContent().stream().allMatch(QnaPosts::isAccepted));
+        assertEquals(3, result.getContent().get(0).getAnswerCount());
+        assertTrue(result.getContent().stream().noneMatch(QnaPosts::isAccepted));
     }
 }

@@ -28,10 +28,10 @@ public class QnaPostController {
     public Page<QnaPostResponse> getQnaPosts(@RequestParam(required = false) String search,
                                              @RequestParam(defaultValue = "latest") String sort,
                                              @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "false") boolean accepted) {
+                                             @RequestParam(defaultValue = "false") boolean unaccepted) {
         sort = sort.trim();
         if (search == null || search.isBlank())
-            return qnaPostService.getQnaPosts(sort, page, accepted);
+            return qnaPostService.getQnaPosts(sort, page, unaccepted);
         return qnaPostService.searchQnaPosts(search.trim(), sort, page);
     }
 
