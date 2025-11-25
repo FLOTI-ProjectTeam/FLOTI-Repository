@@ -14,7 +14,7 @@ public abstract class BaseCommentResponse {
     protected final AuthorResponse author;
     protected String content;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     protected LocalDateTime createdAt;
 
     protected BaseCommentResponse(Comments comment) {

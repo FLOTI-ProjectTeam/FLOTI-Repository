@@ -16,7 +16,7 @@ public class DiscussionRoomResponse {
     private final int maxParticipants;
     private final int participantCount;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime recentActivityAt;
 
     public DiscussionRoomResponse(DiscussionRooms discussionRoom) {

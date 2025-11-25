@@ -16,7 +16,7 @@ public class MessageResponse {
     private final int likeCount;
     private final boolean liked;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime createdAt;
 
     public MessageResponse(Messages message, boolean liked) {
