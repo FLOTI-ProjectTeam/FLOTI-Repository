@@ -1,8 +1,10 @@
 package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.User;
+import com.floti.api.domain.board.tip.dto.BaseCommentResponse;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
+import com.floti.api.domain.board.tip.dto.ReplyResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
@@ -15,11 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +32,18 @@ public class CommentService {
         if (comments.isEmpty())
             return Collections.emptyList();
 
-        Map<Long, CommentResponse> commentMap = comments.stream()
-                .collect(Collectors.toMap(Comments::getId, CommentResponse::new));
+        List<CommentResponse> topComments = new ArrayList<>();
+        Map<Long, CommentResponse> parentMap = new HashMap<>();
 
         /* 댓글 트리 생성 */
-        List<CommentResponse> topComments = new ArrayList<>();
         for (Comments comment : comments) {
-            CommentResponse temp = commentMap.get(comment.getId());
             if (comment.getParentId() == null) {
-                topComments.add(temp);
+                CommentResponse parent = new CommentResponse(comment);
+                topComments.add(parent);
+                parentMap.put(comment.getId(), parent);
             } else {
-                CommentResponse parent = commentMap.get(comment.getParentId());
-                if (parent != null)
-                    parent.getReplies().add(temp);
+                CommentResponse parent = parentMap.get(comment.getParentId());
+                if (parent != null) parent.addReply(new ReplyResponse(comment));
             }
         }
 
@@ -55,7 +52,7 @@ public class CommentService {
 
     /* 2. 등록 */
     @Transactional
-    public CommentResponse createComment(User user, Long postId, CommentRequest request) {
+    public BaseCommentResponse createComment(User user, Long postId, CommentRequest request) {
         TipPosts tipPost = tipPostRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.POST_NOT_FOUND));
         Long parentId = request.getParentId();
@@ -81,12 +78,14 @@ public class CommentService {
         commentRepository.save(comment);
         tipPost.incrementCommentCount();
 
-        return new CommentResponse(comment);
+        if (parentId == null)
+            return new CommentResponse(comment);
+        return new ReplyResponse(comment);
     }
 
     /* 3. 수정 */
     @Transactional
-    public CommentResponse updateComment(Long userId, Long id, CommentRequest request) {
+    public BaseCommentResponse updateComment(Long userId, Long id, CommentRequest request) {
         Comments comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.COMMENT_NOT_FOUND));
 
@@ -94,7 +93,10 @@ public class CommentService {
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
         comment.update(request.getContent());
-        return new CommentResponse(comment);
+
+        if (comment.getParentId() == null)
+            return new CommentResponse(comment);
+        return new ReplyResponse(comment);
     }
 
     /* 4. 삭제 */
@@ -106,11 +108,8 @@ public class CommentService {
         if (comment.getAuthor() == null || !userId.equals(comment.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
 
-        if (comment.getParentId() == null) {
-            comment.softDelete();
-        } else {
-            commentRepository.delete(comment);
-        }
+        if (comment.getParentId() == null) comment.softDelete();
+        else commentRepository.delete(comment);
 
         TipPosts tipPost = tipPostRepository.getReferenceById(comment.getPostId());
         tipPost.decrementCommentCount();

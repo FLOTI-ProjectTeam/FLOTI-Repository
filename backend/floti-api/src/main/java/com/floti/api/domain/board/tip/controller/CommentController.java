@@ -1,6 +1,7 @@
 package com.floti.api.domain.board.tip.controller;
 
 import com.floti.api.domain.auth.entity.User;
+import com.floti.api.domain.board.tip.dto.BaseCommentResponse;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
 import com.floti.api.domain.board.tip.service.CommentService;
@@ -31,21 +32,21 @@ public class CommentController {
 
     /* 2. 등록 */
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<CommentResponse> createComment(@AuthenticationPrincipal UserDetails userDetails,
-                                                         @PathVariable long postId,
-                                                         @Validated @RequestBody CommentRequest comment) {
+    public ResponseEntity<BaseCommentResponse> createComment(@AuthenticationPrincipal UserDetails userDetails,
+                                                             @PathVariable long postId,
+                                                             @Validated @RequestBody CommentRequest comment) {
         User user = authUtil.resolveUser(userDetails);
-        CommentResponse response = commentService.createComment(user, postId, comment);
+        BaseCommentResponse response = commentService.createComment(user, postId, comment);
         return ResponseEntity.status(CREATED).body(response); // 201 Created
     }
 
     /* 3. 수정 */
     @PutMapping("/{postId}/comments/{id}")
-    public ResponseEntity<CommentResponse> updateComment(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<BaseCommentResponse> updateComment(@AuthenticationPrincipal UserDetails userDetails,
                                                          @PathVariable long postId, @PathVariable long id,
                                                          @Validated @RequestBody CommentRequest comment) {
         Long userId = authUtil.resolveUserId(userDetails);
-        CommentResponse response = commentService.updateComment(userId, id, comment);
+        BaseCommentResponse response = commentService.updateComment(userId, id, comment);
         return ResponseEntity.ok(response); // 200 Ok
     }
 

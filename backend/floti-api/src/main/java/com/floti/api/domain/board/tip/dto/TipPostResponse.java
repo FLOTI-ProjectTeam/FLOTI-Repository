@@ -13,7 +13,7 @@ public class TipPostResponse {
     private final AuthorResponse author;
     private final String title;
     private final String content;
-    private final String thumbnail;
+    private String thumbnail;
     private final int commentCount;
     private final int likeCount;
     private final boolean liked;
@@ -30,11 +30,10 @@ public class TipPostResponse {
         this.author = new AuthorResponse(tipPost.getAuthor());
         this.title = tipPost.getTitle();
         this.content = tipPost.getContent();
-        if (tipPost.getThumbnail() != null) {
+
+        if (tipPost.getThumbnail() != null)
             this.thumbnail = baseUrl + "/" + tipPost.getThumbnail();
-        } else {
-            this.thumbnail = null;
-        }
+
         this.commentCount = tipPost.getCommentCount();
         this.likeCount = tipPost.getLikeCount();
         this.createdAt = tipPost.getCreatedAt();

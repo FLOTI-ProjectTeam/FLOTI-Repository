@@ -1,8 +1,10 @@
 package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.User;
+import com.floti.api.domain.board.tip.dto.BaseCommentResponse;
 import com.floti.api.domain.board.tip.dto.CommentRequest;
 import com.floti.api.domain.board.tip.dto.CommentResponse;
+import com.floti.api.domain.board.tip.dto.ReplyResponse;
 import com.floti.api.domain.board.tip.entity.Comments;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.CommentRepository;
@@ -99,7 +101,7 @@ public class CommentServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        CommentResponse response = commentService.createComment(testUser, VALID_ID, request);
+        CommentResponse response = (CommentResponse) commentService.createComment(testUser, VALID_ID, request);
 
         //then
         assertEquals(VALID_ID, response.getPostId());
@@ -124,7 +126,7 @@ public class CommentServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        CommentResponse response = commentService.createComment(testUser, VALID_ID, request);
+        ReplyResponse response = (ReplyResponse) commentService.createComment(testUser, VALID_ID, request);
 
         //then
         assertEquals(VALID_ID, response.getPostId());
@@ -203,7 +205,7 @@ public class CommentServiceTest {
         when(commentRepository.findById(anyLong())).thenReturn(Optional.of(testComment));
 
         //when
-        CommentResponse response = commentService.updateComment(testUser.getId(), testComment.getId(), request);
+        BaseCommentResponse response = commentService.updateComment(testUser.getId(), testComment.getId(), request);
 
         //then
         assertEquals("수정된 댓글", response.getContent());
