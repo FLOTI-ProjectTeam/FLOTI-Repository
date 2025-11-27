@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, ScrollView, Dimensions } from 'react-native';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { formatSmartTime } from '@/utils/time';
+import { formatDetailTime, formatSmartTime } from '@/utils/time';
 import { AuthorResponse } from '@/types/community/common';
 import { DiscussionRoomResponse } from '@/types/community/discussion';
 import COLOR from '@/constants/colors';
@@ -80,7 +80,7 @@ export function SideMenu({
                 <Text style={styles.menuTitle} numberOfLines={1}>{room.title}</Text>
                 </View>
                 <Text style={styles.createdDate}>
-                    개설일: {formatSmartTime(room.createdAt, 'detail')}
+                    개설일: {formatDetailTime(room.createdAt)}
                 </Text>
                 <Text style={styles.createdDate}>
                     활동일: {formatSmartTime(room.recentActivityAt, 'detail')}

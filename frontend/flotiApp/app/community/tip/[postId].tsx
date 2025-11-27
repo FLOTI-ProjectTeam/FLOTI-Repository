@@ -9,6 +9,7 @@ import { Header } from '@/components/ui/Header';
 import BottomBar from '@/components/feature/community/tip/BottomBar';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
 import { showToast } from '@/utils/toast';
+import { formatDetailTime } from '@/utils/time';
 import { TipPostResponse } from '@/types/community/tip';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
@@ -79,7 +80,7 @@ export default function TipDetailScreen() {
 
         {/* 작성자, 작성일 */}
         <Text style={styles.author}>{post.author.nickname}</Text>
-        <Text style={styles.time}>{post.createdAt}</Text>
+        <Text style={styles.time}>{formatDetailTime(post.createdAt)}</Text>
 
         {/* 본문 */}
         <View style={styles.contentContainer}>

@@ -8,7 +8,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
     content: "useEffect가 호출되는 시점과 의존성 배열의 의미를 알고 싶어요.",
     answerCount: 2,
     accepted: false,
-    createdAt: "2025.10.25 09:30",
+    createdAt: "2025-10-25T09:30:00",
     answers: [
       {
         id: 11,
@@ -18,7 +18,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
         likeCount: 3,
         accepted: false,
         liked: false,
-        createdAt: "2025.10.25 10:00",
+        createdAt: "2025-10-25T10:00:00",
       },
       {
         id: 12,
@@ -28,7 +28,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
         likeCount: 1,
         accepted: false,
         liked: true,
-        createdAt: "2025.10.25 10:20",
+        createdAt: "2025-10-25T10:20:00",
       },
     ],
   },
@@ -39,7 +39,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
     content: "인터페이스 상속과 타입 별칭의 차이를 알고 싶습니다.",
     answerCount: 1,
     accepted: false,
-    createdAt: "2025.10.24 14:15",
+    createdAt: "2025-10-24T14:15:00",
     answers: [
       {
         id: 21,
@@ -49,7 +49,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
         likeCount: 2,
         accepted: false,
         liked: true,
-        createdAt: "2025.10.24 15:00",
+        createdAt: "2025-10-24T15:00:00",
       },
     ],
   },
@@ -60,7 +60,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
     content: "FlatList 렌더링 최적화와 keyExtractor 사용법을 알고 싶어요.",
     answerCount: 0,
     accepted: false,
-    createdAt: "2025.10.23 11:45",
+    createdAt: "2025-10-23T11:45:00",
     answers: [],
   },
 ];

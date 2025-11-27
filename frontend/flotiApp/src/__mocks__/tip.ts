@@ -12,7 +12,7 @@ export const dummyPosts: TipPostResponse[] = [
     commentCount: 3,
     likeCount: 5,
     liked: false,
-    createdAt: "2025.10.25 09:12",
+    createdAt: "2025-10-25T09:12:00", // ISO-8601 형식으로 변경
   },
   {
     id: 2,
@@ -23,7 +23,7 @@ export const dummyPosts: TipPostResponse[] = [
     commentCount: 0,
     likeCount: 2,
     liked: true,
-    createdAt: "2025.10.24 18:47",
+    createdAt: "2025-10-24T18:47:00",
   },
   {
     id: 3,
@@ -34,7 +34,7 @@ export const dummyPosts: TipPostResponse[] = [
     commentCount: 1,
     likeCount: 0,
     liked: false,
-    createdAt: "2025.10.23 13:22",
+    createdAt: "2025-10-23T13:22:00",
   },
 ];
 
@@ -46,7 +46,7 @@ export const dummyComments: CommentResponse[] = [
     author: { id: 1, nickname: "Alice", profileImage: null },
     content: "좋은 글 감사합니다!",
     deleted: false,
-    createdAt: "2025.10.24 10:15",
+    createdAt: "2025-10-24T10:15:00",
     replies: [
       {
         id: 2,
@@ -55,7 +55,7 @@ export const dummyComments: CommentResponse[] = [
         author: { id: 2, nickname: "Bob", profileImage: null },
         content: "저도 공감합니다!",
         deleted: false,
-        createdAt: "2025.10.25 10:20",
+        createdAt: "2025-10-25T10:20:00",
         replies: []
       },
     ],
@@ -67,7 +67,7 @@ export const dummyComments: CommentResponse[] = [
     author: { id: 3, nickname: "Charlie", profileImage: null },
     content: "조금 다른 의견이 있습니다.",
     deleted: false,
-    createdAt: "2025.10.25 15:42",
+    createdAt: "2025-10-25T15:42:00",
     replies: [],
   },
   {
@@ -77,7 +77,7 @@ export const dummyComments: CommentResponse[] = [
     author: { id: 4, nickname: "David", profileImage: null },
     content: "이 글 정말 도움이 되었어요.",
     deleted: false,
-    createdAt: "2025.10.23 12:30",
+    createdAt: "2025-10-23T12:30:00",
     replies: [],
   },
 ];

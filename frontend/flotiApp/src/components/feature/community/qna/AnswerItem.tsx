@@ -4,6 +4,7 @@ import { View, Text, Pressable, Modal, StyleSheet, TouchableOpacity } from 'reac
 import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import BreakAllText from '@/components/ui/BreakAllText';
+import { formatDetailTime } from '@/utils/time';
 import { AnswerReponse } from '@/types/community/qna';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
@@ -38,7 +39,7 @@ export default function AnswerItem({
             <View style={styles.itemRowHeader}>
                 <View style={STYLE.COLUMN}>
                     <Text style={styles.author}>{answer.author?.nickname ?? '탈퇴한 사용자'}</Text>
-                    <Text style={styles.time}>{answer.createdAt}</Text>
+                    <Text style={styles.time}>{formatDetailTime(answer.createdAt)}</Text>
                 </View>
                 {accepted ? (
                     answer.accepted && (

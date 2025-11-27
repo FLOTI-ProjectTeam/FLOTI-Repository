@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 
 import BreakAllText from '@/components/ui/BreakAllText';
+import { formatDetailTime } from '@/utils/time';
 import { QnaPostResponse } from '@/types/community/qna';
 import COLOR from '@/constants/colors';
 
@@ -12,7 +13,7 @@ export default function QnaDetailHeader({ post }: { post: QnaPostResponse }) {
 
             {/* 작성자, 작성일 */}
             <Text style={styles.author}>{post.author.nickname}</Text>
-            <Text style={styles.time}>{post.createdAt}</Text>
+            <Text style={styles.time}>{formatDetailTime(post.createdAt)}</Text>
 
             {/* 본문 */}
             <View style={styles.contentContainer}>
