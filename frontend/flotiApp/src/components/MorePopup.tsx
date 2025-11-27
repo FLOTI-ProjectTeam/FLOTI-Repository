@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
-import React from 'react';
+import { Fragment } from 'react';
 
 export default function MorePopup({ 
     actions, style
@@ -15,7 +15,7 @@ export default function MorePopup({
     return (
         <View style={[styles.popup, style, { width }]}>
             {actions.map((action, idx) => (
-            <React.Fragment key={idx}>
+            <Fragment key={idx}>
                 <TouchableOpacity activeOpacity={0.5} onPress={() => action.onPress()}>
                     <Text style={[
                         styles.menuText, 
@@ -24,7 +24,7 @@ export default function MorePopup({
                         {action.label}
                     </Text>
                 </TouchableOpacity>
-            </React.Fragment>
+            </Fragment>
             ))}
         </View>
     );

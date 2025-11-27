@@ -1,16 +1,16 @@
 import { View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { createQnaPost } from '@/api/community/qnaApi';
 import { EditorHeader } from '@/components/ui/Header';
 import InputView from '@/components/feature/community/InputView';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
 export default function QnaCreateScreen() {
-  const router = useRouter();
+  const { navigateTo } = useNavigation();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -54,7 +54,7 @@ export default function QnaCreateScreen() {
     try {
       const response = await callCreateQnaPost();
       await AsyncStorage.removeItem(STORAGE_KEY); // 등록 성공 시 임시저장 삭제
-      router.push(`/community/qna/${response.data.id}`)
+      navigateTo(`/community/qna/${response.data.id}`)
     } catch (error) {
       showToast('등록 실패', 'error');
     }

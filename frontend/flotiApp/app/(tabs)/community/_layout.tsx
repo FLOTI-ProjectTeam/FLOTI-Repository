@@ -1,20 +1,21 @@
 import { View, TouchableOpacity } from 'react-native';
-import { useRouter, Href, useSegments } from 'expo-router';
+import { useSegments } from 'expo-router';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import HiddenTab from '@/components/ui/HiddenTab';
 import SearchBar from '@/components/feature/community/SearchBar';
 import CommunityTabBar from '@/components/feature/community/CommunityTabBar'
 import { CommunitySearchProvider } from '@/contexts/CommunitySearchContext';
+import { useNavigation } from '@/hooks/useNavigation';
 import { STYLE } from '@/constants/styles';
 
 export default function CommunityLayout() {
-  const router = useRouter();
+  const { navigateTo } = useNavigation();
   const segments = useSegments(); // ['(tabs)', 'community', 'tip']
   const currentTab: string = segments[2] || 'tip';
 
   /* 이벤트 핸들러 */
-  const handleGoToCreate = () => router.push(`/community/${currentTab}/create` as Href)
+  const handleGoToCreate = () => navigateTo(`/community/${currentTab}/create`);
 
   return (
     <CommunitySearchProvider>

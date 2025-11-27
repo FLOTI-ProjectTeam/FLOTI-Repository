@@ -1,5 +1,4 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyRoomDetails } from '@/__mocks__/discussion';
@@ -11,6 +10,7 @@ import FilterBar, { SortType, SortOption } from '@/components/feature/community/
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
 import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
 import { formatRelativeTime } from '@/utils/time';
 import { showToast } from '@/utils/toast';
 import { DiscussionRoomResponse } from '@/types/community/discussion';
@@ -24,7 +24,7 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 export default function DiscussionListScreen() {
-  const router = useRouter();
+  const { navigateTo } = useNavigation();
 
   const [loading, setLoading] = useState(true);
   const [rooms, setRooms] = useState<DiscussionRoomResponse[]>([]);
@@ -81,7 +81,7 @@ export default function DiscussionListScreen() {
       if (!targetRoom || cannotJoin) return;
       closeModal();
       // await callToggleJoinDiscussion(targetRoom.id);
-      router.push(`/community/discussion/${targetRoom.id}`);
+      navigateTo(`/community/discussion/${targetRoom.id}`);
     } catch (error) {
       showToast('참여 실패', 'error');
     }

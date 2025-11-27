@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useNavigation } from '@/hooks/useNavigation';
 import COLOR from '@/constants/colors';
 
 export function Header({
@@ -10,11 +10,11 @@ export function Header({
   title: string;
   commentCount?: number;
 }) {
-  const router = useRouter();
+  const { goBackSafely } = useNavigation();
 
   return (
     <View style={styles.headerContainer}>
-      <Pressable onPress={() => router.back()} style={styles.iconWrapper}>
+      <Pressable onPress={() => goBackSafely()} style={styles.iconWrapper}>
         <IconSymbol name="chevron.left" size={32} color={COLOR.TINT.GRAY_DARK} />
       </Pressable>
       <View style={styles.titleContainer}>
@@ -32,12 +32,12 @@ export function EditorHeader({
   onSave?: () => void;
   onSubmit: () => void;
 }) {
-  const router = useRouter();
+  const { goBackSafely } = useNavigation();
 
   return (
     <View style={styles.headerContainer}>
       {/* 취소 버튼 */}
-      <Pressable onPress={() => router.back()} style={styles.iconWrapper}>
+      <Pressable onPress={() => goBackSafely()} style={styles.iconWrapper}>
         <IconSymbol name="x" size={28} color={COLOR.TINT.GRAY_DARK} />
       </Pressable>
 

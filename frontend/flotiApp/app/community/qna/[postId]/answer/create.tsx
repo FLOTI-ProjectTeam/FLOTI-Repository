@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -7,12 +7,13 @@ import { createAnswer } from '@/api/community/qnaApi';
 import { EditorHeader } from '@/components/ui/Header';
 import InputView from '@/components/feature/community/InputView';
 import QnaInfo from '@/components/feature/community/qna/QnaInfo';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
 
 export default function AnswerCreateScreen() {
-  const router = useRouter();
+  const { goBackSafely } = useNavigation();
   const { postId, postTitle, postContent } = useLocalSearchParams();  // URL에서 게시글 정보 가져오기
 
   const [content, setContent] = useState('');
@@ -55,7 +56,7 @@ export default function AnswerCreateScreen() {
     try {
       await callCreateAnswer();
       await AsyncStorage.removeItem(STORAGE_KEY); // 등록 성공 시 임시저장 삭제
-      router.back();
+      goBackSafely();
     } catch (error) {
       showToast('등록 실패', 'error');
     }

@@ -1,5 +1,5 @@
 import { ScrollView } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
 import { updateDiscussionRoom } from '@/api/community/discussionApi';
@@ -7,11 +7,12 @@ import { EditorHeader } from '@/components/ui/Header';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { DiscussionInputView } from '@/components/feature/community/TopicInputView';
 import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
 export default function DiscussionUpdateScreen() {
-  const router = useRouter();
+  const { goBackSafely } = useNavigation();
   const { roomId, initialTitle, initialContent, initialMaxParticipantCount, initialParticipantCount }
     = useLocalSearchParams();  // URL에서 토론방 정보 가져오기
 
@@ -29,7 +30,7 @@ export default function DiscussionUpdateScreen() {
   const handleSubmit = async () => {
     try {
       await callUpdateDiscussionRoom();
-      router.back();
+      goBackSafely();
     } catch (error) {
       showToast('수정 실패', 'error');
     }

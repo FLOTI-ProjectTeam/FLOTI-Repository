@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
-import { router } from 'expo-router';
 import { useState } from 'react';
 
 import { deleteTipPost } from '@/api/community/tipApi';
@@ -7,6 +6,7 @@ import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { TipPostResponse } from '@/types/community/tip';
 import COLOR from '@/constants/colors';
@@ -18,6 +18,8 @@ export default function BottomBar({
   post: TipPostResponse;
   onToggleLike: () => void;
 }) {
+  const { goBackSafely, navigateWithParams } = useNavigation();
+
   const [menuVisible, setMenuVisible] = useState(false);
   const { modalVisible, openModal, closeModal } = useModal();
 
@@ -26,24 +28,18 @@ export default function BottomBar({
 
   /* 이벤트 핸들러 */
   const handleGoToTipUpdate = () => {
-    router.push({
-      pathname: '/community/tip/update/[postId]',
-      params: { 
-        postId: post.id,
-        initialTitle: post.title, 
-        initialContent: post.content
-      }
+    navigateWithParams('/community/tip/update/[postId]', {
+      postId: post.id,
+      initialTitle: post.title, 
+      initialContent: post.content
     });
     setMenuVisible(false);
   };
 
   const handleGoToCommentList = () => {
-    router.push({
-      pathname: '/community/tip/[postId]/comment',
-      params: { 
-        postId: post.id,
-        initialCommentCount: post.commentCount
-      }
+    navigateWithParams('/community/tip/[postId]/comment', {
+      postId: post.id,
+      initialCommentCount: post.commentCount
     });
   }
   
@@ -56,7 +52,7 @@ export default function BottomBar({
     try {
       closeModal();
       await callDeleteTipPost();
-      router.back();
+      goBackSafely();
     } catch (error) {
       showToast('삭제 실패', 'error');
     }

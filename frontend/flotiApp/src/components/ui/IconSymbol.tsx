@@ -8,7 +8,6 @@ import Feather from '@expo/vector-icons/Feather';
 
 import { SymbolWeight } from 'expo-symbols';
 import { OpaqueColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native';
-import React from 'react';
 
 // Add your SFSymbol to MaterialIcons mappings here.
 const MAPPING = {

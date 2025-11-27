@@ -1,15 +1,16 @@
 import { View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
 import { updateTipPost } from '@/api/community/tipApi';
 import { EditorHeader } from '@/components/ui/Header';
 import InputView from '@/components/feature/community/InputView';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
 export default function TipUpdateScreen() {
-  const router = useRouter();
+  const { goBackSafely } = useNavigation();
   const { postId, initialTitle, initialContent } = useLocalSearchParams();  // URL에서 게시글 정보 가져오기
   
   const [title, setTitle] = useState(String(initialTitle || ''));
@@ -24,7 +25,7 @@ export default function TipUpdateScreen() {
   const handleSubmit = async () => {
     try {
       await callUpdateTipPost();
-      router.back();
+      goBackSafely();
     } catch (error) {
       showToast('수정 실패', 'error');
     }

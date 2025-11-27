@@ -12,7 +12,7 @@ export const dummyPosts: TipPostResponse[] = [
     commentCount: 3,
     likeCount: 5,
     liked: false,
-    createdAt: "2025-10-25T09:12:00", // ISO-8601 형식으로 변경
+    createdAt: "2025-10-25T09:12:00",
   },
   {
     id: 2,

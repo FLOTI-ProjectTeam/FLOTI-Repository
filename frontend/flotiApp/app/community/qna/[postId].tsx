@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyPostDetails } from '@/__mocks__/qna';
@@ -12,12 +12,15 @@ import AnswerItem from '@/components/feature/community/qna/AnswerItem';
 import QnaDetailHeader from '@/components/feature/community/qna/QnaDetailHeader';
 import { useMenuInteraction } from '@/hooks/useMenuInteraction';
 import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { AnswerReponse, QnaPostDetailResponse } from '@/types/community/qna';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
 export default function QnaDetailScreen() {
+  const { goBackSafely, navigateWithParams } = useNavigation();
+
   const [loading, setLoading] = useState(true);
   const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
 
@@ -55,37 +58,28 @@ export default function QnaDetailScreen() {
 
   /* 이벤트 핸들러 */
   const handleGoToUpdate = () => {
-    router.push({
-      pathname: '/community/qna/update/[postId]',
-      params: { 
-        postId: post!.id,
-        initialTitle: post!.title, 
-        initialContent: post!.content 
-      }
+    navigateWithParams('/community/qna/update/[postId]', { 
+      postId: post!.id,
+      initialTitle: post!.title, 
+      initialContent: post!.content 
     });
   };
 
   const handleGoToAnswerCreate = () => {
-    router.push({
-      pathname: '/community/qna/[postId]/answer/create',
-      params: { 
-        postId: post!.id,
-        postTitle: post!.title, 
-        postContent: post!.content 
-      }
+    navigateWithParams('/community/qna/[postId]/answer/create', {
+      postId: post!.id,
+      postTitle: post!.title, 
+      postContent: post!.content 
     });
   };
 
   const handleGoToAnswerUpdate = ({ id, content }: AnswerReponse) => {
-    router.push({
-      pathname: '/community/qna/[postId]/answer/[answerId]/update',
-      params: { 
-          postId: post!.id,
-          answerId: id,
-          postTitle: post!.title, 
-          postContent: post!.content,
-          initialContent: content
-      }
+    navigateWithParams('/community/qna/[postId]/answer/[answerId]/update', {
+      postId: post!.id,
+      answerId: id,
+      postTitle: post!.title, 
+      postContent: post!.content,
+      initialContent: content
     });
     answerTools.setOpenMenuId(null);
   };
@@ -104,7 +98,7 @@ export default function QnaDetailScreen() {
     try {
       closeModal();
       await callDeleteQnaPost();
-      router.back();
+      goBackSafely();
     } catch (error) {
       showToast('삭제 실패', 'error');
     }

@@ -1,16 +1,17 @@
 import { View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
 import { updateAnswer } from '@/api/community/qnaApi';
 import { EditorHeader } from '@/components/ui/Header';
 import InputView from '@/components/feature/community/InputView';
 import QnaInfo from '@/components/feature/community/qna/QnaInfo';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
 export default function AnswerUpdateScreen() {
-  const router = useRouter();
+  const { goBackSafely } = useNavigation();
   const { postId, answerId, postTitle, postContent, initialContent } = useLocalSearchParams();  // URL에서 게시글 정보 가져오기
 
   const [content, setContent] = useState(String(initialContent || ''));
@@ -22,7 +23,7 @@ export default function AnswerUpdateScreen() {
   const handleSubmit = async () => {
     try {
       await callUpdateAnswer();
-      router.back();
+      goBackSafely();
     } catch (error) {
       showToast('수정 실패', 'error');
     }

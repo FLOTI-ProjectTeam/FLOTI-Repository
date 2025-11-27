@@ -1,16 +1,16 @@
 import { ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { createDiscussionRoom } from '@/api/community/discussionApi';
 import { EditorHeader } from '@/components/ui/Header';
 import { DiscussionInputView } from '@/components/feature/community/TopicInputView';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
 export default function DiscussionCreateScreen() {
-  const router = useRouter();
+  const { navigateTo } = useNavigation();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -56,7 +56,7 @@ export default function DiscussionCreateScreen() {
     try {
       const response = await callCreateDiscussionRoom();
       await AsyncStorage.removeItem(STORAGE_KEY); // 등록 성공 시 임시저장 삭제
-      router.push(`/community/discussion/${response.data.id}`)
+      navigateTo(`/community/discussion/${response.data.id}`)
     } catch (error) {
       showToast('등록 실패', 'error');
     }

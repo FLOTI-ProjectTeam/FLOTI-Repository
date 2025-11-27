@@ -1,5 +1,4 @@
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyPosts } from '@/__mocks__/tip';
@@ -8,6 +7,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
 import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
+import { useNavigation } from '@/hooks/useNavigation';
 import { formatRelativeTime } from '@/utils/time';
 import { TipPostResponse } from '@/types/community/tip';
 import { STYLE } from '@/constants/styles';
@@ -20,7 +20,7 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 export default function TipListScreen() {
-  const router = useRouter();
+  const { navigateTo } = useNavigation();
 
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<TipPostResponse[]>([]);
@@ -49,7 +49,7 @@ export default function TipListScreen() {
   }, [searchTrigger, sortType]);
 
   /* 이벤트 핸들러 */
-  const handleGoToTipDetail = (postId: number) => router.push(`/community/tip/${postId}`);
+  const handleGoToTipDetail = (postId: number) => navigateTo(`/community/tip/${postId}`);
 
   if (loading) return <LoadingView />
   if (posts.length === 0) return <EmptyView />

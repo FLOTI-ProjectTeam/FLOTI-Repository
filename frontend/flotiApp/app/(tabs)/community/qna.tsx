@@ -1,5 +1,4 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { dummyPostDetails } from '@/__mocks__/qna';
@@ -7,6 +6,7 @@ import { getQnaPosts } from '@/api/community/qnaApi';
 import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
+import { useNavigation } from '@/hooks/useNavigation';
 import { formatRelativeTime } from '@/utils/time';
 import { QnaPostResponse } from '@/types/community/qna';
 import { STYLE } from '@/constants/styles';
@@ -19,7 +19,7 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 export default function QnaListScreen() {
-  const router = useRouter();
+  const { navigateTo } = useNavigation();
 
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<QnaPostResponse[]>([]);
@@ -49,7 +49,7 @@ export default function QnaListScreen() {
   }, [searchTrigger, sortType, isChecked]);
 
   /* 이벤트 핸들러 */
-  const handleGoToQnaDetail = (postId: number) => router.push(`/community/qna/${postId}`);
+  const handleGoToQnaDetail = (postId: number) => navigateTo(`/community/qna/${postId}`);
 
   if (loading) return <LoadingView />
   if (posts.length === 0) return <EmptyView />

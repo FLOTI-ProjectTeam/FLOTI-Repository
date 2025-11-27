@@ -1,7 +1,8 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Href, useRouter, useSegments } from 'expo-router';
+import { useSegments } from 'expo-router';
 import { useEffect } from 'react';
 
+import { useNavigation } from '@/hooks/useNavigation';
 import COLOR from '@/constants/colors';
 
 const TAB_ITEMS = [
@@ -12,17 +13,17 @@ const TAB_ITEMS = [
 ];
 
 export default function CommunityTabBar() {
-  const router = useRouter();
+  const { navigateTo } = useNavigation();
   const segments = useSegments(); // ['(tabs)', 'community', 'tip']
   const currentTab = segments[segments.length - 1] || 'tip';
 
   // 최초 진입 시 TIP 탭으로 이동
   useEffect(() => {
-    if (currentTab === 'community') router.replace('/community/tip');
+    if (currentTab === 'community') navigateTo('/community/tip');
   }, [segments]);
 
   /* 이벤트 핸들러 */
-  const handleGoToTab = (path: string) => router.push(path as Href);
+  const handleGoToTab = (path: string) => navigateTo(path);
 
   return (
     <View style={styles.tabContainer}>

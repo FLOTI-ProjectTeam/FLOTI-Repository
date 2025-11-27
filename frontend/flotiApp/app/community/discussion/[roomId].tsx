@@ -1,6 +1,6 @@
 import { View, FlatList, Text, StyleSheet, Pressable } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 
 import { dummyRoomDetails } from '@/__mocks__/discussion';
 import { deleteDiscussionRoom, getDiscussionRoom } from '@/api/community/discussionApi';
@@ -14,6 +14,7 @@ import MessageItem from '@/components/feature/community/discussion/MessageItem';
 import { SideMenu } from '@/components/feature/community/discussion/SideMenu';
 import { useMenuInteraction } from '@/hooks/useMenuInteraction';
 import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
 import { showToast } from '@/utils/toast';
 import { insertDateLabels } from '@/utils/time';
 import { DiscussionRoomResponse, MessageResponse } from '@/types/community/discussion';
@@ -22,6 +23,8 @@ import { STYLE } from '@/constants/styles';
 import COLOR from '@/constants/colors';
 
 export default function DiscussionDetailScreen() {
+  const { goBackSafely, navigateWithParams } = useNavigation();
+
   const [loading, setLoading] = useState(true);
   const { roomId } = useLocalSearchParams();  // URL에서 토론방 ID 가져오기
 
@@ -37,13 +40,15 @@ export default function DiscussionDetailScreen() {
   const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'messageDelete'>();
 
   /* API 호출 */
-  const fetchRoom = async () => {
+  const loadRoom = async () => {
     try {
       const response = await getDiscussionRoom(Number(roomId));
       setRoom(response.data);
       setParticipants(response.data.participants);
       setMessages(response.data.messages);
     } catch (error) {
+      showToast('상세 조회 실패', 'error');
+
       // 테스트용
       const filtered = dummyRoomDetails.find((room) => room.id.toString() === roomId);
       setRoom(filtered);
@@ -58,20 +63,17 @@ export default function DiscussionDetailScreen() {
 
   // 토론방 ID 변경 시 실행
   useEffect(() => {
-    fetchRoom();
+    loadRoom();
   }, [roomId]);
 
   /* 이벤트 핸들러 */
   const handleGoToUpdate = () => {
-    router.push({
-      pathname: '/community/discussion/update/[roomId]',
-      params: { 
-        roomId: room!.id,
-        initialTitle: room!.title, 
-        initialContent: room!.content,
-        initialMaxParticipantCount: room!.maxParticipantCount,
-        initialParticipantCount: room!.participantCount
-      }
+    navigateWithParams('/community/discussion/update/[roomId]', {
+      roomId: room!.id,
+      initialTitle: room!.title, 
+      initialContent: room!.content,
+      initialMaxParticipantCount: room!.maxParticipantCount,
+      initialParticipantCount: room!.participantCount
     });
   };
 
@@ -107,7 +109,7 @@ export default function DiscussionDetailScreen() {
     try {
       closeModal();
       await callDeleteDiscussionRoom();
-      router.back();
+      goBackSafely();
     } catch (error) {
       showToast('삭제 실패', 'error');
     }
@@ -168,7 +170,7 @@ export default function DiscussionDetailScreen() {
     <View style={STYLE.CONTENT_CONTAINER}>
       {/* 헤더 */}
       <View style={headerStyles.headerContainer}>
-        <Pressable onPress={() => router.back()} style={headerStyles.iconWrapper}>
+        <Pressable onPress={() => goBackSafely()} style={headerStyles.iconWrapper}>
           <IconSymbol name="chevron.left" size={32} color={COLOR.TINT.GRAY_DARK} />
         </Pressable>
         <View style={headerStyles.titleContainer}>
