@@ -7,7 +7,7 @@ import { deleteAnswer, deleteQnaPost, getQnaPost, acceptAnswer, toggleLikeAnswer
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { Header } from '@/components/ui/Header';
-import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+import { LoadingView } from '@/components/feature/community/CommunityStateView';
 import AnswerItem from '@/components/feature/community/qna/AnswerItem';
 import QnaDetailHeader from '@/components/feature/community/qna/QnaDetailHeader';
 import { useMenuInteraction } from '@/hooks/useMenuInteraction';
@@ -176,8 +176,8 @@ export default function QnaDetailScreen() {
     answerAccept: handleAcceptAnswer
   };
 
-  if (loading) return <LoadingView />
-  if (!post) return <EmptyView />
+  if (loading) return <LoadingView />;
+  if (!post) return;
 
   return (
     <View style={STYLE.BASE_CONTAINER}>

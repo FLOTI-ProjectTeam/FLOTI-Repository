@@ -7,6 +7,7 @@ export default function HiddenTab() {
         headerShown: false,
         tabBarStyle: {display: 'none'}
       }}
+      backBehavior='none'
     />
   );
 }

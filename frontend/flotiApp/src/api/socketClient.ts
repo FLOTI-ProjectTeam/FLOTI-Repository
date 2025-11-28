@@ -1,5 +1,6 @@
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
+
 import { BASE_URL } from '@/constants/endpoints';
 
 const SOCKET_URL = BASE_URL + '/ws';

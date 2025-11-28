@@ -19,11 +19,8 @@ export default function CommunityTabBar() {
 
   // 최초 진입 시 TIP 탭으로 이동
   useEffect(() => {
-    if (currentTab === 'community') navigateTo('/community/tip');
-  }, [segments]);
-
-  /* 이벤트 핸들러 */
-  const handleGoToTab = (path: string) => navigateTo(path);
+    if (segments.length === 2) navigateTo('/community/tip', true);
+  }, []);
 
   return (
     <View style={styles.tabContainer}>
@@ -31,7 +28,7 @@ export default function CommunityTabBar() {
         const isFocused = currentTab === name;
 
         return (
-          <Pressable key={name} style={styles.tabItem} onPress={() => handleGoToTab(path)}>
+          <Pressable key={name} style={styles.tabItem} onPress={() => navigateTo(path, true)}>
             <View style={[styles.tabLabelContainer, isFocused && styles.tabLabelContainerActive]}>
               <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{title}</Text>
             </View>

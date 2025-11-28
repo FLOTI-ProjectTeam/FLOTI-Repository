@@ -10,14 +10,15 @@ export const useNavigation = () => {
     };
 
     // 파라미터 포함 화면 이동
-    const navigateWithParams = (path: string, params: Record<string, string | number>) => {
-        router.push({ pathname: path as any, params });
+    const navigateWithParams = (path: string, params: Record<string, string | number>, replace = false) => {
+        if (replace) router.replace({ pathname: path as any, params });
+        else router.push({ pathname: path as any, params });
     };
 
     // 뒤로가기 안전 처리
-    const goBackSafely = () => {
+    const goBackSafely = (path: string = '/') => {
         if (router.canGoBack()) router.back();
-        else router.push('/');
+        else router.replace(path as Href);
     };
 
     return { navigateTo, navigateWithParams, goBackSafely };

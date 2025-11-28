@@ -1,12 +1,6 @@
 import { useState } from 'react';
 
-/**
- * T란?
- * - 대상 데이터의 타입
- * - 기본값을 지정할 수 있음 (예: T = number)
- */
-
-export function useMenuInteraction<T = number>() {
+export function useMenuInteraction<T = number /* 기본값 지정 가능 */>() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [target, setTarget] = useState<T | null>(null);
 

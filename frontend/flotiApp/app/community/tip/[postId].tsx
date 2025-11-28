@@ -7,7 +7,7 @@ import { getTipPost, toggleLikeTipPost } from '@/api/community/tipApi';
 import BreakAllText from '@/components/ui/BreakAllText';
 import { Header } from '@/components/ui/Header';
 import BottomBar from '@/components/feature/community/tip/BottomBar';
-import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+import { LoadingView } from '@/components/feature/community/CommunityStateView';
 import { showToast } from '@/utils/toast';
 import { formatDetailTime } from '@/utils/time';
 import { TipPostResponse } from '@/types/community/tip';
@@ -15,33 +15,34 @@ import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
 export default function TipDetailScreen() {
-  const [loading, setLoading] = useState(true);
   const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
+  const [loading, setLoading] = useState(true);
   const [post, setPost] = useState<TipPostResponse>();
 
   /* API 호출 */
-  const fetchPost = async () => {
-    try {
-      const response = await getTipPost(Number(postId));
-      setPost(response.data);
-    } catch (error) {
-      // 테스트용
-      const filtered = dummyPosts.find((post) => post.id.toString() === postId);
-      setPost(filtered);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   const callToggleLikeTipPost = () => toggleLikeTipPost(post!.id);
 
   // 게시글 ID 변경 시 실행
   useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await getTipPost(Number(postId));
+        setPost(response.data);
+      } catch (error) {
+        // 테스트용
+        const filtered = dummyPosts.find((post) => post.id.toString() === postId);
+        setPost(filtered);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchPost();
   }, [postId]);
 
   /* 이벤트 핸들러 */
   const handleToggleLike = async () => {
+    if (!post) return null;
     try {
       await callToggleLikeTipPost();
 
@@ -56,13 +57,13 @@ export default function TipDetailScreen() {
           : prev
       );
     } catch (error) {
-      if (post!.liked) showToast('좋아요 취소 실패', 'error');
+      if (post.liked) showToast('좋아요 취소 실패', 'error');
       else showToast('좋아요 실패', 'error');
     }
   }
 
-  if (loading) return <LoadingView />
-  if (!post) return <EmptyView text='게시글을 찾을 수 없습니다.' />;
+  if (loading) return <LoadingView />;
+  if (!post) return;
 
   return (
     <View style={STYLE.BASE_CONTAINER}>

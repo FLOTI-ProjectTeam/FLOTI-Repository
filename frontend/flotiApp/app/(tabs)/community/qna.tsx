@@ -14,8 +14,8 @@ import COLOR from '@/constants/colors';
 
 const SORT_OPTIONS: SortOption[] = [
   { value: 'latest', label: '최신순' },
-  { value: 'registered', label: '등록순' },
-  { value: 'comments', label: '답변순' }
+  { value: 'comments', label: '답변순' },
+  { value: 'registered', label: '등록순' }
 ];
 
 export default function QnaListScreen() {

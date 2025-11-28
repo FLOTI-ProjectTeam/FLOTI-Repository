@@ -9,7 +9,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { styles as headerStyles } from '@/components/ui/Header';
 import InputBar from '@/components/feature/community/InputBar';
-import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+import { LoadingView } from '@/components/feature/community/CommunityStateView';
 import MessageItem from '@/components/feature/community/discussion/MessageItem';
 import { SideMenu } from '@/components/feature/community/discussion/SideMenu';
 import { useMenuInteraction } from '@/hooks/useMenuInteraction';
@@ -24,11 +24,11 @@ import COLOR from '@/constants/colors';
 
 export default function DiscussionDetailScreen() {
   const { goBackSafely, navigateWithParams } = useNavigation();
-
-  const [loading, setLoading] = useState(true);
   const { roomId } = useLocalSearchParams();  // URL에서 토론방 ID 가져오기
-
+  
+  const [loading, setLoading] = useState(true);
   const [room, setRoom] = useState<DiscussionRoomResponse>();
+
   const [participants, setParticipants] = useState<AuthorResponse[]>([]);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
 
@@ -40,29 +40,29 @@ export default function DiscussionDetailScreen() {
   const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'messageDelete'>();
 
   /* API 호출 */
-  const loadRoom = async () => {
-    try {
-      const response = await getDiscussionRoom(Number(roomId));
-      setRoom(response.data);
-      setParticipants(response.data.participants);
-      setMessages(response.data.messages);
-    } catch (error) {
-      showToast('상세 조회 실패', 'error');
-
-      // 테스트용
-      const filtered = dummyRoomDetails.find((room) => room.id.toString() === roomId);
-      setRoom(filtered);
-      setParticipants(filtered!.participants);
-      setMessages(filtered!.messages);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   const callDeleteDiscussionRoom = () => deleteDiscussionRoom(room!.id);
 
   // 토론방 ID 변경 시 실행
   useEffect(() => {
+    const loadRoom = async () => {
+      try {
+        const response = await getDiscussionRoom(Number(roomId));
+        setRoom(response.data);
+        setParticipants(response.data.participants);
+        setMessages(response.data.messages);
+      } catch (error) {
+        showToast('상세 조회 실패', 'error');
+  
+        // 테스트용
+        const filtered = dummyRoomDetails.find((room) => room.id.toString() === roomId);
+        setRoom(filtered);
+        setParticipants(filtered!.participants);
+        setMessages(filtered!.messages);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     loadRoom();
   }, [roomId]);
 
@@ -129,28 +129,28 @@ export default function DiscussionDetailScreen() {
   }
 
   const handleToggleLike = async ({ id, liked }: MessageResponse) => {
-      try {
-        toggleLikeMessage(room!.id, id);
+    try {
+      toggleLikeMessage(room!.id, id);
 
-        // 좋아요 갱신
-        setMessages(prev =>
-          prev.map(answer => {
-            if (answer.id === id) {
-              return {
-                ...answer,
-                liked: !answer.liked,
-                likeCount: answer.likeCount + (answer.liked ? -1 : 1)
-              };
-            }
+      // 좋아요 갱신
+      setMessages(prev =>
+        prev.map(answer => {
+          if (answer.id === id) {
+            return {
+              ...answer,
+              liked: !answer.liked,
+              likeCount: answer.likeCount + (answer.liked ? -1 : 1)
+            };
+          }
 
-            return answer;
-          })
-        );
-      } catch (error) {
-        if (liked) showToast('좋아요 취소 실패', 'error');
-        else showToast('좋아요 실패', 'error');
-      }
+          return answer;
+        })
+      );
+    } catch (error) {
+      if (liked) showToast('좋아요 취소 실패', 'error');
+      else showToast('좋아요 실패', 'error');
     }
+  }
 
   /* 모달 정보 */
   const modalTitle = {
@@ -163,8 +163,8 @@ export default function DiscussionDetailScreen() {
     messageDelete: handleMessageDelete
   };
 
-  if (loading) return <LoadingView />
-  if (!room) return <EmptyView text='토론방을 찾을 수 없습니다.' />;
+  if (loading) return <LoadingView />;
+  if (!room) return;
 
   return (
     <View style={STYLE.CONTENT_CONTAINER}>
@@ -229,13 +229,13 @@ export default function DiscussionDetailScreen() {
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
         room={room}
-        participants={participants} // 참여자 목록 전달
+        participants={participants}
         onUpdate={() => {
-          setMenuVisible(false); // 메뉴 닫고 이동
+          setMenuVisible(false);
           handleGoToUpdate();
         }}
         onDelete={() => {
-          setMenuVisible(false); // 메뉴 닫고 모달 띄우기
+          setMenuVisible(false);
           openModal('roomDelete');
         }}
       />
