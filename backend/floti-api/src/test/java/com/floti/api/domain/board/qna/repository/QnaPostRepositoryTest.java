@@ -91,23 +91,8 @@ public class QnaPostRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAll: 미채택 답변적은순 - 답변 적은 QnaPosts 페이지 먼저 반환")
-    void findAll_answersAsc_notAccepted() {
-        // given
-        Pageable pageable = PageRequest.of(0, 20, Sort.by("answerCount").ascending());
-
-        // when
-        Page<QnaPosts> result = qnaPostRepository.findAll(true, pageable);
-
-        // then
-        assertEquals(2, result.getTotalElements());
-        assertEquals(0, result.getContent().get(0).getAnswerCount());
-        assertTrue(result.getContent().stream().noneMatch(QnaPosts::isAccepted));
-    }
-
-    @Test
-    @DisplayName("findAll: 미채택 답변많은순 - 답변 많은 QnaPosts 페이지 먼저 반환")
-    void findAll_answersDesc_notAccepted() {
+    @DisplayName("findAll: 미채택 답변순 - 답변 많은 QnaPosts 페이지 먼저 반환")
+    void findAll_answers_notAccepted() {
         // given
         Pageable pageable = PageRequest.of(0, 20, Sort.by("answerCount").descending());
 
@@ -117,6 +102,21 @@ public class QnaPostRepositoryTest {
         // then
         assertEquals(2, result.getTotalElements());
         assertEquals(3, result.getContent().get(0).getAnswerCount());
+        assertTrue(result.getContent().stream().noneMatch(QnaPosts::isAccepted));
+    }
+
+    @Test
+    @DisplayName("findAll: 미채택 등록순 - 오래된 QnaPosts 페이지 먼저 반환")
+    void findAll_registered_notAccepted() {
+        // given
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("id").ascending());
+
+        // when
+        Page<QnaPosts> result = qnaPostRepository.findAll(true, pageable);
+
+        // then
+        assertEquals(2, result.getTotalElements());
+        assertEquals(0, result.getContent().get(0).getAnswerCount());
         assertTrue(result.getContent().stream().noneMatch(QnaPosts::isAccepted));
     }
 }

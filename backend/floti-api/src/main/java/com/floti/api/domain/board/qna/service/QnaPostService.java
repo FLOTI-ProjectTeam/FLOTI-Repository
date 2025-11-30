@@ -40,8 +40,8 @@ public class QnaPostService {
     public Page<QnaPostResponse> getQnaPosts(String sort, int page, boolean unaccepted) {
         Sort.Order baseOrder = Sort.Order.desc("id");
         Sort sortOrder = switch (sort.toLowerCase()) {
-            case "answers_asc"  -> Sort.by(Sort.Order.asc("answerCount"), baseOrder);
-            case "answers_desc" -> Sort.by(Sort.Order.desc("answerCount"), baseOrder);
+            case "answers" -> Sort.by(Sort.Order.desc("answerCount"), baseOrder);
+            case "registered" -> Sort.by(Sort.Order.asc("id"));
             default -> Sort.by(baseOrder);
         };
 
