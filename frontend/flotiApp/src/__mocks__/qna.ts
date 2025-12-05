@@ -3,7 +3,7 @@ import { QnaPostDetailResponse } from '@/types/community/qna';
 export const dummyPostDetails: QnaPostDetailResponse[] = [
   {
     id: 1,
-    author: { id: 101, nickname: "Alice", profileImage: null },
+    author: { username: "alice", nickname: "Alice", profileImage: null },
     title: "React에서 useEffect는 언제 호출되나요?",
     content: "useEffect가 호출되는 시점과 의존성 배열의 의미를 알고 싶어요.",
     answerCount: 2,
@@ -13,7 +13,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
       {
         id: 11,
         postId: 1,
-        author: { id: 201, nickname: "David", profileImage: null },
+        author: { username: "david", nickname: "David", profileImage: null },
         content: "의존성 배열이 비어있으면 마운트 시 한 번만 호출됩니다.",
         likeCount: 3,
         accepted: false,
@@ -23,7 +23,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
       {
         id: 12,
         postId: 1,
-        author: { id: 202, nickname: "Eve", profileImage: null },
+        author: { username: "eve", nickname: "Eve", profileImage: null },
         content: "값이 바뀔 때마다 호출되는 점도 기억하세요.",
         likeCount: 1,
         accepted: false,
@@ -34,7 +34,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
   },
   {
     id: 2,
-    author: { id: 102, nickname: "Bob", profileImage: null },
+    author: { username: "bob", nickname: "Bob", profileImage: null },
     title: "TypeScript에서 타입을 확장하는 방법?",
     content: "인터페이스 상속과 타입 별칭의 차이를 알고 싶습니다.",
     answerCount: 1,
@@ -44,7 +44,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
       {
         id: 21,
         postId: 2,
-        author: { id: 203, nickname: "Frank", profileImage: null },
+        author: { username: "frank", nickname: "Frank", profileImage: null },
         content: "interface 상속은 여러 인터페이스를 확장할 수 있고, 타입 별칭은 union, intersection이 가능합니다.",
         likeCount: 2,
         accepted: false,
@@ -55,7 +55,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
   },
   {
     id: 3,
-    author: { id: 103, nickname: "Carol", profileImage: null },
+    author: { username: "carol", nickname: "Carol", profileImage: null },
     title: "React Native에서 FlatList 최적화 방법",
     content: "FlatList 렌더링 최적화와 keyExtractor 사용법을 알고 싶어요.",
     answerCount: 0,

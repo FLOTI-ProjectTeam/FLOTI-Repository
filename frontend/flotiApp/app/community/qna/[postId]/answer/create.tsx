@@ -3,11 +3,14 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useNavigation } from '@/hooks/useNavigation';
+
 import { createAnswer } from '@/api/community/qnaApi';
+
 import { EditorHeader } from '@/components/ui/Header';
 import InputView from '@/components/feature/community/InputView';
 import QnaInfo from '@/components/feature/community/qna/QnaInfo';
-import { useNavigation } from '@/hooks/useNavigation';
+
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
@@ -20,24 +23,25 @@ export default function AnswerCreateScreen() {
 
   const STORAGE_KEY = `@answer_save_${postId}`;
 
-  /* API 호출 */
-  const callCreateAnswer = () => createAnswer(Number(postId), { content });
-
-  // 화면 로드 시 임시저장 로드
+  /* 사이드 이펙트 */
   useEffect(() => {
-    const loadDraft = async () => {
-      try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const { content: savedContent } = JSON.parse(saved);
-          setContent(savedContent);
-        }
-      } catch (error) {
-        showToast('임시저장 불러오기 실패', 'error');
-      }
-    };
     loadDraft();
   }, []);
+
+  /* API 호출 */
+  const loadDraft = async () => {
+    try {
+      const saved = await AsyncStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const { content: savedContent } = JSON.parse(saved);
+        setContent(savedContent);
+      }
+    } catch (error) {
+      showToast('임시저장 불러오기 실패', 'error');
+    }
+  };
+
+  const callCreateAnswer = () => createAnswer(Number(postId), { content });
 
   /* 이벤트 핸들러 */
   const handleSave = async () => {

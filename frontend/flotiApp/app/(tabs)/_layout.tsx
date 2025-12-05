@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+
 import COLOR from '@/constants/colors';
 
 export default function TabLayout() {

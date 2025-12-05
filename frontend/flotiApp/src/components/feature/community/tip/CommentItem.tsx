@@ -1,12 +1,16 @@
-import { formatSmartTime } from '@/utils/time';
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useRef, useState } from 'react';
 import { View, Text, Pressable, Modal, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
+
+import { UserContext } from '@/contexts/UserContext';
+
+import { CommentResponse } from '@/types/community/tip';
 
 import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import BreakAllText from '@/components/ui/BreakAllText';
+
+import { formatSmartTime } from '@/utils/time';
 import { showToast } from '@/utils/toast';
-import { CommentResponse } from '@/types/community/tip';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
@@ -20,10 +24,13 @@ export default function CommentItem({
   onDeleteConfirm: (comment: CommentResponse) => void;
   onReply?: (comment: CommentResponse) => void;
 }) {
-  const buttonRef = useRef<View>(null); // 컴포넌트의 레퍼런스 저장
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [editing, setEditing] = useState(false);  // 수정 모드 여부
   const [editText, setEditText] = useState(comment.content);  // 수정 중인 댓글 내용
+
+  const buttonRef = useRef<View>(null); // 컴포넌트의 레퍼런스 저장
+  const userContext = useContext(UserContext);  // 사용자 상태
+  const isAuthor = (comment.author?.username === userContext?.username);
 
   /* 이벤트 핸들러 */
   const handleOpenMenu = () => {
@@ -64,7 +71,7 @@ export default function CommentItem({
             <Text style={styles.time}>{formatSmartTime(String(comment.createdAt))}</Text>
           }
         </View>
-        {!comment.deleted && (
+        {!comment.deleted && isAuthor && (
           <Pressable ref={buttonRef} onPress={handleOpenMenu}>
             <IconSymbol name="more.horizontal" size={20} color={COLOR.TINT.GRAY_DARK} />
           </Pressable>

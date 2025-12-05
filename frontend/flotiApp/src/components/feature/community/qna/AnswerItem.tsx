@@ -1,18 +1,23 @@
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useRef, useState } from 'react';
 import { View, Text, Pressable, Modal, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { UserContext } from '@/contexts/UserContext';
+
+import { AnswerReponse } from '@/types/community/qna';
 
 import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import BreakAllText from '@/components/ui/BreakAllText';
+
 import { formatDetailTime } from '@/utils/time';
-import { AnswerReponse } from '@/types/community/qna';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
 export default function AnswerItem({
-    answer, menuId, accepted, onChangeMenuId, onGoToUpdate, onDeleteConfirm, onAcceptConfirm, onToggleLike
+    answer, questioner, menuId, accepted, onChangeMenuId, onGoToUpdate, onDeleteConfirm, onAcceptConfirm, onToggleLike
 }: {
     answer: AnswerReponse;
+    questioner: string;
     menuId: number | null;
     accepted: boolean;
     onChangeMenuId: Dispatch<SetStateAction<number | null>>;
@@ -21,8 +26,12 @@ export default function AnswerItem({
     onAcceptConfirm: (answerId: number) => void;
     onToggleLike: (answer: AnswerReponse) => void;
 }) {
-    const buttonRef = useRef<View>(null); // 컴포넌트의 레퍼런스 저장
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+
+    const buttonRef = useRef<View>(null); // 컴포넌트의 레퍼런스 저장
+    const userContext = useContext(UserContext);  // 사용자 상태
+    const isQuestioner = (questioner === userContext?.username);
+    const isAuthor = (answer.author?.username === userContext?.username);
 
     const handleOpenMenu = () => {
         if (buttonRef.current) {
@@ -49,10 +58,16 @@ export default function AnswerItem({
                         </View>
                     )
                 ) : (
-                    <TouchableOpacity activeOpacity={0.8} style={styles.acceptedButton} onPress={() => onAcceptConfirm(answer.id)}>
-                        <IconSymbol name="check.bold" size={20} color='white' />
-                        <Text style={styles.acceptedText}>채택하기</Text>
-                    </TouchableOpacity>
+                    isQuestioner && (
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            style={styles.acceptedButton}
+                            onPress={() => onAcceptConfirm(answer.id)}
+                        >
+                            <IconSymbol name="check.bold" size={20} color='white' />
+                            <Text style={styles.acceptedText}>채택하기</Text>
+                        </TouchableOpacity>
+                    )
                 )}
             </View>
 
@@ -61,7 +76,7 @@ export default function AnswerItem({
 
             {/* 좋아요 정보, 더보기 버튼 */}
             <View style={styles.infoContainer}>
-                <Pressable style={styles.likeItem} onPress={() => onToggleLike(answer)}>
+                <Pressable style={styles.likeItem} onPress={() => onToggleLike(answer)} disabled={isAuthor}>
                     <IconSymbol 
                         size={20} 
                         name={answer.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
@@ -69,9 +84,11 @@ export default function AnswerItem({
                     />
                     <Text style={styles.likeCount}>{answer.likeCount}</Text>
                 </Pressable>
-                <Pressable ref={buttonRef} onPress={handleOpenMenu}>
-                    <IconSymbol name="more.horizontal" size={20} color={COLOR.TINT.GRAY_DARK} />
-                </Pressable>
+                {isAuthor && (
+                    <Pressable ref={buttonRef} onPress={handleOpenMenu}>
+                        <IconSymbol name="more.horizontal" size={20} color={COLOR.TINT.GRAY_DARK} />
+                    </Pressable>
+                )}
             </View>
 
             {/* 더보기 팝업 */}

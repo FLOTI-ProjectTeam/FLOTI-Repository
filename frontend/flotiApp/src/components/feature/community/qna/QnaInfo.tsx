@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import BreakAllText from '@/components/ui/BreakAllText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+
 import COLOR from '@/constants/colors';
 
 export default function QnaInfo({

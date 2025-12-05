@@ -4,10 +4,20 @@
  * - Provider를 통해 데이터를 하위 컴포넌트에 전달하고, Hook을 통해 언제든 접근 가능
  */
 
-// 커뮤니티 검색어 상태
-export type CommunitySearchContextType = {
+export type ProviderProps = {
+  children: React.ReactNode;
+};
+
+// 사용자 상태
+export type UserContextType = {
+  username: string | null;
+  setUsername: React.Dispatch<React.SetStateAction<string | null>>;
+};
+
+// 검색어 상태
+export type SearchContextType = {
   search: string; // 입력 중인 검색어
-  setSearch: (value: string) => void;
+  setSearch: (search: string) => void;
   searchTrigger: string;  // 실제 사용할 검색어
-  setSearchTrigger: (value: string) => void;
+  setSearchTrigger: (searchTrigger: string) => void;
 };

@@ -11,9 +11,9 @@ const apiClient = axios.create({
 
 // 모든 요청에 JWT 토큰 자동 추가
 apiClient.interceptors.request.use(config => {
-    const jwt = AsyncStorage.getItem('jwt');
-    if (jwt)
-        config.headers.Authorization = `Bearer ${jwt}`;
+    const token = AsyncStorage.getItem('jwt');
+    if (token)
+        config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
 

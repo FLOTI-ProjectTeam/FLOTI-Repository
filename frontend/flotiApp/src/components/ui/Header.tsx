@@ -1,7 +1,9 @@
 import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
 
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useNavigation } from '@/hooks/useNavigation';
+
+import { IconSymbol } from '@/components/ui/IconSymbol';
+
 import COLOR from '@/constants/colors';
 
 export function Header({

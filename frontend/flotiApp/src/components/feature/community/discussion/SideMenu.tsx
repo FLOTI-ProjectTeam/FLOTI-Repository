@@ -111,13 +111,13 @@ export function SideMenu({
                         <IconSymbol name="crown" size={14} color="#FFD700" style={{marginLeft: 4}}/>
                     </View>
                     {participants.map((user) => (
-                    <View key={user.id} style={styles.participantItem}>
-                    {/* 프로필 이미지가 없으면 기본 아이콘 */}
-                    <View style={styles.avatar}>
-                        <Text style={styles.avatarText}>{user.nickname[0]}</Text>
-                    </View>
-                    <Text style={styles.nickname}>{user.nickname}</Text>
-                    </View>
+                        <View key={user.username} style={styles.participantItem}>
+                            {/* 프로필 이미지가 없으면 기본 아이콘 */}
+                            <View style={styles.avatar}>
+                                <Text style={styles.avatarText}>{user.nickname[0]}</Text>
+                            </View>
+                            <Text style={styles.nickname}>{user.nickname}</Text>
+                        </View>
                 ))}
                 </ScrollView>
             </View>

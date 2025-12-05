@@ -1,15 +1,18 @@
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 
+import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
+import { useNavigation } from '@/hooks/useNavigation';
+
 import { dummyPosts } from '@/__mocks__/tip';
 import { getTipPosts } from '@/api/community/tipApi';
+import { TipPostResponse } from '@/types/community/tip';
+
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
 import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
-import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
-import { useNavigation } from '@/hooks/useNavigation';
+
 import { formatRelativeTime } from '@/utils/time';
-import { TipPostResponse } from '@/types/community/tip';
 import { STYLE } from '@/constants/styles';
 import COLOR from '@/constants/colors';
 
@@ -21,15 +24,19 @@ const SORT_OPTIONS: SortOption[] = [
 
 export default function TipListScreen() {
   const { navigateTo } = useNavigation();
+  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
 
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<TipPostResponse[]>([]);
-  
-  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
   const [sortType, setSortType] = useState<SortType>('latest'); // 정렬순
 
+  /* 사이드 이펙트 */
+  useEffect(() => {
+    loadPosts();
+  }, [searchTrigger, sortType]);
+
   /* API 호출 */
-  const fetchPosts = async () => {  
+  const loadPosts = async () => {  
     try {
       setLoading(true);
       const response = await getTipPosts(searchTrigger);
@@ -42,11 +49,6 @@ export default function TipListScreen() {
       setLoading(false);
     }
   };
-
-  // 검색하거나 정렬순 변경 시 실행
-  useEffect(() => {
-    fetchPosts();
-  }, [searchTrigger, sortType]);
 
   /* 이벤트 핸들러 */
   const handleGoToTipDetail = (postId: number) => navigateTo(`/community/tip/${postId}`);

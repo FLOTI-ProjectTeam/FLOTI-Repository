@@ -1,4 +1,4 @@
-import { AuthorResponse } from '@/types/community/common';
+import { UserResponse } from '@/types/community/common';
 
 export interface DiscussionRoomRequest {
     title: string;
@@ -8,7 +8,7 @@ export interface DiscussionRoomRequest {
 
 export interface DiscussionRoomResponse {
     id: number;
-    author: AuthorResponse;
+    author: UserResponse;
     title: string;
     content: string;
     maxParticipantCount: number;
@@ -18,7 +18,7 @@ export interface DiscussionRoomResponse {
 }
 
 export interface DiscussionRoomDetailResponse extends DiscussionRoomResponse {
-    participants: AuthorResponse[];
+    participants: UserResponse[];
     messages: MessageResponse[];
 }
 
@@ -29,7 +29,7 @@ export interface MessageRequest {
 export interface MessageResponse {
     id: number;
     roomId: number;
-    author: AuthorResponse | null;
+    author: UserResponse | null;
     content: string;
     likeCount: number;
     liked: boolean;

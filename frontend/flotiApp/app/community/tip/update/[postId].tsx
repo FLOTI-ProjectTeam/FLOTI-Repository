@@ -2,10 +2,13 @@ import { View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
+import { useNavigation } from '@/hooks/useNavigation';
+
 import { updateTipPost } from '@/api/community/tipApi';
+
 import { EditorHeader } from '@/components/ui/Header';
 import InputView from '@/components/feature/community/InputView';
-import { useNavigation } from '@/hooks/useNavigation';
+
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 

@@ -27,7 +27,7 @@ export const DISCUSSION_API = {
     ...createCommunityEndpoint('/community/discussions', 'messages'),
     JOIN: (roomId: number) => `/community/discussions/${roomId}/join`,
 
-    /* WebSocket API */
+    /* 소켓 API */
     WS_SUBSCRIBE: (roomId: number) => `/topic/community/discussions/${roomId}/messages`,
     WS_SEND: (roomId: number) => `/app/community/discussions/${roomId}/messages`,
     WS_DELETE: (roomId: number, messageId: number) => `/app/community/discussions/${roomId}/messages/${messageId}`,

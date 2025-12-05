@@ -4,41 +4,45 @@ import { useEffect, useState } from 'react';
 
 import { dummyPosts } from '@/__mocks__/tip';
 import { getTipPost, toggleLikeTipPost } from '@/api/community/tipApi';
+import { TipPostResponse } from '@/types/community/tip';
+
 import BreakAllText from '@/components/ui/BreakAllText';
 import { Header } from '@/components/ui/Header';
 import BottomBar from '@/components/feature/community/tip/BottomBar';
 import { LoadingView } from '@/components/feature/community/CommunityStateView';
+
 import { showToast } from '@/utils/toast';
 import { formatDetailTime } from '@/utils/time';
-import { TipPostResponse } from '@/types/community/tip';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
 export default function TipDetailScreen() {
   const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
+  
   const [loading, setLoading] = useState(true);
   const [post, setPost] = useState<TipPostResponse>();
 
   /* API 호출 */
   const callToggleLikeTipPost = () => toggleLikeTipPost(post!.id);
 
-  // 게시글 ID 변경 시 실행
+  /* 사이드 이펙트 */
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await getTipPost(Number(postId));
-        setPost(response.data);
-      } catch (error) {
-        // 테스트용
-        const filtered = dummyPosts.find((post) => post.id.toString() === postId);
-        setPost(filtered);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPost();
+    loadPost();
   }, [postId]);
+
+  /* API 호출 */
+  const loadPost = async () => {
+    try {
+      const response = await getTipPost(Number(postId));
+      setPost(response.data);
+    } catch (error) {
+      // 테스트용
+      const filtered = dummyPosts.find((post) => post.id.toString() === postId);
+      setPost(filtered);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   /* 이벤트 핸들러 */
   const handleToggleLike = async () => {
@@ -67,7 +71,7 @@ export default function TipDetailScreen() {
 
   return (
     <View style={STYLE.BASE_CONTAINER}>
-      <Header title="TIP" />
+      <Header title='TIP' />
       
       <ScrollView 
         style={STYLE.WRAPPER} 

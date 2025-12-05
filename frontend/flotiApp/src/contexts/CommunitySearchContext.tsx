@@ -1,12 +1,12 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState } from 'react';
 
-import { CommunitySearchContextType } from '@/types/context';
+import { SearchContextType, ProviderProps } from '@/types/context';
 
 // Context 생성
-const CommunitySearchContext = createContext<CommunitySearchContextType | null>(null);
+const CommunitySearchContext = createContext<SearchContextType | null>(null);
 
 // Provider 컴포넌트 생성: 하위 화면에 검색어 상태 공유
-export const CommunitySearchProvider = ({ children }: { children: ReactNode }) => {
+export const CommunitySearchProvider = ({ children }: ProviderProps) => {
   const [search, setSearch] = useState('');
   const [searchTrigger, setSearchTrigger] = useState('');
 

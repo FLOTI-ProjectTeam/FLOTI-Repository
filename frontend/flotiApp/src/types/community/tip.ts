@@ -1,8 +1,8 @@
-import { AuthorResponse } from '@/types/community/common';
+import { UserResponse } from '@/types/community/common';
 
 export interface TipPostResponse {
     id: number;
-    author: AuthorResponse;
+    author: UserResponse;
     title: string;
     content: string;
     thumbnail: string | null;
@@ -21,7 +21,7 @@ export interface CommentResponse {
     id: number;
     postId: number;
     parentId: number | null;
-    author: AuthorResponse | null;
+    author: UserResponse | null;
     content: string | null;
     deleted: boolean;
     replies: CommentResponse[];

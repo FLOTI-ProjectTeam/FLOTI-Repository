@@ -1,37 +1,47 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import { useMenuInteraction } from '@/hooks/useMenuInteraction';
+import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
 
 import { dummyPostDetails } from '@/__mocks__/qna';
 import { deleteAnswer, deleteQnaPost, getQnaPost, acceptAnswer, toggleLikeAnswer } from '@/api/community/qnaApi';
+import { AnswerReponse, QnaPostDetailResponse } from '@/types/community/qna';
+
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { Header } from '@/components/ui/Header';
 import { LoadingView } from '@/components/feature/community/CommunityStateView';
 import AnswerItem from '@/components/feature/community/qna/AnswerItem';
 import QnaDetailHeader from '@/components/feature/community/qna/QnaDetailHeader';
-import { useMenuInteraction } from '@/hooks/useMenuInteraction';
-import { useModal } from '@/hooks/useModal';
-import { useNavigation } from '@/hooks/useNavigation';
+
 import { showToast } from '@/utils/toast';
-import { AnswerReponse, QnaPostDetailResponse } from '@/types/community/qna';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
+import { UserContext } from '@/contexts/UserContext';
 
 export default function QnaDetailScreen() {
-  const { goBackSafely, navigateWithParams } = useNavigation();
-
-  const [loading, setLoading] = useState(true);
   const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
-
-  const [post, setPost] = useState<QnaPostDetailResponse>();
-  const [answers, setAnswers] = useState<AnswerReponse[]>([]);
-
+  const { goBackSafely, navigateWithParams } = useNavigation();
   const { target: targetAnswerId, ...answerTools } = useMenuInteraction(); // 선택 답변 처리
   const { modalVisible, type, openModal, closeModal } = useModal<'postDelete' | 'answerDelete' | 'answerAccept'>();
 
+  const [loading, setLoading] = useState(true);
+  const [post, setPost] = useState<QnaPostDetailResponse>();
+  const [answers, setAnswers] = useState<AnswerReponse[]>([]);
+
+  const userContext = useContext(UserContext);  // 사용자 상태
+  const isAuthor = (post?.author.username === userContext?.username);
+
+  /* 사이드 이펙트 */
+  useEffect(() => {
+    loadPost();
+  }, [postId]);
+
   /* API 호출 */
-  const fetchPost = async () => {
+  const loadPost = async () => {
     try {
       const response = await getQnaPost(Number(postId));
       setPost(response.data);
@@ -50,11 +60,6 @@ export default function QnaDetailScreen() {
   const callDeleteAnswer = (answerId: number) => deleteAnswer(post!.id, answerId);
   const callAcceptAnswer = (answerId: number) => acceptAnswer(post!.id, answerId);
   const callToggleLikeAnswer = (answerId: number) => toggleLikeAnswer(post!.id, answerId);
-
-  // 게시글 ID 변경 시 실행
-  useEffect(() => {
-    fetchPost();
-  }, [postId]);
 
   /* 이벤트 핸들러 */
   const handleGoToUpdate = () => {
@@ -181,7 +186,7 @@ export default function QnaDetailScreen() {
 
   return (
     <View style={STYLE.BASE_CONTAINER}>
-      <Header title="Q&A" />
+      <Header title='Q&A' />
 
       {/* 답변 목록 */}
       <FlatList
@@ -203,6 +208,7 @@ export default function QnaDetailScreen() {
         renderItem={({ item }) => (
           <AnswerItem
             answer={item}
+            questioner={post.author.username}
             menuId={answerTools.openMenuId}
             accepted={post.accepted}
             onChangeMenuId={answerTools.setOpenMenuId}
@@ -216,17 +222,22 @@ export default function QnaDetailScreen() {
 
       {/* 수정·삭제·답변 버튼 */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity activeOpacity={0.8} style={styles.updateButton} onPress={handleGoToUpdate}>
-          <IconSymbol name="pen" size={24} color='white' />
-          <Text style={styles.buttonText}>수정하기</Text>
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.8} style={styles.deleteButton} onPress={() => openModal('postDelete')}>
-          <IconSymbol name="trash" size={24} color='white' />
-        </TouchableOpacity>
-        {/* <TouchableOpacity activeOpacity={0.8} style={styles.answerButton} onPress={handleGoToAnswerCreate}>
-          <IconSymbol name="plus.pen" size={24} color='white' />
-          <Text style={styles.buttonText}>답변하기</Text>
-        </TouchableOpacity> */}
+        {isAuthor ? (
+          <>
+            <TouchableOpacity activeOpacity={0.8} style={styles.updateButton} onPress={handleGoToUpdate}>
+              <IconSymbol name="pen" size={24} color='white' />
+              <Text style={styles.buttonText}>수정하기</Text>
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.8} style={styles.deleteButton} onPress={() => openModal('postDelete')}>
+              <IconSymbol name="trash" size={24} color='white' />
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity activeOpacity={0.8} style={styles.answerButton} onPress={handleGoToAnswerCreate}>
+            <IconSymbol name="plus.pen" size={24} color='white' />
+            <Text style={styles.buttonText}>답변하기</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ConfirmModal

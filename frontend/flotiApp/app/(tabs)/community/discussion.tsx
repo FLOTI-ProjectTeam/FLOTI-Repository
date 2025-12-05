@@ -1,19 +1,22 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 
+import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
+import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
+
 import { dummyRoomDetails } from '@/__mocks__/discussion';
 import { getDiscussionRooms, toggleJoinDiscussion } from '@/api/community/discussionApi';
+import { DiscussionRoomResponse } from '@/types/community/discussion';
+
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import BreakAllText from '@/components/ui/BreakAllText';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
-import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
-import { useModal } from '@/hooks/useModal';
-import { useNavigation } from '@/hooks/useNavigation';
+
 import { formatRelativeTime } from '@/utils/time';
 import { showToast } from '@/utils/toast';
-import { DiscussionRoomResponse } from '@/types/community/discussion';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
@@ -25,22 +28,24 @@ const SORT_OPTIONS: SortOption[] = [
 
 export default function DiscussionListScreen() {
   const { navigateTo } = useNavigation();
+  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
+  const { modalVisible, openModal, closeModal } = useModal();
 
   const [loading, setLoading] = useState(true);
   const [rooms, setRooms] = useState<DiscussionRoomResponse[]>([]);
-
-  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
   const [sortType, setSortType] = useState<SortType>('recentActivity'); // 정렬순
   const [isChecked, setIsChecked] = useState(false);  // 체크 여부
-
   const [modalTitle, setModalTitle] = useState('');
   const [targetRoom, setTargetRoom] = useState<DiscussionRoomResponse | null>(null);
   const [cannotJoin, setCannotJoin] = useState(false); // 참여 불가 여부
 
-  const { modalVisible, openModal, closeModal } = useModal();
+  /* 사이드 이펙트 */
+  useEffect(() => {
+    loadRooms();
+  }, [searchTrigger, sortType, isChecked]);
 
   /* API 호출 */
-  const fetchRooms = async () => {
+  const loadRooms = async () => {
     try {
       setLoading(true);
       const response = await getDiscussionRooms(searchTrigger, sortType, 0, isChecked);
@@ -55,11 +60,6 @@ export default function DiscussionListScreen() {
   };
 
   const callToggleJoinDiscussion = (roomId: number) => toggleJoinDiscussion(roomId);
-
-  // 검색하거나 정렬순 또는 체크 상태 변경 시 실행
-  useEffect(() => {
-    fetchRooms();
-  }, [searchTrigger, sortType, isChecked]);
 
   /* 이벤트 핸들러 */
   const handleSetModal = (target: DiscussionRoomResponse) => {

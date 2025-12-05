@@ -1,14 +1,17 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 
-import { dummyPostDetails } from '@/__mocks__/qna';
-import { getQnaPosts } from '@/api/community/qnaApi';
-import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
-import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
 import { useNavigation } from '@/hooks/useNavigation';
-import { formatRelativeTime } from '@/utils/time';
+
+import { dummyPostDetails } from '@/__mocks__/qna';
+import { getQnaPosts } from '@/api/community/qnaApi';
 import { QnaPostResponse } from '@/types/community/qna';
+
+import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
+import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+
+import { formatRelativeTime } from '@/utils/time';
 import { STYLE } from '@/constants/styles';
 import COLOR from '@/constants/colors';
 
@@ -20,16 +23,20 @@ const SORT_OPTIONS: SortOption[] = [
 
 export default function QnaListScreen() {
   const { navigateTo } = useNavigation();
+  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
 
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<QnaPostResponse[]>([]);
-  
-  const { searchTrigger } = useCommunitySearch(); // 실제 사용할 검색어 로드
   const [sortType, setSortType] = useState<SortType>('latest'); // 정렬순
   const [isChecked, setIsChecked] = useState(false);  // 체크 여부
 
+  /* 사이드 이펙트 */
+  useEffect(() => {
+    loadPosts();
+  }, [searchTrigger, sortType, isChecked]);
+
   /* API 호출 */
-  const fetchPosts = async () => {
+  const loadPosts = async () => {
     try {
       setLoading(true);
       const response = await getQnaPosts(searchTrigger, sortType, 0, isChecked);
@@ -42,11 +49,6 @@ export default function QnaListScreen() {
       setLoading(false);
     }
   };
-
-  // 검색하거나 정렬순 또는 체크 상태 변경 시 실행
-  useEffect(() => {
-    fetchPosts();
-  }, [searchTrigger, sortType, isChecked]);
 
   /* 이벤트 핸들러 */
   const handleGoToQnaDetail = (postId: number) => navigateTo(`/community/qna/${postId}`);

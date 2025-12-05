@@ -8,8 +8,8 @@ export interface Page<T> {
     last: boolean;
     empty: boolean;
 }
-export interface AuthorResponse {
-    id: number;
+export interface UserResponse {
+    username: string;
     nickname: string;
     profileImage: string | null;
 }

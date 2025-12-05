@@ -85,7 +85,7 @@ export default function DiscussionDetailScreen() {
       const tempMessage: MessageResponse = {
         id: Date.now(),
         roomId: room!.id,
-        author: { id: 3, nickname: '앨리스', profileImage: null },
+        author: { username: 'alice', nickname: '앨리스', profileImage: null },
         content,
         likeCount: 0,
         liked: false,

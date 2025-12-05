@@ -2,31 +2,37 @@ import { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 
+import { useMenuInteraction } from '@/hooks/useMenuInteraction';
+import { useModal } from '@/hooks/useModal';
+
 import { dummyComments } from '@/__mocks__/tip';
 import { createComment, deleteComment, getComments, updateComment } from '@/api/community/tipApi';
+import { CommentResponse } from '@/types/community/tip';
+
 import { Header } from '@/components/ui/Header';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import InputBar, { ReplyTo } from '@/components/feature/community/InputBar';
 import CommentItem from '@/components/feature/community/tip/CommentItem';
-import { useMenuInteraction } from '@/hooks/useMenuInteraction';
-import { useModal } from '@/hooks/useModal';
+
 import { showToast } from '@/utils/toast';
-import { CommentResponse } from '@/types/community/tip';
 import { STYLE } from '@/constants/styles';
 import COLOR from '@/constants/colors';
 
 export default function CommentListScreen() {
-  const [loading, setLoading] = useState(true);
   const { postId, initialCommentCount } = useLocalSearchParams(); // URL에서 게시글 정보 가져오기
-  
-  const [comments, setComments] = useState<CommentResponse[]>([]);
-  const [commentCount, setCommentCount] = useState(Number(initialCommentCount || 0));
-
   const { target: targetComment, ...commentTools } = useMenuInteraction<CommentResponse>(); // 선택 댓글 처리
   const { modalVisible, openModal, closeModal } = useModal();
 
+  const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState<CommentResponse[]>([]);
+  const [commentCount, setCommentCount] = useState(Number(initialCommentCount || 0));
   const [content, setContent] = useState(''); // 작성 중인 댓글 내용
   const [replyTo, setReplyTo] = useState<ReplyTo | null>(null); // 답글 대상
+
+  /* 사이드 이펙트 */
+  useEffect(() => {
+    fetchComments();
+  }, [postId]);
 
   /* API 호출 */
   const fetchComments = async () => {
@@ -49,11 +55,6 @@ export default function CommentListScreen() {
     updateComment(Number(postId), comment.id, { parentId: comment.parentId, content: String(comment.content) });
 
   const callDeleteComment = (comment: CommentResponse) => deleteComment(Number(postId), comment.id);
-
-  // 게시글 ID 변경 시 실행
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
 
   /* 이벤트 핸들러 */
   const handleSubmit = async (replyTo: ReplyTo | null) => {

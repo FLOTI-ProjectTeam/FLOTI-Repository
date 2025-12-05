@@ -1,5 +1,6 @@
 import apiClient from '@/api/apiClient';
 import { AUTH_API } from '@/constants/endpoints';
+import { userStorage } from '@/utils/storage';
 import { SignUpRequest, EmailRequest, CodeVerifyRequest, UsernameCheckRequest } from '@/types/auth/signup';
 import { LoginRequest, LoginResponse } from '@/types/auth/login';
 
@@ -18,5 +19,8 @@ export const checkUsername = (data: UsernameCheckRequest) =>
   apiClient.post(AUTH_API.SIGNUP_CHECK_USERNAME, data);
 
 // 로그인
-export const login = (data: LoginRequest) => 
-  apiClient.post<LoginResponse>(AUTH_API.LOGIN, data);
+export const login = async (data: LoginRequest) => {
+  const response = await apiClient.post<LoginResponse>(AUTH_API.LOGIN, data);
+  await userStorage.setUser(response.data);
+  return response.data;
+};

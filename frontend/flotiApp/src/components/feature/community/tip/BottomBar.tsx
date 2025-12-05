@@ -1,14 +1,18 @@
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
-import { deleteTipPost } from '@/api/community/tipApi';
-import MorePopup from '@/components/MorePopup';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import ConfirmModal from '@/components/ui/ConfirmModal';
 import { useModal } from '@/hooks/useModal';
 import { useNavigation } from '@/hooks/useNavigation';
-import { showToast } from '@/utils/toast';
+import { UserContext } from '@/contexts/UserContext';
+
+import { deleteTipPost } from '@/api/community/tipApi';
 import { TipPostResponse } from '@/types/community/tip';
+
+import MorePopup from '@/components/MorePopup';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+
+import { showToast } from '@/utils/toast';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
@@ -19,9 +23,12 @@ export default function BottomBar({
   onToggleLike: () => void;
 }) {
   const { goBackSafely, navigateWithParams } = useNavigation();
+  const { modalVisible, openModal, closeModal } = useModal();
 
   const [menuVisible, setMenuVisible] = useState(false);
-  const { modalVisible, openModal, closeModal } = useModal();
+
+  const userContext = useContext(UserContext);  // 사용자 상태
+  const isAuthor = (post.author.username === userContext?.username);
 
   /* API 호출 */
   const callDeleteTipPost = () => deleteTipPost(post.id);
@@ -30,7 +37,7 @@ export default function BottomBar({
   const handleGoToTipUpdate = () => {
     navigateWithParams('/community/tip/update/[postId]', {
       postId: post.id,
-      initialTitle: post.title, 
+      initialTitle: post.title,
       initialContent: post.content
     });
     setMenuVisible(false);
@@ -62,7 +69,7 @@ export default function BottomBar({
     <View style={styles.bottomBar}>
       {/* 좋아요·댓글수 */}
       <View style={styles.leftActions}>
-        <Pressable style={styles.actionButton} onPress={onToggleLike}>
+        <Pressable style={styles.actionButton} onPress={onToggleLike} disabled={isAuthor}>
           <IconSymbol 
             name={post.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
             color={post.liked ? 'tomato' : COLOR.TINT.GRAY_DARK} // 좋아요 여부에 따라 색상 변경
@@ -78,9 +85,11 @@ export default function BottomBar({
 
       {/* 더보기 버튼 */}
       <View>
-        <Pressable onPress={() => setMenuVisible(!menuVisible)}>
-          <IconSymbol name="more.horizontal" color={COLOR.TINT.GRAY_DARK} />
-        </Pressable>
+        {isAuthor && (
+          <Pressable onPress={() => setMenuVisible(!menuVisible)}>
+            <IconSymbol name="more.horizontal" color={COLOR.TINT.GRAY_DARK} />
+          </Pressable>
+        )}
 
         {/* 더보기 팝업 */}
         {menuVisible && (
