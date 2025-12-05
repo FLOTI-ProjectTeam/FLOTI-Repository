@@ -14,7 +14,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarInactiveTintColor: '#B0C4DE', // 기본 탭 색상
+        tabBarActiveTintColor: '#153257',   // 활성화된 탭 색상
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -25,19 +26,37 @@ export default function TabLayout() {
           },
           default: {},
         }),
-      }}>
+        tabBarLabel: () => null,  // 라벨 제거
+      }}
+      >
       <Tabs.Screen
-        name="index"
+        name="community"
         options={{
-          title: 'Home',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="community.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="mind-map"
+        options={{
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mindMap.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="home"
+        options={{
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="report"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="report.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="mypage"
+        options={{
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="mypage.fill" color={color} />,
         }}
       />
     </Tabs>
