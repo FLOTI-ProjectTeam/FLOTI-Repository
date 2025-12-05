@@ -1,26 +1,39 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+const COLOR = {
+  TEXT: {
+    GRAY_DARK: '#323232',
+    GRAY_CHARCOAL: '#556170',
+    GRAY_MEDIUM: '#898989',
+    GRAY_LIGHT: '#BDBDBD',
+    NAVY: '#405876'
   },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+
+  BACKGROUND: {
+    SLATE_LIGHT: '#EBF0F6',
+    POWDER_LIGHT: '#E8F6F8'
   },
+
+  OVERLAY: 'rgba(0, 0, 0, 0.5)',
+
+  BUTTON: {
+    GRAY: '#DDDDDD',
+    GRAY_LIGHT: '#F3F5F7',
+    RED: '#FF5356',
+    NAVY: '#153257',
+    SLATE_DARK: '#7D98C9',
+    SLATE: '#B0C4DE',
+    POWDER: '#B0E0E6'
+  },
+
+  TINT: {
+    GRAY_DARK: '#556170',
+    GRAY: '#DDDDDD',
+    GRAY_LIGHT: '#F3F5F7',
+    SLATE: '#B0C4DE',
+    SLATE_SOFT: '#D7E1EE',
+    SLATE_LIGHT: '#EBF0F6',
+    POWDER: '#B0E0E6',
+    POWDER_LIGHT: '#E8F6F8'
+  }
 };
+
+export default COLOR;
