@@ -1,12 +1,16 @@
-import { AuthorResponse } from '@/types/community/common';
+import { UserResponse } from '@/types/community/common';
 
 export interface QnaPostResponse {
     id: number;
-    author: AuthorResponse;
+    author: UserResponse;
     title: string;
     content: string;
     answerCount: number;
-    liked: boolean;
+    accepted: boolean;
+    createdAt: string;
+}
+
+export interface QnaPostDetailResponse extends QnaPostResponse {
     answers: AnswerReponse[];
 }
 
@@ -17,9 +21,10 @@ export interface AnswerRequest {
 export interface AnswerReponse {
     id: number;
     postId: number;
-    author: AuthorResponse;
+    author: UserResponse | null;
     content: string;
     likeCount: number;
     accepted: boolean;
     liked: boolean;
+    createdAt: string;
 }

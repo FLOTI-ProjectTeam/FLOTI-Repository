@@ -1,28 +1,29 @@
-import { AuthorResponse } from '@/types/community/common';
+import { UserResponse } from '@/types/community/common';
 
 export interface TipPostResponse {
     id: number;
-    author: AuthorResponse;
+    author: UserResponse;
     title: string;
     content: string;
-    thumbnail: string;
+    thumbnail: string | null;
     commentCount: number;
     likeCount: number;
     liked: boolean;
+    createdAt: string;
 }
 
 export interface CommentRequest {
-    parentId: number;
+    parentId: number | null;
     content: string;
 }
 
 export interface CommentResponse {
     id: number;
     postId: number;
-    author: AuthorResponse;
-    content: string;
-    thumbnail: string;
-    likeCount: number;
+    parentId: number | null;
+    author: UserResponse | null;
+    content: string | null;
     deleted: boolean;
     replies: CommentResponse[];
+    createdAt: string | null;
 }

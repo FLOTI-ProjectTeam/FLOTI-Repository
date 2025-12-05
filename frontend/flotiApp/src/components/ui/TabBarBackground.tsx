@@ -1,13 +1,11 @@
-// TabBarBackground.tsx
 import { View } from 'react-native';
-import { Colors } from '@/constants/Colors';
 
 export default function TabBarBackground() {
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
       }}
     />
   );
