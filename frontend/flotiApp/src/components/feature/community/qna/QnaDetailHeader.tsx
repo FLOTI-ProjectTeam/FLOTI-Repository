@@ -1,11 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
 
-import { formatDetailTime } from '@/utils/time';
-
 import { QnaPostResponse } from '@/types/community/qna';
 
 import BreakAllText from '@/components/ui/BreakAllText';
 
+import { formatDetailTime } from '@/utils/time';
 import COLOR from '@/constants/colors';
 
 export default function QnaDetailHeader({ post }: { post: QnaPostResponse }) {

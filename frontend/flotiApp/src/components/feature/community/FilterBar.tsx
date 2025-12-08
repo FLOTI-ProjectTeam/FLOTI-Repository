@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, Pressable } from 'reac
 import { useState } from 'react';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
+
 import COLOR from '@/constants/colors';
 
 export type SortType = 'latest' | 'registered' | 'likes' | 'comments' | 'recentActivity';
@@ -57,6 +58,7 @@ function CheckBox({ label, value, onChange }: CheckProps) {
 
 function SortDropdown({ options, value, onChange }: SortProps) {
   const [popupVisible, setPopupVisible] = useState(false);
+
   const currentLabel = options.find(option => option.value === value)?.label || options[0].label;
 
   return (

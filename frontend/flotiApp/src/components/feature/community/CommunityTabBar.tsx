@@ -3,6 +3,7 @@ import { useSegments } from 'expo-router';
 import { useEffect } from 'react';
 
 import { useNavigation } from '@/hooks/useNavigation';
+
 import COLOR from '@/constants/colors';
 
 const TAB_ITEMS = [
@@ -14,12 +15,13 @@ const TAB_ITEMS = [
 
 export default function CommunityTabBar() {
   const { navigateTo } = useNavigation();
+
   const segments = useSegments(); // ['(tabs)', 'community', 'tip']
   const currentTab = segments[segments.length - 1] || 'tip';
 
-  // 최초 진입 시 TIP 탭으로 이동
+  /* 사이드 이펙트 */
   useEffect(() => {
-    if (segments.length === 2) navigateTo('/community/tip', true);
+    if (segments.length === 2) navigateTo('/community/tip', true);  // 최초 진입 시 TIP 탭으로 이동
   }, []);
 
   return (

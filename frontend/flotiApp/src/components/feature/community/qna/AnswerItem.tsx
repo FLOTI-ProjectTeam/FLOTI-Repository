@@ -33,6 +33,7 @@ export default function AnswerItem({
     const isQuestioner = (questioner === userContext?.username);
     const isAuthor = (answer.author?.username === userContext?.username);
 
+    /* 이벤트 핸들러 */
     const handleOpenMenu = () => {
         if (buttonRef.current) {
             buttonRef.current.measure((x, y, width, height, pageX, pageY) => {

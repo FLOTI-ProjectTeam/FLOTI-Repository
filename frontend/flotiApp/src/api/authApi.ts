@@ -1,8 +1,9 @@
 import apiClient from '@/api/apiClient';
-import { AUTH_API } from '@/constants/endpoints';
-import { userStorage } from '@/utils/storage';
 import { SignUpRequest, EmailRequest, CodeVerifyRequest, UsernameCheckRequest } from '@/types/auth/signup';
 import { LoginRequest, LoginResponse } from '@/types/auth/login';
+
+import { userStorage } from '@/utils/storage';
+import { AUTH_API } from '@/constants/endpoints';
 
 // 회원가입
 export const signup = (data: SignUpRequest) => 

@@ -1,13 +1,18 @@
-import { Dispatch, SetStateAction, useState } from 'react';
-import { View, Text, Pressable, Modal, StyleSheet, useWindowDimensions, Image } from 'react-native';
+import { Dispatch, SetStateAction, useContext, useState } from 'react';
+import { View, Text, Pressable, Modal, StyleSheet, useWindowDimensions } from 'react-native';
+
+import { UserContext } from '@/contexts/UserContext';
+
+import { TouchEvent } from '@/types/event'
+import { MessageResponse } from '@/types/community/discussion';
 
 import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import BreakAllText from '@/components/ui/BreakAllText';
+import ProfileAvatar from '@/components/feature/community/ProfileAvatar';
+
 import { computePopupPosition } from '@/utils/position';
 import { formatTimeOnly } from '@/utils/time';
-import { TouchEvent } from '@/types/event'
-import { MessageResponse } from '@/types/community/discussion';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
@@ -21,7 +26,11 @@ export default function MessageItem({
     onToggleLike: (message: MessageResponse) => void;
 }) {
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+
     const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+
+    const userContext = useContext(UserContext);  // 사용자 상태
+    const isAuthor = (message.author?.username === userContext?.username);
 
     /* 이벤트 핸들러 */
     const handleOpenMenu = (event: TouchEvent) => {
@@ -34,11 +43,13 @@ export default function MessageItem({
 
     return (
         <View style={STYLE.ROW}>
-            {/* 섬네일 */}
-            {message.author?.profileImage
-                ? <Image source={{ uri: message.author?.profileImage }} style={styles.profile} />
-                : <View style={[styles.profile, { backgroundColor: 'lightgray' }]} />
-            }
+            <ProfileAvatar 
+                profileImage={message.author?.profileImage ?? null}
+                nickname={message.author?.nickname ?? null}
+                size={50}
+                borderRadius={10}
+                fontSize={20}
+            />
 
             <View style={styles.MessageItem}>
                 {/* 작성자 */}
@@ -51,7 +62,7 @@ export default function MessageItem({
 
                 {/* 좋아요수, 시간 */}
                 <View style={styles.infoContainer}>
-                    <Pressable style={styles.likeItem} onPress={() => onToggleLike(message)}>
+                    <Pressable style={styles.likeItem} onPress={() => onToggleLike(message)} disabled={isAuthor}>
                         <IconSymbol 
                             size={20} 
                             name={message.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
@@ -64,7 +75,7 @@ export default function MessageItem({
             </View>
 
             {/* 더보기 팝업 */}
-            {menuId === message.id && (
+            {menuId === message.id && isAuthor && (
                 <Modal transparent visible animationType='fade' onRequestClose={() => onChangeMenuId(null)}>
                     <Pressable style={STYLE.FLEX} onPress={() => onChangeMenuId(null)} />
                     <MorePopup
@@ -78,11 +89,10 @@ export default function MessageItem({
 }
 
 const styles = StyleSheet.create({
-    profile: { width: 50, height: 50, borderRadius: 10 },
     MessageItem: { flexShrink: 1, marginBottom: 4 },
-    card: { ...STYLE.CARD, marginBottom: 0, marginLeft: 8 },
+    card: { ...STYLE.CARD, marginBottom: 0 },
     author: { 
-        paddingVertical: 4, paddingHorizontal: 8,
+        paddingVertical: 4,
         fontSize: 14, 
         fontWeight: 600, 
         color: COLOR.TEXT.GRAY_DARK 
@@ -92,7 +102,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 4,
+        paddingRight: 8,
         gap: 8
     },
     likeItem: { padding: 4, flexDirection: 'row', alignItems: 'center', gap: 4 },

@@ -2,9 +2,16 @@ import { View, FlatList, Text, StyleSheet, Pressable } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 
+import { useMenuInteraction } from '@/hooks/useMenuInteraction';
+import { useModal } from '@/hooks/useModal';
+import { useNavigation } from '@/hooks/useNavigation';
+
 import { dummyRoomDetails } from '@/__mocks__/discussion';
 import { deleteDiscussionRoom, getDiscussionRoom } from '@/api/community/discussionApi';
 import { createMessage, deleteMessage, toggleLikeMessage } from '@/api/community/discussionSocket';
+import { DiscussionRoomResponse, MessageResponse } from '@/types/community/discussion';
+import { UserResponse } from '@/types/community/common';
+
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { styles as headerStyles } from '@/components/ui/Header';
@@ -12,59 +19,49 @@ import InputBar from '@/components/feature/community/InputBar';
 import { LoadingView } from '@/components/feature/community/CommunityStateView';
 import MessageItem from '@/components/feature/community/discussion/MessageItem';
 import { SideMenu } from '@/components/feature/community/discussion/SideMenu';
-import { useMenuInteraction } from '@/hooks/useMenuInteraction';
-import { useModal } from '@/hooks/useModal';
-import { useNavigation } from '@/hooks/useNavigation';
+
 import { showToast } from '@/utils/toast';
 import { insertDateLabels } from '@/utils/time';
-import { DiscussionRoomResponse, MessageResponse } from '@/types/community/discussion';
-import { AuthorResponse } from '@/types/community/common';
 import { STYLE } from '@/constants/styles';
 import COLOR from '@/constants/colors';
 
 export default function DiscussionDetailScreen() {
   const { goBackSafely, navigateWithParams } = useNavigation();
   const { roomId } = useLocalSearchParams();  // URL에서 토론방 ID 가져오기
+  const { target: targetMessageId, ...messageTools } = useMenuInteraction(); // 선택 메시지 처리
+  const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'messageDelete'>();
   
   const [loading, setLoading] = useState(true);
   const [room, setRoom] = useState<DiscussionRoomResponse>();
-
-  const [participants, setParticipants] = useState<AuthorResponse[]>([]);
+  const [participants, setParticipants] = useState<UserResponse[]>([]);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
-
   const [menuVisible, setMenuVisible] = useState(false);
-
   const [content, setContent] = useState(''); // 작성 중인 메시지 내용
 
-  const { target: targetMessageId, ...messageTools } = useMenuInteraction(); // 선택 메시지 처리
-  const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'messageDelete'>();
-
-  /* API 호출 */
-  const callDeleteDiscussionRoom = () => deleteDiscussionRoom(room!.id);
-
-  // 토론방 ID 변경 시 실행
+  /* 사이드 이펙트 */
   useEffect(() => {
-    const loadRoom = async () => {
-      try {
-        const response = await getDiscussionRoom(Number(roomId));
-        setRoom(response.data);
-        setParticipants(response.data.participants);
-        setMessages(response.data.messages);
-      } catch (error) {
-        showToast('상세 조회 실패', 'error');
-  
-        // 테스트용
-        const filtered = dummyRoomDetails.find((room) => room.id.toString() === roomId);
-        setRoom(filtered);
-        setParticipants(filtered!.participants);
-        setMessages(filtered!.messages);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     loadRoom();
   }, [roomId]);
+
+  /* API 호출 */
+  const loadRoom = async () => {
+    try {
+      const response = await getDiscussionRoom(Number(roomId));
+      setRoom(response.data);
+      setParticipants(response.data.participants);
+      setMessages(response.data.messages);
+    } catch (error) {
+      // 테스트용
+      const filtered = dummyRoomDetails.find((room) => room.id.toString() === roomId);
+      setRoom(filtered);
+      setParticipants(filtered!.participants);
+      setMessages(filtered!.messages);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const callDeleteDiscussionRoom = () => deleteDiscussionRoom(room!.id);
 
   /* 이벤트 핸들러 */
   const handleGoToUpdate = () => {

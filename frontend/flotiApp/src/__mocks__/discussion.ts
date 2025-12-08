@@ -5,7 +5,7 @@ const URL: string = 'https://image.utoimage.com/preview/cp872722/2022/12/2022120
 export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
     {
         id: 1,
-        author: { username: "booklover", nickname: "booklover", profileImage: URL },
+        author: { username: "booklover", nickname: "booklover", profileImage: null },
         title: "AI 시대의 글쓰기",
         content: "AI와 함께 글쓰기를 어떻게 발전시킬 수 있을지 이야기해봐요.",
         maxParticipantCount: 5,
@@ -30,7 +30,7 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
             {
                 id: 2,
                 roomId: 1,
-                author: { username: "booklover", nickname: "booklover", profileImage: URL },
+                author: { username: "booklover", nickname: "booklover", profileImage: null },
                 content: "맞아요. 아이디어 확장할 때 정말 유용하죠.",
                 likeCount: 5,
                 liked: true,

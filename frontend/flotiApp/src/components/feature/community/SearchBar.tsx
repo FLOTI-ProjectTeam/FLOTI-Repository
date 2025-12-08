@@ -1,7 +1,9 @@
 import { TextInput, View, StyleSheet, Pressable } from 'react-native';
 
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
+
+import { IconSymbol } from '@/components/ui/IconSymbol';
+
 import COLOR from '@/constants/colors';
 
 export default function SearchBar() {

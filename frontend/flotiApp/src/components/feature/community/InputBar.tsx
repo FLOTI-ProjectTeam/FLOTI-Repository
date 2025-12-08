@@ -1,7 +1,9 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
+
+import { IconSymbol } from '@/components/ui/IconSymbol';
+
 import COLOR from '@/constants/colors';
 
 export type ReplyTo = {

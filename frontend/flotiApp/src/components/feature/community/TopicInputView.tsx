@@ -1,6 +1,7 @@
 import { Text, TextInput, StyleSheet, View } from 'react-native';
 
 import ParticipantDropdown from '@/components/feature/community/discussion/ParticipantDropdown';
+
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 

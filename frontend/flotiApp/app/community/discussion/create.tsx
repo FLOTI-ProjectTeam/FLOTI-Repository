@@ -2,10 +2,13 @@ import { ScrollView } from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useNavigation } from '@/hooks/useNavigation';
+
 import { createDiscussionRoom } from '@/api/community/discussionApi';
+
 import { EditorHeader } from '@/components/ui/Header';
 import { DiscussionInputView } from '@/components/feature/community/TopicInputView';
-import { useNavigation } from '@/hooks/useNavigation';
+
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
@@ -18,26 +21,27 @@ export default function DiscussionCreateScreen() {
 
   const STORAGE_KEY = '@discussuin_save';
 
-  /* API 호출 */
-  const callCreateDiscussionRoom= () => createDiscussionRoom({ title, content, maxParticipantCount });
-
-  // 화면 로드 시 임시저장 로드
+  /* 사이드 이펙트 */
   useEffect(() => {
-    const loadDraft = async () => {
-      try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const { title: savedTitle, content: savedContent, maxParticipantCount: savedMaxParticipantCount } = JSON.parse(saved);
-          setTitle(savedTitle);
-          setContent(savedContent);
-          setMaxParticipantCount(savedMaxParticipantCount);
-        }
-      } catch (error) {
-        showToast('임시저장 불러오기 실패', 'error');
-      }
-    };
     loadDraft();
   }, []);
+
+  /* API 호출 */
+  const loadDraft = async () => {
+    try {
+      const saved = await AsyncStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const { title: savedTitle, content: savedContent, maxParticipantCount: savedMaxParticipantCount } = JSON.parse(saved);
+        setTitle(savedTitle);
+        setContent(savedContent);
+        setMaxParticipantCount(savedMaxParticipantCount);
+      }
+    } catch (error) {
+      showToast('임시저장 불러오기 실패', 'error');
+    }
+  };
+
+  const callCreateDiscussionRoom= () => createDiscussionRoom({ title, content, maxParticipantCount });
 
   /* 이벤트 핸들러 */
   const handleSave = async () => {
