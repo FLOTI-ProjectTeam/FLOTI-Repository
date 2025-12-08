@@ -11,9 +11,28 @@ export const UserProvider = ({ children }: ProviderProps) => {
   const [username, setUsername] = useState<string | null>('alice'); // 테스트용
 
   useEffect(() => {
-    userStorage.getUser().then(user => {
-      if (user?.username) setUsername(user.username);
-    });
+    const initUser = async () => {
+      try {
+        const user = await userStorage.getUser();
+        if (user?.username && user?.jwt) {
+          // [Fix] Ensure apiClient can find the token (Sync user.jwt -> 'jwt')
+          const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+          await AsyncStorage.setItem('jwt', user.jwt);
+
+          setUsername(user.username);
+        } else {
+          // [개발용] 자동 로그인 처리 (user1/password)
+          console.log('[Dev] Trying auto-login...');
+          const { login } = require('@/api/authApi'); // 순환 참조 방지 위해 dynamic import or direct import if safe
+          const res = await login({ username: 'user1', password: '1234' });
+          if (res.username) setUsername(res.username);
+          console.log('[Dev] Auto-login success:', res.username);
+        }
+      } catch (e) {
+        console.error('[Dev] Auto-login failed:', e);
+      }
+    };
+    initUser();
   }, []);
 
   return (

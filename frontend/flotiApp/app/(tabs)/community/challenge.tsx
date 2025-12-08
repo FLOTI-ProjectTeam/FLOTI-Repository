@@ -1,5 +1,6 @@
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 
 import { useCommunitySearch } from '@/contexts/CommunitySearchContext';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -30,10 +31,13 @@ export default function ChallengeListScreen() {
   const [sortType, setSortType] = useState<SortType>('latest');
   const [showMyChallenges, setShowMyChallenges] = useState(false); // 참여 중인 챌린지 보기 토글
 
-  /* 사이드 이펙트 */
-  useEffect(() => {
-    loadChallenges();
-  }, [searchTrigger, sortType, showMyChallenges]);
+  /* 사이드 이펙트: 화면 포커스 시(뒤로가기 포함) & 필터 변경 시 데이터 갱신 */
+  // Fix: useFocusEffect must be inside the component and use useCallback
+  useFocusEffect(
+    useCallback(() => {
+      loadChallenges();
+    }, [searchTrigger, sortType, showMyChallenges])
+  );
 
   /* API 호출 */
   const loadChallenges = async () => {
@@ -76,19 +80,7 @@ export default function ChallengeListScreen() {
       </View>
 
       {/* 태그 리스트 */}
-      <View style={styles.createButtonContainer}>
-        <View style={styles.tagFilter}>
-          {['#영어', '#코딩', '#독서'].map(tag => (
-            <View key={tag} style={styles.filterTag}>
-              <Text style={styles.filterTagText}>{tag}</Text>
-            </View>
-          ))}
-        </View>
 
-        <TouchableOpacity onPress={() => { /* Edit 기능 */ }}>
-          <Text style={styles.editText}>Edit</Text>
-        </TouchableOpacity>
-      </View>
 
       {challenges.length === 0 ? <EmptyView /> : (
         <FlatList

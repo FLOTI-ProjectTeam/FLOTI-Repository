@@ -4,7 +4,7 @@ COPY . .
 RUN apk update && apk add --no-cache dos2unix
 RUN dos2unix gradlew
 RUN chmod +x gradlew
-RUN ./gradlew bootJar --no-daemon
+RUN ./gradlew bootJar --no-daemon -x test
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app

@@ -222,9 +222,9 @@ CREATE TABLE like_messages (
 
 -- 1. Users
 INSERT INTO users (email, username, password, nickname) VALUES 
-('user1@example.com', 'user1', '{noop}password', 'user1'), 
-('user2@example.com', 'user2', '{noop}password', 'user2'),
-('user3@example.com', 'user3', '{noop}password', 'user3');
+('user1@example.com', 'user1', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'user1'), 
+('user2@example.com', 'user2', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'user2'),
+('user3@example.com', 'user3', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'user3');
 
 -- 2. Tags
 INSERT INTO tags (tag_name) VALUES ('독서'), ('영어'), ('공부'), ('운동'), ('플랭크'), ('문제풀이');

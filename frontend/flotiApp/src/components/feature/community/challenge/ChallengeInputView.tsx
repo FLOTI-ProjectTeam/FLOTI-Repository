@@ -1,7 +1,10 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { useState, createElement } from 'react';
 import ParticipantDropdown from '@/components/feature/community/discussion/ParticipantDropdown';
 import COLOR from '@/constants/colors';
 import { STYLE, SHADOW } from '@/constants/styles';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import dayjs from 'dayjs';
 
 interface Props {
     title: string;
@@ -24,6 +27,64 @@ export default function ChallengeInputView({
     title, content, detail, startDate, endDate, maxParticipants, tags,
     onChangeTitle, onChangeContent, onChangeDetail, onChangeStartDate, onChangeEndDate, onChangeMaxParticipants, onChangeTags
 }: Props) {
+
+    const isWeb = Platform.OS === 'web';
+    const [showStart, setShowStart] = useState(false);
+    const [showEnd, setShowEnd] = useState(false);
+
+    const handleDateChange = (type: 'start' | 'end', event: any, selectedDate?: Date) => {
+        // Mobile Only Logic
+        if (Platform.OS === 'android') {
+            if (type === 'start') setShowStart(false);
+            else setShowEnd(false);
+        }
+
+        if (selectedDate) {
+            const formatted = dayjs(selectedDate).format('YYYY.MM.DD');
+            if (type === 'start') onChangeStartDate(formatted);
+            else onChangeEndDate(formatted);
+        }
+    };
+
+    // Web-specific raw input renderer
+    const renderWebInput = (type: 'start' | 'end', valueStr: string) => {
+        const isoValue = valueStr ? dayjs(valueStr, 'YYYY.MM.DD').format('YYYY-MM-DD') : '';
+
+        return createElement('input', {
+            type: 'date',
+            value: isoValue,
+            style: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                opacity: 0,
+                zIndex: 20,
+                cursor: 'pointer',
+                border: 'none'
+            },
+            onClick: (e: any) => {
+                // Force picker to show on click
+                try {
+                    if (e.target && typeof e.target.showPicker === 'function') {
+                        e.target.showPicker();
+                    }
+                } catch (err) {
+                    console.log('showPicker not supported', err);
+                }
+            },
+            onChange: (e: any) => {
+                const newVal = e.target.value; // YYYY-MM-DD
+                if (newVal) {
+                    const formatted = dayjs(newVal).format('YYYY.MM.DD');
+                    if (type === 'start') onChangeStartDate(formatted);
+                    else onChangeEndDate(formatted);
+                }
+            }
+        });
+    };
+
     return (
         <View style={styles.container}>
             {/* 챌린지 제목 */}
@@ -37,7 +98,7 @@ export default function ChallengeInputView({
                     placeholderTextColor={COLOR.TEXT.GRAY_LIGHT}
                     maxLength={100}
                 />
-                <Text style={styles.counter}>0/100</Text>
+                <Text style={styles.counter}>{title.length}/100</Text>
             </View>
 
             {/* 한줄 소개 */}
@@ -51,7 +112,7 @@ export default function ChallengeInputView({
                     placeholderTextColor={COLOR.TEXT.GRAY_LIGHT}
                     maxLength={100}
                 />
-                <Text style={styles.counter}>0/100</Text>
+                <Text style={styles.counter}>{content.length}/100</Text>
             </View>
 
             {/* 상세 내용 */}
@@ -61,7 +122,7 @@ export default function ChallengeInputView({
                     style={styles.textArea}
                     value={detail}
                     onChangeText={onChangeDetail}
-                    placeholder={'예:\n• 목표: 하루 30분 이상 독서 후 인증\n• 인증 방식: 피드에 읽은 책 & 느낀 점 공유하기'}
+                    placeholder={'예:\n\u2022 목표: 하루 30분 이상 독서 후 인증\n\u2022 인증 방식: 피드에 읽은 책 & 느낀 점 공유하기'}
                     placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
                     multiline
                 />
@@ -70,27 +131,58 @@ export default function ChallengeInputView({
             {/* 기간 */}
             <View style={styles.card}>
                 <Text style={styles.label}>⏰ 기간</Text>
-                <View style={styles.dateRow}>
+                <View style={[styles.dateRow, { zIndex: 10 }]}>
+                    {/* Start Date */}
                     <View style={styles.dateBox}>
-                        <TextInput
-                            style={styles.dateInput}
-                            value={startDate}
-                            onChangeText={onChangeStartDate}
-                            placeholder='2025.01.01'
-                            keyboardType='numeric'
-                        />
+                        <Text style={[styles.dateInput, !startDate && { color: COLOR.TEXT.GRAY_LIGHT }]} pointerEvents="none">
+                            {startDate || '시작일'}
+                        </Text>
+                        {isWeb ? (
+                            // Render Raw HTML Input for Web to force showPicker
+                            renderWebInput('start', startDate)
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.mobileTouchArea}
+                                onPress={() => setShowStart(true)}
+                            />
+                        )}
                     </View>
+
                     <Text style={{ fontSize: 16, color: COLOR.TINT.SLATE }}>~</Text>
+
+                    {/* End Date */}
                     <View style={styles.dateBox}>
-                        <TextInput
-                            style={styles.dateInput}
-                            value={endDate}
-                            onChangeText={onChangeEndDate}
-                            placeholder='2025.01.07'
-                            keyboardType='numeric'
-                        />
+                        <Text style={[styles.dateInput, !endDate && { color: COLOR.TEXT.GRAY_LIGHT }]} pointerEvents="none">
+                            {endDate || '종료일'}
+                        </Text>
+                        {isWeb ? (
+                            renderWebInput('end', endDate)
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.mobileTouchArea}
+                                onPress={() => setShowEnd(true)}
+                            />
+                        )}
                     </View>
                 </View>
+
+                {/* Mobile Pickers (Modal) */}
+                {!isWeb && showStart && (
+                    <DateTimePicker
+                        value={startDate ? dayjs(startDate, 'YYYY.MM.DD').toDate() : new Date()}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={(e, d) => handleDateChange('start', e, d)}
+                    />
+                )}
+                {!isWeb && showEnd && (
+                    <DateTimePicker
+                        value={endDate ? dayjs(endDate, 'YYYY.MM.DD').toDate() : new Date()}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={(e, d) => handleDateChange('end', e, d)}
+                    />
+                )}
             </View>
 
             {/* 참여 가능 인원 */}
@@ -106,7 +198,7 @@ export default function ChallengeInputView({
                 <Text style={styles.label}>🏷️ 태그</Text>
                 <View style={styles.tagInputContainer}>
                     <TextInput
-                        style={{ fontSize: 14, color: '#7D8CFF' }}
+                        style={{ fontSize: 14, color: '#7D8CFF', flex: 1 }}
                         value={tags}
                         onChangeText={onChangeTags}
                         placeholder='#태그 입력'
@@ -149,10 +241,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: COLOR.TINT.SLATE_SOFT,
         borderRadius: 8,
-        paddingVertical: 10,
-        alignItems: 'center'
+        height: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        overflow: 'hidden'
     },
     dateInput: { fontSize: 14, color: COLOR.TEXT.GRAY_DARK, textAlign: 'center' },
+    mobileTouchArea: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 10
+    },
     tagInputContainer: {
         backgroundColor: '#F0F4FF',
         borderRadius: 20,
@@ -160,6 +259,8 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         alignSelf: 'flex-start',
         borderWidth: 1,
-        borderColor: '#E0E6FF'
+        borderColor: '#E0E6FF',
+        flexDirection: 'row',
+        minWidth: 100
     }
 });
