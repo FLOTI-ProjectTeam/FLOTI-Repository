@@ -2,22 +2,24 @@ import { StyleSheet, ViewStyle } from 'react-native';
 
 import COLOR from '@/constants/colors';
 
+export const SHADOW = {
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.5,
+    elevation: 6
+};
+
 const COMMON = {
     CENTER: { justifyContent: 'center', alignItems: 'center' } as ViewStyle,
-    CARD: { 
+    CARD: {
         padding: 12,
         marginBottom: 12,
         borderRadius: 10,
         backgroundColor: 'white',
         gap: 8
     },
-    SHADOW: {
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.5,
-        elevation: 6
-    }
+    SHADOW
 };
 
 export const STYLE = StyleSheet.create({

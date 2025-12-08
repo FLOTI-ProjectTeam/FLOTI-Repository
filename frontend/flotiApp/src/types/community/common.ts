@@ -14,6 +14,8 @@ export interface UserResponse {
     profileImage: string | null;
 }
 
+export type AuthorResponse = UserResponse;
+
 export interface PostRequest {
     title: string;
     content: string;

@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 CREATE TABLE users (
 	user_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	email VARCHAR(320) NOT NULL UNIQUE,
@@ -132,7 +134,7 @@ CREATE TABLE challenge_posts (
 	post_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	author_id BIGINT UNSIGNED NOT NULL,
 	title VARCHAR(100) NOT NULL,
-	intro VARCHAR(50) NOT NULL,
+	intro VARCHAR(255) NOT NULL,
 	content VARCHAR(255) NOT NULL,
 	max_participants TINYINT UNSIGNED CHECK (max_participants BETWEEN 2 AND 10),
 	current_participants TINYINT UNSIGNED DEFAULT 1,
@@ -215,3 +217,46 @@ CREATE TABLE like_messages (
 	FOREIGN KEY (message_id) REFERENCES messages(message_id) ON DELETE CASCADE,
 	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+-- 초기 데이터 (DUMMY DATA) --
+
+-- 1. Users
+INSERT INTO users (email, username, password, nickname) VALUES 
+('user1@example.com', 'user1', '{noop}password', 'user1'), 
+('user2@example.com', 'user2', '{noop}password', 'user2'),
+('user3@example.com', 'user3', '{noop}password', 'user3');
+
+-- 2. Tags
+INSERT INTO tags (tag_name) VALUES ('독서'), ('영어'), ('공부'), ('운동'), ('플랭크'), ('문제풀이');
+
+-- 3. Challenge Posts
+-- 챌린지 1
+INSERT INTO challenge_posts (author_id, title, intro, content, max_participants, current_participants, start_date, end_date, is_completed) 
+VALUES (1, '7일 동안 하루 30분 독서 챌린지', '매일 30분씩 책을 읽으며 꾸준한 습관을 만들어봐요!', '• 목표: 하루 30분 이상 독서 후 인증\n• 인증 방식: 피드에 읽은 책 & 느낀 점 공유하기', 10, 3, '2025-01-01 00:00:00', '2025-02-01 00:00:00', 0);
+-- 태그 연결 (Board Type 2: Challenge)
+INSERT INTO post_tags (board_type, post_id, tag_id) VALUES (2, 1, (SELECT tag_id FROM tags WHERE tag_name = '독서'));
+
+-- 챌린지 2
+INSERT INTO challenge_posts (author_id, title, intro, content, max_participants, current_participants, start_date, end_date, is_completed) 
+VALUES (1, '4주 영어 단어 암기 챌린지', '매일 20개씩 단어를 외우며 어휘력을 늘려봐요!', '하루 20개씩 영단어 암기!', 10, 3, '2025-01-01 00:00:00', '2025-02-01 00:00:00', 0);
+INSERT INTO post_tags (board_type, post_id, tag_id) VALUES 
+(2, 2, (SELECT tag_id FROM tags WHERE tag_name = '영어')),
+(2, 2, (SELECT tag_id FROM tags WHERE tag_name = '공부'));
+
+-- 챌린지 3
+INSERT INTO challenge_posts (author_id, title, intro, content, max_participants, current_participants, start_date, end_date, is_completed) 
+VALUES (1, '30일 플랭크 도전! 코어 강화 챌린지', '하루 1분부터 시작하는 플랭크 루틴 도전!', '플랭크로 코어를 튼튼하게!', 10, 3, '2025-01-01 00:00:00', '2025-02-01 00:00:00', 0);
+INSERT INTO post_tags (board_type, post_id, tag_id) VALUES 
+(2, 3, (SELECT tag_id FROM tags WHERE tag_name = '운동')),
+(2, 3, (SELECT tag_id FROM tags WHERE tag_name = '플랭크'));
+
+-- 4. Participants (챌린지 1에 3명 모두 참여)
+INSERT INTO challenge_participants (challenge_id, participant_id, progress, contribution) VALUES
+(1, 1, 15, 10),
+(1, 2, 10, 5),
+(1, 3, 0, 0);
+
+-- 5. Feeds (챌린지 1에 대한 피드)
+INSERT INTO feeds (challenge_id, author_id, content, created_at) VALUES
+(1, 1, '📌 [DAY 1] 독서 완료!\n📕 『아주 작은 습관의 힘』 - 1장 (p.1~30) 읽음\n책에서 "습관이 우리 정체성을 만든다"는 말이 인상적이었어요.', '2024-12-01 10:00:00'),
+(1, 2, '📚 오늘 읽은 책: 『미라클 모닝』\n아침을 어떻게 보내느냐가 중요하다는 걸 깨달았어요!\n여러분도 오늘 30분 독서 챌린지 완료하셨나요?', '2024-12-01 12:00:00');

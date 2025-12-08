@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 import { userStorage } from '@/utils/storage';
 import { ProviderProps, UserContextType } from '@/types/context';
@@ -21,4 +21,10 @@ export const UserProvider = ({ children }: ProviderProps) => {
       {children}
     </UserContext.Provider>
   );
+};
+
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) throw new Error('useUser must be used within UserProvider');
+  return { user: { username: context.username }, ...context }; // 호환성을 위해 user 객체 랩핑
 };

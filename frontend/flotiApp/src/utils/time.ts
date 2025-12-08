@@ -16,6 +16,10 @@ type MessageWithLabel = {
     dateLabel: string;
 };
 
+// 날짜 포맷 (YYYY.MM.DD)
+export const formatDay = (createdAt: string) =>
+    dayjs(createdAt).format('YYYY.MM.DD');
+
 // 날짜를 상세 시간으로 변환
 export const formatDetailTime = (createdAt: string) =>
     dayjs(createdAt).format('YYYY.MM.DD HH:mm');
@@ -26,12 +30,12 @@ export const formatRelativeTime = (createdAt: string) =>
 
 // 날짜가 24시간 이내면 상대 시간으로 변환
 export const formatSmartTime = (
-    createdAt: string, 
+    createdAt: string,
     type: 'date' | 'detail' = 'date'
 ) => {
     const date = dayjs(createdAt);
     const diffHours = dayjs().diff(date, 'hour');
-  
+
     if (diffHours < 24) return date.fromNow();
     if (type === 'date') return date.format('YYYY.MM.DD');
     return date.format('YYYY.MM.DD HH:mm');
@@ -45,18 +49,18 @@ export const formatTimeOnly = (createdAt: string) =>
 export const insertDateLabels = (messages: MessageResponse[]): MessageWithLabel[] => {
     const result: MessageWithLabel[] = [];
     let lastDate = '';
-  
+
     messages.forEach(msg => {
         const dateLabel = dayjs(msg.createdAt).format('YYYY.MM.DD');
-    
+
         // 날짜가 바뀌면 라벨 추가
         if (dateLabel !== lastDate) {
             result.push({ type: 'label', id: `label-${dateLabel}`, dateLabel });
             lastDate = dateLabel;
         }
-    
+
         result.push({ type: 'message', id: msg.id.toString(), message: msg, dateLabel });
     });
-  
+
     return result;
 };

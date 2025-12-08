@@ -13,7 +13,7 @@ import { OpaqueColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
 const MAPPING = {
   // See MaterialIcons here: https://icons.expo.fyi
   // See SF Symbols in the SF Symbols app on Mac.
-  
+
   // 하단바
   'community': { lib: 'FontAwesome', name: 'wechat' },
   'mindMap': { lib: 'FontAwesome6', name: 'brain' },
@@ -40,10 +40,16 @@ const MAPPING = {
   'x': { lib: 'Feather', name: 'x' },
   'check': { lib: 'Feather', name: 'check' },
   'check.bold': { lib: 'FontAwesome', name: 'check' },
-  'pen' : {lib: 'MaterialCommunityIcons', name: 'pencil' },
-  'plus.pen' : {lib: 'MaterialCommunityIcons', name: 'pencil-plus' },
+  'pen': { lib: 'MaterialCommunityIcons', name: 'pencil' },
+  'plus.pen': { lib: 'MaterialCommunityIcons', name: 'pencil-plus' },
   'more.horizontal': { lib: 'MaterialIcons', name: 'more-horiz' },
   'menu': { lib: 'Feather', name: 'menu' },
+  'calendar': { lib: 'Feather', name: 'calendar' },
+  'person.2': { lib: 'Ionicons', name: 'people' }, // Alias for people
+  'arrow.right': { lib: 'Feather', name: 'arrow-right' },
+  'plus': { lib: 'Feather', name: 'plus' },
+  'list.bullet': { lib: 'MaterialIcons', name: 'list' }, // View All Feeds
+  'camera.fill': { lib: 'Ionicons', name: 'camera' }, // Camera
 } as const
 
 export type IconSymbolName = keyof typeof MAPPING;
@@ -64,7 +70,7 @@ export function IconSymbol({
   weight?: SymbolWeight;
 }) {
   const mapping = MAPPING[name];
-  const styleProp =  style as StyleProp<TextStyle>;
+  const styleProp = style as StyleProp<TextStyle>;
   if (!mapping) return null;
 
   switch (mapping.lib) {

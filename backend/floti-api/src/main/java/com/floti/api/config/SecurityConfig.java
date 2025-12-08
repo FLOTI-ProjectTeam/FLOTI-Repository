@@ -44,12 +44,29 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 공개 허용 경로
                         .requestMatchers("/auth/**").permitAll()
+                        // 커뮤니티(챌린지 등) 조회는 로그인 없이 가능하도록 허용
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/community/**").permitAll()
                         // 나머지는 인증 필요
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         return http.build();
+    }
+
+    // CORS 설정을 위한 Bean 등록 (프론트엔드 연동 필수)
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+
+        config.addAllowedOriginPattern("*"); // 모든 출처 허용 (개발용)
+        config.addAllowedHeader("*"); // 모든 헤더 허용
+        config.addAllowedMethod("*"); // GET, POST, PUT, DELETE 등 모든 메서드 허용
+        config.setAllowCredentials(true); // 쿠키/인증정보 포함 허용
+
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
