@@ -4,6 +4,7 @@ export interface ChallengeSummaryResponse {
     id: number;
     title: string;
     intro: string; // Changed from description
+    author: UserResponse;
     startDate: string;
     endDate: string;
     currentParticipants: number; // Changed from participantCount
@@ -12,11 +13,19 @@ export interface ChallengeSummaryResponse {
     createdAt: string;
 }
 
+export interface ParticipantResponse {
+    id: number;
+    nickname: string;
+    profileImage: string | null;
+    progress: number;
+    contribution: number;
+}
+
 export interface ChallengeDetailResponse extends ChallengeSummaryResponse {
     content: string;
     myProgress: number; // Integer in backend
     progress: number; // totalProgress -> progress
-    participants: any[]; // generic for now, backend has List<ParticipantResponse>
+    participants: ParticipantResponse[];
 }
 
 export interface ChallengeRequest {

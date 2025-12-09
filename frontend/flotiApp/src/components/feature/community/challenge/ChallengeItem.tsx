@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
 import { ChallengeSummaryResponse } from '@/types/community/challenge';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 import { formatDay } from '@/utils/time';
+import { getChallengeProgress } from '@/api/community/challengeApi';
 
 export default function ChallengeItem({
     item, onPress, showProgress = true
@@ -12,8 +14,26 @@ export default function ChallengeItem({
     onPress: () => void;
     showProgress?: boolean;
 }) {
-    // 진행 상태 계산
-    const isActive = !item.isCompleted;
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        if (showProgress) {
+            getChallengeProgress(item.id)
+                .then(res => {
+                    setProgress(res.data.progress || 0);
+                })
+                .catch(err => {
+                    console.error('Progress fetch failed:', err);
+                });
+        }
+    }, [item.id, showProgress]);
+
+    // 진행 상태 계산: 날짜 지났으면 종료 처리
+    const now = new Date();
+    const endDate = new Date(item.endDate);
+    const isExpired = now > endDate;
+
+    const isActive = !item.isCompleted && !isExpired;
     const statusText = isActive ? '진행 중' : '종료됨';
     const statusColor = isActive ? '#53C3A6' : '#999';
 
@@ -52,8 +72,7 @@ export default function ChallengeItem({
                 <View style={styles.progressCircleStub}>
                     <View style={styles.progressInnerRing} />
                     <Text style={styles.progressText}>
-                        {/* 목록 조회시 myProgress 필드가 없으므로 기본값 처리 */}
-                        -
+                        {Math.round(progress)}%
                     </Text>
                 </View>
             </View>

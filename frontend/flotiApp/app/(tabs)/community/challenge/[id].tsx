@@ -3,8 +3,9 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { useNavigation } from '@/hooks/useNavigation';
-import { getChallengePost, getChallengeProgress, getChallengeFeeds } from '@/api/community/challengeApi';
-import { ChallengeDetailResponse, FeedResponse } from '@/types/community/challenge';
+import { getChallengePost, getChallengeProgress, getChallengeFeeds, joinChallenge } from '@/api/community/challengeApi';
+import { ChallengeDetailResponse, FeedResponse, ParticipantResponse } from '@/types/community/challenge';
+import { useUser } from '@/contexts/UserContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { formatDay } from '@/utils/time';
 import COLOR from '@/constants/colors';
@@ -13,6 +14,7 @@ import { STYLE, SHADOW } from '@/constants/styles';
 export default function ChallengeDetailScreen() {
     const { id } = useLocalSearchParams();
     const { goBackSafely, navigateTo } = useNavigation();
+    const { user } = useUser();
 
     const [challenge, setChallenge] = useState<ChallengeDetailResponse | null>(null);
     const [feeds, setFeeds] = useState<FeedResponse[]>([]);
@@ -32,6 +34,26 @@ export default function ChallengeDetailScreen() {
     // 전체 피드 보기
     const handleGoToAllFeeds = () => {
         navigateTo(`/community/challenge/feed/list?challengeId=${id}`);
+    };
+
+    // 챌린지 참여하기
+    const handleJoinChallenge = async () => {
+        if (!user) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        try {
+            await joinChallenge(Number(id));
+            alert('챌린지에 참여하였습니다!');
+            // 데이터 갱신
+            const res = await getChallengePost(Number(id));
+            setChallenge(res.data);
+            // 진행률 갱신
+            getChallengeProgress(Number(id)).then(p => setProgress(p.data.myProgress || 0));
+        } catch (error) {
+            console.error(error);
+            alert('참여에 실패했습니다.');
+        }
     };
 
     useEffect(() => {
@@ -62,13 +84,25 @@ export default function ChallengeDetailScreen() {
         startDate: new Date().toISOString(),
         endDate: new Date().toISOString(),
         currentParticipants: 0,
-        maxParticipants: 0,
         content: '',
+        participants: [],
+        myProgress: 0,
+        progress: 0,
         isCompleted: false
     } as unknown as ChallengeDetailResponse;
 
-    const statusText = !safeChallenge.isCompleted ? '진행 중' : '종료됨';
-    const statusColor = !safeChallenge.isCompleted ? '#53C3A6' : '#999';
+    const now = new Date();
+    const endDate = new Date(safeChallenge.endDate);
+    const isExpired = now > endDate;
+
+    // 종료 조건: DB status가 true이거나 날짜가 지났으면
+    const isCompleted = safeChallenge.isCompleted || isExpired;
+
+    const statusText = !isCompleted ? '진행 중' : '종료됨';
+    const statusColor = !isCompleted ? '#53C3A6' : '#999';
+
+    // 참여 여부 확인
+    const isJoined = challenge?.participants?.some(p => p.nickname === user?.username) || false;
 
     return (
         <View style={STYLE.BASE_CONTAINER}>
@@ -149,11 +183,30 @@ export default function ChallengeDetailScreen() {
                     {tab === 'PARTICIPANT' ? (
                         <>
                             <Text style={{ fontSize: 13, color: COLOR.TEXT.GRAY_MEDIUM, marginBottom: 10 }}>
-                                👥 {safeChallenge.currentParticipants}/{safeChallenge.maxParticipants}명
+                                👥 {safeChallenge.participants ? safeChallenge.participants.length : 0}/{safeChallenge.maxParticipants}명
                             </Text>
-                            <View style={{ paddingVertical: 20, alignItems: 'center' }}>
-                                <Text style={{ color: COLOR.TEXT.GRAY_MEDIUM }}>참여자 목록 (기능 준비중)</Text>
-                            </View>
+                            {safeChallenge.participants && safeChallenge.participants.length > 0 ? (
+                                safeChallenge.participants.map((p, index) => (
+                                    <View key={p.id} style={styles.participantRow}>
+                                        <Text style={styles.rank}>{index + 1}</Text>
+                                        <View style={styles.avatarPlaceholderSmall} />
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, width: 60 }}>
+                                            <Text style={styles.participantName} numberOfLines={1}>{p.nickname}</Text>
+                                            {safeChallenge.author && safeChallenge.author.nickname === p.nickname && (
+                                                <Text style={{ fontSize: 10 }}>👑</Text>
+                                            )}
+                                        </View>
+                                        <View style={styles.smallProgressContainer}>
+                                            <View style={{ width: `${p.progress}%`, backgroundColor: '#53C3A6', height: '100%', borderRadius: 6 }} />
+                                        </View>
+                                        <Text style={{ fontSize: 12, color: '#53C3A6', fontWeight: '600' }}>{p.progress}%</Text>
+                                    </View>
+                                ))
+                            ) : (
+                                <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+                                    <Text style={{ color: COLOR.TEXT.GRAY_MEDIUM }}>아직 참여자가 없습니다.</Text>
+                                </View>
+                            )}
                         </>
                     ) : (
                         <>
@@ -182,11 +235,25 @@ export default function ChallengeDetailScreen() {
             </ScrollView>
 
             {/* 하단 버튼 */}
-            <View style={styles.bottomButtonContainer}>
+            {isCompleted ? (
+                <TouchableOpacity
+                    style={[styles.bottomButton, { backgroundColor: '#999' }]}
+                    disabled={true}
+                >
+                    <Text style={styles.bottomButtonText}>종료된 챌린지</Text>
+                </TouchableOpacity>
+            ) : isJoined ? (
                 <TouchableOpacity style={styles.bottomButton} onPress={handleGoToFeedCreate}>
                     <Text style={styles.bottomButtonText}>성과 공유</Text>
                 </TouchableOpacity>
-            </View>
+            ) : (
+                <TouchableOpacity
+                    style={[styles.bottomButton, { backgroundColor: '#53C3A6' }]}
+                    onPress={handleJoinChallenge}
+                >
+                    <Text style={styles.bottomButtonText}>참여하기</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 }

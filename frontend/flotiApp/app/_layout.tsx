@@ -37,6 +37,16 @@ export default function RootLayout() {
     SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+  /* [Debug] Force Logout: Clear storage on mount once */
+  useEffect(() => {
+    const forceLogout = async () => {
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      await AsyncStorage.clear();
+      console.log('[Debug] Force logout executed. Storage cleared.');
+    };
+    forceLogout();
+  }, []);
+
   useEffect(() => {
     if (loaded) SplashScreen.hideAsync();
   }, [loaded]);
@@ -56,10 +66,10 @@ export default function RootLayout() {
         </Stack>
 
         {/* 토스트 메시지를 네이게이션 바 뒤에 표시 */}
-        <Toast 
-          config={toastConfig} 
-          visibilityTime={1500} 
-          position='bottom' 
+        <Toast
+          config={toastConfig}
+          visibilityTime={1500}
+          position='bottom'
           bottomOffset={keyboardHeight + 60} // 키보드가 나타나면 하단 여백 설정
         />
 

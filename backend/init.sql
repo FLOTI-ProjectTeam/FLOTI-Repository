@@ -238,14 +238,14 @@ INSERT INTO post_tags (board_type, post_id, tag_id) VALUES (2, 1, (SELECT tag_id
 
 -- 챌린지 2
 INSERT INTO challenge_posts (author_id, title, intro, content, max_participants, current_participants, start_date, end_date, is_completed) 
-VALUES (1, '4주 영어 단어 암기 챌린지', '매일 20개씩 단어를 외우며 어휘력을 늘려봐요!', '하루 20개씩 영단어 암기!', 10, 3, '2025-01-01 00:00:00', '2025-02-01 00:00:00', 0);
+VALUES (1, '4주 영어 단어 암기 챌린지', '매일 20개씩 단어를 외우며 어휘력을 늘려봐요!', '하루 20개씩 영단어 암기!', 10, 1, '2025-01-01 00:00:00', '2025-02-01 00:00:00', 0);
 INSERT INTO post_tags (board_type, post_id, tag_id) VALUES 
 (2, 2, (SELECT tag_id FROM tags WHERE tag_name = '영어')),
 (2, 2, (SELECT tag_id FROM tags WHERE tag_name = '공부'));
 
 -- 챌린지 3
 INSERT INTO challenge_posts (author_id, title, intro, content, max_participants, current_participants, start_date, end_date, is_completed) 
-VALUES (1, '30일 플랭크 도전! 코어 강화 챌린지', '하루 1분부터 시작하는 플랭크 루틴 도전!', '플랭크로 코어를 튼튼하게!', 10, 3, '2025-01-01 00:00:00', '2025-02-01 00:00:00', 0);
+VALUES (1, '30일 플랭크 도전! 코어 강화 챌린지', '하루 1분부터 시작하는 플랭크 루틴 도전!', '플랭크로 코어를 튼튼하게!', 10, 1, '2025-01-01 00:00:00', '2025-02-01 00:00:00', 0);
 INSERT INTO post_tags (board_type, post_id, tag_id) VALUES 
 (2, 3, (SELECT tag_id FROM tags WHERE tag_name = '운동')),
 (2, 3, (SELECT tag_id FROM tags WHERE tag_name = '플랭크'));
@@ -254,9 +254,16 @@ INSERT INTO post_tags (board_type, post_id, tag_id) VALUES
 INSERT INTO challenge_participants (challenge_id, participant_id, progress, contribution) VALUES
 (1, 1, 15, 10),
 (1, 2, 10, 5),
-(1, 3, 0, 0);
+(1, 3, 0, 0),
+(2, 1, 0, 0),
+(3, 1, 0, 0);
 
 -- 5. Feeds (챌린지 1에 대한 피드)
 INSERT INTO feeds (challenge_id, author_id, content, created_at) VALUES
-(1, 1, '📌 [DAY 1] 독서 완료!\n📕 『아주 작은 습관의 힘』 - 1장 (p.1~30) 읽음\n책에서 "습관이 우리 정체성을 만든다"는 말이 인상적이었어요.', '2024-12-01 10:00:00'),
 (1, 2, '📚 오늘 읽은 책: 『미라클 모닝』\n아침을 어떻게 보내느냐가 중요하다는 걸 깨달았어요!\n여러분도 오늘 30분 독서 챌린지 완료하셨나요?', '2024-12-01 12:00:00');
+
+-- 챌린지 4 (user1이 참여하지 않은 챌린지)
+INSERT INTO challenge_posts (author_id, title, intro, content, max_participants, current_participants, start_date, end_date, is_completed) 
+VALUES (2, '1일 1커밋 챌린지', '매일매일 깃허브에 잔디를 심어봐요!', '개발자의 기본은 꾸준함! 하루에 한 번 커밋하기.', 5, 1, '2025-12-01 00:00:00', '2026-01-01 00:00:00', 0);
+INSERT INTO post_tags (board_type, post_id, tag_id) VALUES (2, 4, (SELECT tag_id FROM tags WHERE tag_name = '공부'));
+INSERT INTO challenge_participants (challenge_id, participant_id, progress, contribution) VALUES (4, 2, 0, 0);
