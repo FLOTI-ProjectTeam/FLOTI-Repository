@@ -10,6 +10,7 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
         content: "AI와 함께 글쓰기를 어떻게 발전시킬 수 있을지 이야기해봐요.",
         maxParticipantCount: 5,
         participantCount: 4,
+        joined: true,
         createdAt: "2025-01-10T10:00:00",
         recentActivityAt: "2025-01-10T10:20:00",
         participants: [
@@ -54,12 +55,11 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
         content: "2025년 프론트엔드 동향에 대해 의견을 나눠보아요.",
         maxParticipantCount: 2,
         participantCount: 2,
+        joined: false,
         createdAt: "2025-01-12T08:00:00",
         recentActivityAt: "2025-01-12T08:45:00",
         participants: [
-            { username: "curiousdev", nickname: "curiousdev", profileImage: URL },
             { username: "typescriptFan", nickname: "typescriptFan", profileImage: URL },
-            { username: "ux_pro", nickname: "ux_pro", profileImage: URL },
         ],
         messages: [
             {
@@ -75,6 +75,40 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
                 id: 11,
                 roomId: 2,
                 author: { username: "curiousdev", nickname: "curiousdev", profileImage: URL },
+                content: "맞아요. 프레임워크별 지원 차이도 흥미롭네요.",
+                likeCount: 2,
+                liked: false,
+                createdAt: "2025-01-12T08:50:00",
+            },
+        ],
+    },
+    {
+        id: 3,
+        author: { username: "curiousdev", nickname: "curiousdev", profileImage: URL },
+        title: "프론트엔드 기술 트렌드",
+        content: "2025년 프론트엔드 동향에 대해 의견을 나눠보아요.",
+        maxParticipantCount: 2,
+        participantCount: 2,
+        joined: true,
+        createdAt: "2025-01-12T08:00:00",
+        recentActivityAt: "2025-01-12T08:45:00",
+        participants: [
+            { username: "peter", nickname: "peter", profileImage: URL },
+        ],
+        messages: [
+            {
+                id: 10,
+                roomId: 2,
+                author: { username: "curiousdev", nickname: "curiousdev", profileImage: URL },
+                content: "최근에는 서버 컴포넌트가 정말 핫하더라고요.",
+                likeCount: 7,
+                liked: true,
+                createdAt: "2025-01-11T14:23:12",
+            },
+            {
+                id: 11,
+                roomId: 2,
+                author: { username: "peter", nickname: "peter", profileImage: URL },
                 content: "맞아요. 프레임워크별 지원 차이도 흥미롭네요.",
                 likeCount: 2,
                 liked: false,

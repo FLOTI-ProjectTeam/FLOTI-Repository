@@ -26,7 +26,7 @@ export default function QnaDetailScreen() {
   const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
   const { goBackSafely, navigateWithParams } = useNavigation();
   const { target: targetAnswerId, ...answerTools } = useMenuInteraction(); // 선택 답변 처리
-  const { modalVisible, type, openModal, closeModal } = useModal<'postDelete' | 'answerDelete' | 'answerAccept'>();
+  const { modalVisible, type, openModal, closeModal } = useModal<'postDelete' | 'answerDelete' | 'answerAccept' | 'likeError'>();
 
   const [loading, setLoading] = useState(true);
   const [post, setPost] = useState<QnaPostDetailResponse>();
@@ -61,29 +61,31 @@ export default function QnaDetailScreen() {
   const callAcceptAnswer = (answerId: number) => acceptAnswer(post!.id, answerId);
   const callToggleLikeAnswer = (answerId: number) => toggleLikeAnswer(post!.id, answerId);
 
+  if (!post) return;
+
   /* 이벤트 핸들러 */
   const handleGoToUpdate = () => {
-    navigateWithParams('/community/qna/update/[postId]', { 
-      postId: post!.id,
-      initialTitle: post!.title, 
-      initialContent: post!.content 
+    navigateWithParams('/community/qna/update/[postId]', {
+      postId: post.id,
+      initialTitle: post.title,
+      initialContent: post.content
     });
   };
 
   const handleGoToAnswerCreate = () => {
     navigateWithParams('/community/qna/[postId]/answer/create', {
-      postId: post!.id,
-      postTitle: post!.title, 
-      postContent: post!.content 
+      postId: post.id,
+      postTitle: post.title,
+      postContent: post.content
     });
   };
 
   const handleGoToAnswerUpdate = ({ id, content }: AnswerReponse) => {
     navigateWithParams('/community/qna/[postId]/answer/[answerId]/update', {
-      postId: post!.id,
+      postId: post.id,
       answerId: id,
-      postTitle: post!.title, 
-      postContent: post!.content,
+      postTitle: post.title,
+      postContent: post.content,
       initialContent: content
     });
     answerTools.setOpenMenuId(null);
@@ -145,7 +147,12 @@ export default function QnaDetailScreen() {
     }
   }
 
-  const handleToggleLike = async ({ id, liked }: AnswerReponse) => {
+  const handleToggleLike = async ({ id, liked, author }: AnswerReponse) => {
+    if (isAuthor) {
+      openModal('likeError');
+      return;
+    }
+
     try {
       await callToggleLikeAnswer(id);
 
@@ -172,17 +179,18 @@ export default function QnaDetailScreen() {
   const modalTitle = {
     postDelete: '게시글을 삭제하시겠습니까?',
     answerDelete: '답변을 삭제하시겠습니까?',
-    answerAccept: '답변을 채택하시겠습니까?'
+    answerAccept: '답변을 채택하시겠습니까?',
+    likeError: '내 답변은 좋아요 할 수 없습니다.'
   };
 
   const modalAction = {
     postDelete: handleDelete,
     answerDelete: handleDeleteAnswer,
-    answerAccept: handleAcceptAnswer
+    answerAccept: handleAcceptAnswer,
+    likeError: undefined
   };
 
   if (loading) return <LoadingView />;
-  if (!post) return;
 
   return (
     <View style={STYLE.BASE_CONTAINER}>
@@ -193,13 +201,11 @@ export default function QnaDetailScreen() {
         data={answers}
         keyExtractor={(item) => item.id.toString()}
         style={STYLE.WRAPPER}
-        contentContainerStyle={{ 
+        contentContainerStyle={{
           flexGrow: 1, // ScrollView가 화면 전체 높이 차지
-          paddingBottom: 60 
+          paddingBottom: post.accepted ? 0 : 60
         }}
-        ListHeaderComponent={ 
-          <QnaDetailHeader post={post} /> 
-        }
+        ListHeaderComponent={<QnaDetailHeader post={post} />}
         ListEmptyComponent={
           <View style={[STYLE.WRAPPER, STYLE.CENTER]}>
             <Text style={STYLE.EMPTY_TEXT}>답변이 없습니다.</Text>
@@ -222,7 +228,7 @@ export default function QnaDetailScreen() {
 
       {/* 수정·삭제·답변 버튼 */}
       <View style={styles.buttonContainer}>
-        {isAuthor ? (
+        {post.author.username === userContext?.username ? (
           <>
             <TouchableOpacity activeOpacity={0.8} style={styles.updateButton} onPress={handleGoToUpdate}>
               <IconSymbol name="pen" size={24} color='white' />
@@ -233,10 +239,12 @@ export default function QnaDetailScreen() {
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity activeOpacity={0.8} style={styles.answerButton} onPress={handleGoToAnswerCreate}>
-            <IconSymbol name="plus.pen" size={24} color='white' />
-            <Text style={styles.buttonText}>답변하기</Text>
-          </TouchableOpacity>
+          !post.accepted && (
+            <TouchableOpacity activeOpacity={0.8} style={styles.answerButton} onPress={handleGoToAnswerCreate}>
+              <IconSymbol name="plus.pen" size={24} color='white' />
+              <Text style={styles.buttonText}>답변하기</Text>
+            </TouchableOpacity>
+          )
         )}
       </View>
 
@@ -244,7 +252,7 @@ export default function QnaDetailScreen() {
         visible={modalVisible}
         title={modalTitle[type!]}
         onClose={closeModal}
-        onAction={() => modalAction[type!]()}
+        onAction={modalAction[type!]}
       />
     </View>
   );
@@ -259,11 +267,11 @@ const styles = StyleSheet.create({
     gap: 8
   },
   updateButton: { ...STYLE.BUTTON, width: '80%' },
-  deleteButton: { 
-    ...STYLE.BUTTON, 
-    flex: 1, 
-    backgroundColor: COLOR.BUTTON.RED, 
-    paddingHorizontal: 16 
+  deleteButton: {
+    ...STYLE.BUTTON,
+    flex: 1,
+    backgroundColor: COLOR.BUTTON.RED,
+    paddingHorizontal: 16
   },
   answerButton: { ...STYLE.BUTTON, flex: 1 },
   buttonText: {

@@ -19,7 +19,7 @@ export const dummyPosts: TipPostResponse[] = [
     author: { username: "bob", nickname: "Bob", profileImage: null },
     title: "두 번째 팁",
     content: "API 연결 전 임시 데이터입니다.",
-    thumbnail: URL,
+    thumbnail: null,
     commentCount: 0,
     likeCount: 2,
     liked: true,

@@ -1,7 +1,8 @@
 import { View, FlatList, Text, StyleSheet, Pressable } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
+import { UserContext } from '@/contexts/UserContext';
 import { useMenuInteraction } from '@/hooks/useMenuInteraction';
 import { useModal } from '@/hooks/useModal';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -29,14 +30,16 @@ export default function DiscussionDetailScreen() {
   const { goBackSafely, navigateWithParams } = useNavigation();
   const { roomId } = useLocalSearchParams();  // URL에서 토론방 ID 가져오기
   const { target: targetMessageId, ...messageTools } = useMenuInteraction(); // 선택 메시지 처리
-  const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'messageDelete'>();
-  
+  const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'messageDelete' | 'likeError'>();
+
   const [loading, setLoading] = useState(true);
   const [room, setRoom] = useState<DiscussionRoomResponse>();
   const [participants, setParticipants] = useState<UserResponse[]>([]);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [menuVisible, setMenuVisible] = useState(false);
   const [content, setContent] = useState(''); // 작성 중인 메시지 내용
+
+  const userContext = useContext(UserContext);  // 사용자 상태
 
   /* 사이드 이펙트 */
   useEffect(() => {
@@ -67,11 +70,12 @@ export default function DiscussionDetailScreen() {
   const handleGoToUpdate = () => {
     navigateWithParams('/community/discussion/update/[roomId]', {
       roomId: room!.id,
-      initialTitle: room!.title, 
+      initialTitle: room!.title,
       initialContent: room!.content,
       initialMaxParticipantCount: room!.maxParticipantCount,
       initialParticipantCount: room!.participantCount
     });
+    setMenuVisible(false);
   };
 
   const handleSubmit = () => {
@@ -95,6 +99,11 @@ export default function DiscussionDetailScreen() {
     } catch (error) {
       showToast('전송 실패', 'error');
     }
+  };
+
+  const handleShowDeleteConfirm = () => {
+    openModal('roomDelete');
+    setMenuVisible(false);
   };
 
   const handleShowMessageDeleteConfirm = (targetId: number) => {
@@ -125,7 +134,12 @@ export default function DiscussionDetailScreen() {
     }
   }
 
-  const handleToggleLike = async ({ id, liked }: MessageResponse) => {
+  const handleToggleLike = async ({ id, liked, author }: MessageResponse) => {
+    if (author?.username === userContext?.username) {
+      openModal('likeError');
+      return;
+    }
+
     try {
       toggleLikeMessage(room!.id, id);
 
@@ -152,12 +166,14 @@ export default function DiscussionDetailScreen() {
   /* 모달 정보 */
   const modalTitle = {
     roomDelete: '토론방을 삭제하시겠습니까?',
-    messageDelete: '메시지를 삭제하시겠습니까?'
+    messageDelete: '메시지를 삭제하시겠습니까?',
+    likeError: '내 메시지는 좋아요 할 수 없습니다.'
   };
 
   const modalAction = {
     roomDelete: handleDelete,
-    messageDelete: handleMessageDelete
+    messageDelete: handleMessageDelete,
+    likeError: undefined
   };
 
   if (loading) return <LoadingView />;
@@ -177,7 +193,7 @@ export default function DiscussionDetailScreen() {
           <IconSymbol name="menu" size={28} color={COLOR.TINT.GRAY_DARK} />
         </Pressable>
       </View>
-      
+
       <FlatList
         data={insertDateLabels(messages)}
         keyExtractor={(item) => item.id.toString()}
@@ -194,7 +210,7 @@ export default function DiscussionDetailScreen() {
               </View>
             );
           }
-      
+
           // 메시지 렌더링
           return (
             <MessageItem
@@ -212,29 +228,23 @@ export default function DiscussionDetailScreen() {
         content={content}
         onChangeText={setContent}
         onSubmit={() => handleSubmit()}
-        placeholder = '메시지를 입력하세요'
+        placeholder='메시지를 입력하세요'
       />
 
       <ConfirmModal
         visible={modalVisible}
         title={modalTitle[type!]}
         onClose={closeModal}
-        onAction={() => modalAction[type!]()}
+        onAction={modalAction[type!]}
       />
 
-      <SideMenu 
+      <SideMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
         room={room}
         participants={participants}
-        onUpdate={() => {
-          setMenuVisible(false);
-          handleGoToUpdate();
-        }}
-        onDelete={() => {
-          setMenuVisible(false);
-          openModal('roomDelete');
-        }}
+        onUpdate={handleGoToUpdate}
+        onDelete={handleShowDeleteConfirm}
       />
     </View>
   );
@@ -243,10 +253,10 @@ export default function DiscussionDetailScreen() {
 const styles = StyleSheet.create({
   dateLabelContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   line: { flex: 1, height: 1, backgroundColor: COLOR.TINT.GRAY },
-  dateLabelText: { 
-    marginHorizontal: 10, 
-    fontSize: 12, 
+  dateLabelText: {
+    marginHorizontal: 10,
+    fontSize: 12,
     fontWeight: 700,
-    color: COLOR.TEXT.GRAY_CHARCOAL 
+    color: COLOR.TEXT.GRAY_CHARCOAL
   }
 })

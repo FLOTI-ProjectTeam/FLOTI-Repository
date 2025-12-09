@@ -1,6 +1,9 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import { UserContext } from '@/contexts/UserContext';
+import { useModal } from '@/hooks/useModal';
 
 import { dummyPosts } from '@/__mocks__/tip';
 import { getTipPost, toggleLikeTipPost } from '@/api/community/tipApi';
@@ -8,6 +11,7 @@ import { TipPostResponse } from '@/types/community/tip';
 
 import BreakAllText from '@/components/ui/BreakAllText';
 import { Header } from '@/components/ui/Header';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import BottomBar from '@/components/feature/community/tip/BottomBar';
 import { LoadingView } from '@/components/feature/community/CommunityStateView';
 
@@ -18,9 +22,13 @@ import { STYLE } from '@/constants/styles';
 
 export default function TipDetailScreen() {
   const { postId } = useLocalSearchParams();  // URL에서 게시글 ID 가져오기
-  
+  const { modalVisible, openModal, closeModal } = useModal();
+
   const [loading, setLoading] = useState(true);
   const [post, setPost] = useState<TipPostResponse>();
+
+  const userContext = useContext(UserContext);  // 사용자 상태
+  const isAuthor = (post?.author.username === userContext?.username);
 
   /* API 호출 */
   const callToggleLikeTipPost = () => toggleLikeTipPost(post!.id);
@@ -44,20 +52,26 @@ export default function TipDetailScreen() {
     }
   }
 
+  if (!post) return;
+
   /* 이벤트 핸들러 */
   const handleToggleLike = async () => {
-    if (!post) return null;
+    if (isAuthor) {
+      openModal();
+      return;
+    }
+
     try {
       await callToggleLikeTipPost();
 
       // 좋아요 갱신
       setPost(prev =>
         prev
-          ? { 
-              ...prev,
-              liked: !prev.liked,
-              likeCount: prev.likeCount + (prev.liked ? -1 : 1)
-            }
+          ? {
+            ...prev,
+            liked: !prev.liked,
+            likeCount: prev.likeCount + (prev.liked ? -1 : 1)
+          }
           : prev
       );
     } catch (error) {
@@ -67,15 +81,14 @@ export default function TipDetailScreen() {
   }
 
   if (loading) return <LoadingView />;
-  if (!post) return;
 
   return (
     <View style={STYLE.BASE_CONTAINER}>
       <Header title='TIP' />
-      
-      <ScrollView 
-        style={STYLE.WRAPPER} 
-        contentContainerStyle={{ 
+
+      <ScrollView
+        style={STYLE.WRAPPER}
+        contentContainerStyle={{
           flexGrow: 1, // 화면 전체 높이 차지
           paddingBottom: 16
         }}
@@ -94,6 +107,12 @@ export default function TipDetailScreen() {
       </ScrollView>
 
       <BottomBar post={post} onToggleLike={handleToggleLike} />
+
+      <ConfirmModal
+        visible={modalVisible}
+        title='내 게시글은 좋아요 할 수 없습니다.'
+        onClose={closeModal}
+      />
     </View>
   );
 }

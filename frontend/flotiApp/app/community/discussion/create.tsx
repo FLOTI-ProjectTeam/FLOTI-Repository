@@ -41,7 +41,7 @@ export default function DiscussionCreateScreen() {
     }
   };
 
-  const callCreateDiscussionRoom= () => createDiscussionRoom({ title, content, maxParticipantCount });
+  const callCreateDiscussionRoom = () => createDiscussionRoom({ title, content, maxParticipantCount });
 
   /* 이벤트 핸들러 */
   const handleSave = async () => {

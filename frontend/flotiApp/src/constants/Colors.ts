@@ -21,7 +21,8 @@ const COLOR = {
     NAVY: '#153257',
     SLATE_DARK: '#7D98C9',
     SLATE: '#B0C4DE',
-    POWDER: '#B0E0E6'
+    POWDER: '#B0E0E6',
+    MINT: '#53C3A6'
   },
 
   TINT: {

@@ -68,10 +68,10 @@ export default function TipCreateScreen() {
   return (
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSave={handleSave} onSubmit={handleSubmit} />
-      <InputView 
-        title={title} 
-        content={content} 
-        onChangeTitle={setTitle} 
+      <InputView
+        title={title}
+        content={content}
+        onChangeTitle={setTitle}
         onChangeContent={setContent}
       />
     </View>

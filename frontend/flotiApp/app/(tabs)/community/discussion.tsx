@@ -14,6 +14,7 @@ import BreakAllText from '@/components/ui/BreakAllText';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+import StatusLabel from '@/components/feature/community/StatusLabel';
 
 import { formatRelativeTime } from '@/utils/time';
 import { showToast } from '@/utils/toast';
@@ -52,7 +53,9 @@ export default function DiscussionListScreen() {
       setRooms(response.data.content);
     } catch (error) {
       // 테스트용
-      const filtered = dummyRoomDetails.filter(room => room.title.includes(searchTrigger));
+      const filtered = dummyRoomDetails.filter(room =>
+        room.title.includes(searchTrigger) && (!isChecked || room.joined)
+      );
       setRooms(filtered);
     } finally {
       setLoading(false);
@@ -63,8 +66,15 @@ export default function DiscussionListScreen() {
 
   /* 이벤트 핸들러 */
   const handleSetModal = (target: DiscussionRoomResponse) => {
+    // 참여 중이면 바로 이동
+    if (target.joined) {
+      navigateTo(`/community/discussion/${target.id}`);
+      return;
+    }
+
+    // 모달 설정
     setTargetRoom(target);
-  
+
     if (target.participantCount >= target.maxParticipantCount) {
       setModalTitle('토론방이 가득 찼습니다.');
       setCannotJoin(true);
@@ -72,10 +82,10 @@ export default function DiscussionListScreen() {
       setModalTitle('토론방에 참여하시겠습니까?');
       setCannotJoin(false);
     }
-  
+
     openModal();
   };
-  
+
   const handleToggleJoin = async () => {
     try {
       if (!targetRoom || cannotJoin) return;
@@ -88,7 +98,6 @@ export default function DiscussionListScreen() {
   };
 
   if (loading) return <LoadingView />
-  if (rooms.length === 0) return <EmptyView text='토론방이 없습니다.' />
 
   return (
     <View style={STYLE.CONTENT_CONTAINER}>
@@ -101,7 +110,11 @@ export default function DiscussionListScreen() {
         data={rooms}
         keyExtractor={(item) => item.id.toString()}
         style={STYLE.WRAPPER}
-        contentContainerStyle={{ paddingBottom: 8 }}
+        contentContainerStyle={{
+          flexGrow: 1, // ScrollView가 화면 전체 높이 차지
+          paddingBottom: 8
+        }}
+        ListEmptyComponent={<EmptyView text='토론방이 없습니다.' />}
         renderItem={({ item }) => (
           <TouchableOpacity
             activeOpacity={0.7} // 클릭 시 투명도 설정
@@ -110,11 +123,16 @@ export default function DiscussionListScreen() {
             <View style={STYLE.CARD}>
               <View style={styles.info}>
                 {/* 제목 */}
-                <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+                <View style={styles.titleContainer}>
+                  {item.joined
+                    ? <StatusLabel type='JOINED' />
+                    : (item.participantCount >= item.maxParticipantCount ? <StatusLabel type='FULL' /> : null)}
+                  <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+                </View>
 
-                {/* 소개 */}
+                {/* 토론 내용 */}
                 <BreakAllText style={styles.content}>{item.content}</BreakAllText>
-                
+
                 {/* 활동일, 인원 */}
                 <View style={styles.meta}>
                   <View style={styles.metaItem}>
@@ -144,7 +162,8 @@ export default function DiscussionListScreen() {
 
 const styles = StyleSheet.create({
   info: { flex: 1, justifyContent: 'space-between', gap: 4 },
-  title: { fontSize: 16, fontWeight: 700, color: 'black' },
+  titleContainer: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  title: { flex: 1, fontSize: 16, fontWeight: 700, color: 'black' },
   content: { marginBottom: 2, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   metaItem: { flexDirection: 'row', alignItems: 'center' },

@@ -38,7 +38,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
     title: "TypeScript에서 타입을 확장하는 방법?",
     content: "인터페이스 상속과 타입 별칭의 차이를 알고 싶습니다.",
     answerCount: 1,
-    accepted: false,
+    accepted: true,
     createdAt: "2025-10-24T14:15:00",
     answers: [
       {
@@ -47,7 +47,7 @@ export const dummyPostDetails: QnaPostDetailResponse[] = [
         author: { username: "frank", nickname: "Frank", profileImage: null },
         content: "interface 상속은 여러 인터페이스를 확장할 수 있고, 타입 별칭은 union, intersection이 가능합니다.",
         likeCount: 2,
-        accepted: false,
+        accepted: true,
         liked: true,
         createdAt: "2025-10-24T15:00:00",
       },

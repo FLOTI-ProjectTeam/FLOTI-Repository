@@ -34,7 +34,7 @@ export default function RootLayout() {
   const keyboardHeight = useKeyboardHeight();
 
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('@assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
@@ -56,10 +56,10 @@ export default function RootLayout() {
         </Stack>
 
         {/* 토스트 메시지를 네이게이션 바 뒤에 표시 */}
-        <Toast 
-          config={toastConfig} 
-          visibilityTime={1500} 
-          position='bottom' 
+        <Toast
+          config={toastConfig}
+          visibilityTime={1500}
+          position='bottom'
           bottomOffset={keyboardHeight + 60} // 키보드가 나타나면 하단 여백 설정
         />
 

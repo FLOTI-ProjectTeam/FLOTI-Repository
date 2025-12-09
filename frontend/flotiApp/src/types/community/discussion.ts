@@ -13,6 +13,7 @@ export interface DiscussionRoomResponse {
     content: string;
     maxParticipantCount: number;
     participantCount: number;
+    joined: boolean;
     createdAt: string;
     recentActivityAt: string;
 }

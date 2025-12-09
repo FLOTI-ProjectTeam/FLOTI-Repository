@@ -5,7 +5,7 @@ import ParticipantDropdown from '@/components/feature/community/discussion/Parti
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
-export function DiscussionInputView({ 
+export function DiscussionInputView({
     title, content, maxParticipantCount, onChangeTitle, onChangeContent, onChangeMaxParticipantCount
 }: {
     title: string;
@@ -27,7 +27,7 @@ export function DiscussionInputView({
                     placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
                 />
             </View>
-            
+
             <View style={STYLE.CARD_OUTLINE}>
                 <Text style={styles.label}>📌 토론 내용</Text>
                 <TextInput
@@ -46,19 +46,19 @@ export function DiscussionInputView({
                 <ParticipantDropdown value={maxParticipantCount} onChange={onChangeMaxParticipantCount}
                 />
             </View>
-      </View>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    cardContainer: { ...STYLE.WRAPPER, paddingVertical: 20, gap: 8 }, 
+    cardContainer: { ...STYLE.WRAPPER, paddingVertical: 20, gap: 8 },
     label: { fontSize: 16, fontWeight: 700, color: COLOR.TEXT.GRAY_DARK },
-    input: { 
+    input: {
         flex: 1,
         marginHorizontal: 8,
-        paddingVertical: 6, 
-        fontSize: 15, 
-        backgroundColor: 'white' 
+        paddingVertical: 6,
+        fontSize: 15,
+        backgroundColor: 'white'
     },
     inputLine: { borderBottomWidth: 1, borderBottomColor: COLOR.TINT.SLATE_SOFT }
 });

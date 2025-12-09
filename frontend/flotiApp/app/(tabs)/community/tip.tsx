@@ -36,7 +36,7 @@ export default function TipListScreen() {
   }, [searchTrigger, sortType]);
 
   /* API 호출 */
-  const loadPosts = async () => {  
+  const loadPosts = async () => {
     try {
       setLoading(true);
       const response = await getTipPosts(searchTrigger);
@@ -50,11 +50,7 @@ export default function TipListScreen() {
     }
   };
 
-  /* 이벤트 핸들러 */
-  const handleGoToTipDetail = (postId: number) => navigateTo(`/community/tip/${postId}`);
-
   if (loading) return <LoadingView />
-  if (posts.length === 0) return <EmptyView />
 
   return (
     <View style={STYLE.CONTENT_CONTAINER}>
@@ -66,11 +62,15 @@ export default function TipListScreen() {
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         style={STYLE.WRAPPER}
-        contentContainerStyle={{ paddingBottom: 8 }}
+        contentContainerStyle={{
+          flexGrow: 1, // ScrollView가 화면 전체 높이 차지
+          paddingBottom: 8
+        }}
+        ListEmptyComponent={<EmptyView />}
         renderItem={({ item }) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             activeOpacity={0.7} // 클릭 시 투명도 설정
-            onPress={() => handleGoToTipDetail(item.id)}
+            onPress={() => navigateTo(`/community/tip/${item.id}`)}
           >
             <View style={[STYLE.CARD, STYLE.ROW]}>
               <View style={styles.info}>
@@ -82,7 +82,7 @@ export default function TipListScreen() {
                   {item.author.nickname} • {formatRelativeTime(item.createdAt)}
                 </Text>
 
-                {/* 좋아요·댓글수 */}  
+                {/* 좋아요·댓글수 */}
                 <View style={styles.stats}>
                   <View style={styles.statItem}>
                     <IconSymbol name="heart" size={16} color={COLOR.TINT.GRAY_DARK} />
@@ -96,9 +96,9 @@ export default function TipListScreen() {
               </View>
 
               {/* 섬네일 */}
-              {item.thumbnail 
+              {item.thumbnail
                 ? <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
-                : <View style={[styles.thumbnail, { backgroundColor: 'lightgray' }]} />
+                : <Image source={require('@assets/images/no-thumbnail.jpg')} style={styles.thumbnail} />
               }
             </View>
           </TouchableOpacity>

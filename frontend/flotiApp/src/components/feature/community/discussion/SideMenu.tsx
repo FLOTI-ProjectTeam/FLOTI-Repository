@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated, ScrollView, Dimensions, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { UserContext } from '@/contexts/UserContext';
 
@@ -11,13 +12,13 @@ import ProfileAvatar from '@/components/feature/community/ProfileAvatar';
 
 import { formatDetailTime, formatSmartTime } from '@/utils/time';
 import COLOR from '@/constants/colors';
-import { STYLE } from '@/constants/styles';
+import BreakAllText from '@/components/ui/BreakAllText';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const MENU_WIDTH = SCREEN_WIDTH * 0.75; // 화면의 75% 차지
+const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.8, 320); // Max 320px or 80%
 
-export function SideMenu({ 
-    visible, onClose, room, participants, onUpdate, onDelete 
+export function SideMenu({
+    visible, onClose, room, participants, onUpdate, onDelete
 }: {
     visible: boolean;
     onClose: () => void;
@@ -25,27 +26,27 @@ export function SideMenu({
     participants: UserResponse[];
     onUpdate: () => void;
     onDelete: () => void;
-}) {  
+}) {
     const [shouldRender, setShouldRender] = useState(visible);
+    const insets = useSafeAreaInsets();
 
-    const slideAnim = useRef(new Animated.Value(MENU_WIDTH)).current; // 슬라이드 애니메이션
-    const fadeAnim = useRef(new Animated.Value(0)).current;   // 투명도 애니메이션
-    const userContext = useContext(UserContext);  // 사용자 상태
+    const slideAnim = useRef(new Animated.Value(MENU_WIDTH)).current;
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const userContext = useContext(UserContext);
     const isAuthor = (room.author.username === userContext?.username);
 
     useEffect(() => {
         if (visible) {
             setShouldRender(true);
-            // 병렬 애니메이션 실행 (슬라이드 + 배경 어두워짐)
             Animated.parallel([
                 Animated.timing(slideAnim, {
                     toValue: 0,
-                    duration: 300,
+                    duration: 250,
                     useNativeDriver: true,
                 }),
                 Animated.timing(fadeAnim, {
-                    toValue: 1, // 불투명도 1 (스타일에서 backgroundColor alpha로 조절하거나 여기서 opacity 조절)
-                    duration: 300,
+                    toValue: 1,
+                    duration: 250,
                     useNativeDriver: true,
                 })
             ]).start();
@@ -53,12 +54,12 @@ export function SideMenu({
             Animated.parallel([
                 Animated.timing(slideAnim, {
                     toValue: MENU_WIDTH,
-                    duration: 300,
+                    duration: 200,
                     useNativeDriver: true,
                 }),
                 Animated.timing(fadeAnim, {
-                    toValue: 0, 
-                    duration: 300,
+                    toValue: 0,
+                    duration: 200,
                     useNativeDriver: true,
                 })
             ]).start(() => setShouldRender(false));
@@ -69,140 +70,273 @@ export function SideMenu({
 
     return (
         <View style={styles.overlayContainer}>
-        {/* 배경 터치 시 닫기 */}
-        <Animated.View 
-            style={[
-            styles.backdrop, 
-            { opacity: fadeAnim } 
-            ]}
-        >
-            <Pressable style={{ flex: 1 }} onPress={onClose} />
-        </Animated.View>
+            <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
+                <Pressable style={{ flex: 1 }} onPress={onClose} />
+            </Animated.View>
 
-        <Animated.View style={[styles.menuPanel, { transform: [{ translateX: slideAnim }] }]}>
-            <View style={STYLE.FLEX}>
-            
-                {/* 1. 헤더 & 토론방 정보 */}
-                <View style={styles.headerSection}>
-                    <View style={styles.titleRow}>
-                    <Text style={styles.menuTitle} numberOfLines={1}>{room.title}</Text>
-                    </View>
-                    <Text style={styles.createdDate}>
-                        개설일: {formatDetailTime(room.createdAt)}
+            <Animated.View
+                style={[
+                    styles.menuPanel,
+                    {
+                        transform: [{ translateX: slideAnim }],
+                        paddingTop: insets.top + 20,
+                        paddingBottom: insets.bottom + 20
+                    }
+                ]}
+            >
+                <Text style={styles.roomTitle}>{room.title}</Text>
+
+                <View style={styles.metaInfoRow}>
+                    <IconSymbol name="time" size={14} color={COLOR.TEXT.GRAY_MEDIUM} />
+                    <Text style={styles.metaText}>
+                        개설일  {formatDetailTime(room.createdAt)}
                     </Text>
-                    <Text style={styles.createdDate}>
-                        활동일: {formatSmartTime(room.recentActivityAt, 'detail')}
-                    </Text>
-                    <Text style={styles.roomContent} numberOfLines={3}>
-                        {room.content}
+                </View>
+                <View style={styles.metaInfoRow}>
+                    <IconSymbol name="report" size={14} color={COLOR.TEXT.GRAY_MEDIUM} />
+                    <Text style={styles.metaText}>
+                        활동일  {formatSmartTime(room.recentActivityAt, 'detail')}
                     </Text>
                 </View>
 
-                <View style={styles.divider} />
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 20 }} showsVerticalScrollIndicator={false}>
 
-                {/* 2. 참여자 리스트 (여기를 풍성하게!) */}
-                <View style={styles.participantSection}>
+                    {/* 1. Room Info Card */}
                     <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>참여자</Text>
-                    <Text style={styles.participantCount}>
-                        {room.participantCount} / {room.maxParticipantCount}명
-                    </Text>
+                        <Text style={styles.sectionTitle}>토론 내용</Text>
                     </View>
-                    
-                    <ScrollView style={styles.participantList}>
-                        <View style={styles.participantItem}>
-                            <ProfileAvatar profileImage={room.author.profileImage } nickname={room.author.nickname} />
-                            <Text style={styles.nickname}>{room.author.nickname}</Text>
-                            <IconSymbol name="crown" size={14} color='orange' style={{marginLeft: 4}}/>
+
+                    <View style={styles.roomContentContainer}>
+                        <BreakAllText style={styles.roomContent}>{room.content}</BreakAllText>
+                    </View>
+
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>참여자</Text>
+                        <View style={styles.participantBadge}>
+                            <Text style={styles.participantCount}>
+                                {room.participantCount} / {room.maxParticipantCount}
+                            </Text>
                         </View>
+                    </View>
+
+                    {/* 2. Participants List */}
+                    <View style={styles.participantsList}>
+                        {/* Author */}
+                        <View style={styles.participantItem}>
+                            <ProfileAvatar profileImage={room.author.profileImage} />
+                            <View style={styles.nameRow}>
+                                <Text style={styles.nickname}>{room.author.nickname}</Text>
+                                <View style={styles.crownBadge}>
+                                    <IconSymbol name="crown" size={12} color="#FFF" />
+                                </View>
+                            </View>
+                        </View>
+
+                        {/* Other Participants */}
                         {participants.map((user) => (
                             <View key={user.username} style={styles.participantItem}>
-                                <ProfileAvatar profileImage={user.profileImage} nickname={user.nickname} />
+                                <ProfileAvatar profileImage={user.profileImage} />
                                 <Text style={styles.nickname}>{user.nickname}</Text>
                             </View>
                         ))}
-                    </ScrollView>
-                </View>
-
-                <View style={styles.divider} />
-
-                {/* 3. 하단 액션 버튼 */}
-                {isAuthor ? (
-                    <View style={styles.actionSection}>
-                        <Pressable style={styles.menuItem} onPress={onUpdate}>
-                            <IconSymbol name="plus.pen" size={20} color={COLOR.TINT.GRAY_DARK} />
-                            <Text style={styles.menuItemText}>토론방 정보 수정</Text>
-                        </Pressable>
-
-                        <Pressable style={[styles.menuItem, styles.deleteItem]} onPress={onDelete}>
-                            <IconSymbol name="trash" size={20} color='tomato' />
-                            <Text style={[styles.menuItemText, { color: 'tomato' }]}>토론방 삭제</Text>
-                        </Pressable>
                     </View>
-                ) : (
-                    <Pressable style={styles.menuItem} onPress={onDelete}>
-                        <IconSymbol name="exit" size={20} color='tomato' />
-                        <Text style={[styles.menuItemText, { color: 'tomato' }]}>토론방 나가기</Text>
-                    </Pressable>
-                )}
-            </View>
-        </Animated.View>
+                </ScrollView>
+
+                {/* 3. Footer Actions */}
+                <View style={[styles.footerActions, { paddingBottom: 0 }]}>
+                    {isAuthor ? (
+                        <>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.actionButton,
+                                    styles.updateButton,
+                                    pressed && styles.pressedButton
+                                ]}
+                                onPress={onUpdate}
+                            >
+                                <IconSymbol name="plus.pen" size={18} color={COLOR.TEXT.NAVY} />
+                                <Text style={[styles.actionButtonText, { color: COLOR.TEXT.NAVY }]}>정보 수정</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.actionButton,
+                                    styles.deleteButton,
+                                    pressed && styles.pressedButton
+                                ]}
+                                onPress={onDelete}
+                            >
+                                <IconSymbol name="trash" size={18} color={COLOR.BUTTON.RED} />
+                                <Text style={[styles.actionButtonText, { color: COLOR.BUTTON.RED }]}>삭제하기</Text>
+                            </Pressable>
+                        </>
+                    ) : (
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.actionButton,
+                                styles.deleteButton,
+                                pressed && styles.pressedButton
+                            ]}
+                            onPress={onDelete}
+                        >
+                            <IconSymbol name="exit" size={18} color={COLOR.BUTTON.RED} />
+                            <Text style={[styles.actionButtonText, { color: COLOR.BUTTON.RED }]}>나가기</Text>
+                        </Pressable>
+                    )}
+                </View>
+            </Animated.View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    overlayContainer: { ...StyleSheet.absoluteFillObject, zIndex: 100 },
-    backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+    overlayContainer: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 1000
+    },
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
     menuPanel: {
         position: 'absolute',
-        right: 0, // 오른쪽에 붙이기
-        top: 0,
-        bottom: 0,
-        width: MENU_WIDTH,
+        right: 0,
         height: '100%',
-        backgroundColor: 'white',
-        padding: 20,
-        shadowColor: "#000",
-        shadowOffset: { width: -2, height: 0 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
+        width: MENU_WIDTH,
+        backgroundColor: '#FFFFFF',
+        paddingHorizontal: 20,
+        ...Platform.select({
+            ios: {
+                shadowColor: "#000",
+                shadowOffset: { width: -4, height: 0 },
+                shadowOpacity: 0.1,
+                shadowRadius: 10,
+            },
+            android: {
+                elevation: 10,
+            }
+        })
     },
-    /* 섹션 스타일 */
-    headerSection: { marginBottom: 20 },
-    titleRow: {
+    roomTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLOR.TEXT.GRAY_DARK,
+        marginBottom: 24
+    },
+    /* Card Style for Room Info */
+    metaInfoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 6,
+        gap: 6,
+    },
+    metaText: {
+        fontSize: 13,
+        color: COLOR.TEXT.GRAY_MEDIUM,
+        fontWeight: '500',
+    },
+    roomContentContainer: {
+        padding: 12,
+        borderRadius: 12,
+        marginBottom: 30,
+        borderWidth: 1,
+        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
+        borderColor: COLOR.TINT.SLATE,
+    },
+    roomContent: {
+        fontSize: 15,
+        color: COLOR.TEXT.GRAY_CHARCOAL,
+        lineHeight: 22
+    },
+
+    /* Headers */
+    sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 16
     },
-    menuTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        flex: 1,
-        marginRight: 10,
-        marginBottom: 10
+    sectionTitle: {
+        fontSize: 17,
+        fontWeight: '700',
+        color: COLOR.TEXT.GRAY_DARK
     },
-    createdDate: { fontSize: 12, color: '#888', marginBottom: 8 },
-    roomContent: { fontSize: 14, color: '#555', lineHeight: 20 },
-    divider: { height: 1, backgroundColor: '#EEE', marginVertical: 15 },
-    /* 참여자 섹션 */
-    participantSection: { flex: 1 },
-    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
-    sectionTitle: { fontSize: 16, fontWeight: '600' },
-    participantCount: { fontSize: 14, color: '#666' },
-    participantList: { flex: 1 },
-    participantItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
-    nickname: { fontSize: 15, color: '#333' },
-    /* 하단 액션 */
-    actionSection: { marginBottom: 20 },
-    menuItem: {
+    participantBadge: {
+        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    participantCount: {
+        fontSize: 13,
+        color: COLOR.TEXT.NAVY,
+        fontWeight: '600'
+    },
+
+    /* Participant List */
+    participantsList: { marginBottom: 20 },
+    participantItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 12,
+        padding: 12,
+        backgroundColor: '#F9FAFB',
+        borderRadius: 12,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#F0F0F0',
+    },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    nickname: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: COLOR.TEXT.GRAY_DARK,
+    },
+    roleText: {
+        fontSize: 12,
+        color: COLOR.TEXT.GRAY_MEDIUM,
+        marginTop: 2,
+    },
+    crownBadge: {
+        backgroundColor: '#FFD700',
+        borderRadius: 10,
+        width: 18,
+        height: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    /* Footer Buttons */
+    footerActions: {
+        marginTop: 10,
         gap: 12,
     },
-    menuItemText: { fontSize: 16, color: '#333' },
-    deleteItem: { marginTop: 10 }
+    actionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 14,
+        borderRadius: 12,
+        gap: 8,
+        borderWidth: 1,
+    },
+    updateButton: {
+        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
+        borderColor: 'transparent',
+    },
+    deleteButton: {
+        backgroundColor: '#FFF0F0',
+        borderColor: 'transparent',
+    },
+    pressedButton: {
+        opacity: 0.7,
+        transform: [{ scale: 0.98 }]
+    },
+    actionButtonText: {
+        fontSize: 15,
+        fontWeight: '600',
+    },
 });

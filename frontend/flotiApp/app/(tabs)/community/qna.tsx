@@ -10,6 +10,7 @@ import { QnaPostResponse } from '@/types/community/qna';
 
 import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
+import StatusLabel from '@/components/feature/community/StatusLabel';
 
 import { formatRelativeTime } from '@/utils/time';
 import { STYLE } from '@/constants/styles';
@@ -43,18 +44,16 @@ export default function QnaListScreen() {
       setPosts(response.data.content);
     } catch (error) {
       // 테스트용
-      const filtered = dummyPostDetails.filter(post => post.title.includes(searchTrigger));
+      const filtered = dummyPostDetails.filter(post =>
+        post.title.includes(searchTrigger) && (!isChecked || !post.accepted)
+      );
       setPosts(filtered);
     } finally {
       setLoading(false);
     }
   };
 
-  /* 이벤트 핸들러 */
-  const handleGoToQnaDetail = (postId: number) => navigateTo(`/community/qna/${postId}`);
-
   if (loading) return <LoadingView />
-  if (posts.length === 0) return <EmptyView />
 
   return (
     <View style={STYLE.CONTENT_CONTAINER}>
@@ -67,16 +66,23 @@ export default function QnaListScreen() {
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         style={STYLE.WRAPPER}
-        contentContainerStyle={{ paddingBottom: 8 }}
+        contentContainerStyle={{
+          flexGrow: 1, // ScrollView가 화면 전체 높이 차지
+          paddingBottom: 8
+        }}
+        ListEmptyComponent={<EmptyView />}
         renderItem={({ item }) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             activeOpacity={0.7} // 클릭 시 투명도 설정
-            onPress={() => handleGoToQnaDetail(item.id)}
+            onPress={() => navigateTo(`/community/qna/${item.id}`)}
           >
             <View style={[STYLE.CARD, STYLE.ROW]}>
               <View style={styles.info}>
                 {/* 제목 */}
-                <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+                <View style={styles.titleContainer}>
+                  {item.accepted && <StatusLabel type='ACCEPTED' />}
+                  <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+                </View>
 
                 {/* 작성자, 작성일 */}
                 <Text style={styles.authorInfo}>
@@ -98,7 +104,8 @@ export default function QnaListScreen() {
 
 const styles = StyleSheet.create({
   info: { flex: 1, justifyContent: 'space-between', gap: 4 },
-  title: { fontSize: 16, fontWeight: 700, color: 'black' },
+  titleContainer: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  title: { flex: 1, fontSize: 16, fontWeight: 700 },
   authorInfo: { marginBottom: 2, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   answerBadge: {
     justifyContent: 'center',

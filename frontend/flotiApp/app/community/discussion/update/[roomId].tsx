@@ -55,7 +55,7 @@ export default function DiscussionUpdateScreen() {
         onChangeContent={setContent}
         onChangeMaxParticipantCount={handleChangeMaxCount}
       />
-      
+
       <ConfirmModal
         visible={modalVisible}
         title='현재 참여자보다 적은 인원입니다.'

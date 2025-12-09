@@ -15,7 +15,7 @@ import { STYLE } from '@/constants/styles';
 export default function TipUpdateScreen() {
   const { goBackSafely } = useNavigation();
   const { postId, initialTitle, initialContent } = useLocalSearchParams();  // URL에서 게시글 정보 가져오기
-  
+
   const [title, setTitle] = useState(String(initialTitle || ''));
   const [content, setContent] = useState(String(initialContent || ''));
   const [file, setFile] = useState<File | undefined>(undefined);
@@ -37,11 +37,11 @@ export default function TipUpdateScreen() {
   return (
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSubmit={handleSubmit} />
-      <InputView 
-        title={title} 
+      <InputView
+        title={title}
         content={content}
-        onChangeTitle={setTitle} 
-        onChangeContent={setContent} 
+        onChangeTitle={setTitle}
+        onChangeContent={setContent}
       />
     </View>
   );

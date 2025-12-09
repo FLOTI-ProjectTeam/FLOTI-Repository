@@ -61,7 +61,7 @@ export default function CommentListScreen() {
     try {
       if (!content.trim()) return;
       const response = await callCreateComment();
-    
+
       // 답글이면 부모 댓글의 replies에 추가
       if (replyTo) {
         setComments(prev =>
@@ -97,7 +97,7 @@ export default function CommentListScreen() {
           // 부모 댓글 수정
           if (comment.id === target.id)
             return { ...comment, content: target.content };
-    
+
           // 답글 수정
           if (comment.replies?.length) {
             return {
@@ -107,7 +107,7 @@ export default function CommentListScreen() {
               )
             };
           }
-    
+
           return comment;
         })
       );
@@ -196,7 +196,7 @@ export default function CommentListScreen() {
         content={content}
         onChangeText={setContent}
         onSubmit={() => handleSubmit(replyTo)}
-        placeholder = '댓글을 입력하세요'
+        placeholder='댓글을 입력하세요'
         replyTo={replyTo}
         onCancelReply={() => setReplyTo(null)}
       />

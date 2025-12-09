@@ -16,7 +16,7 @@ import { showToast } from '@/utils/toast';
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
 
-export default function BottomBar({ 
+export default function BottomBar({
   post, onToggleLike
 }: {
   post: TipPostResponse;
@@ -49,7 +49,7 @@ export default function BottomBar({
       initialCommentCount: post.commentCount
     });
   }
-  
+
   const handleShowDeleteConfirm = () => {
     setMenuVisible(false);
     openModal();
@@ -69,8 +69,8 @@ export default function BottomBar({
     <View style={styles.bottomBar}>
       {/* 좋아요·댓글수 */}
       <View style={styles.leftActions}>
-        <Pressable style={styles.actionButton} onPress={onToggleLike} disabled={isAuthor}>
-          <IconSymbol 
+        <Pressable style={styles.actionButton} onPress={onToggleLike}>
+          <IconSymbol
             name={post.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
             color={post.liked ? 'tomato' : COLOR.TINT.GRAY_DARK} // 좋아요 여부에 따라 색상 변경
           />

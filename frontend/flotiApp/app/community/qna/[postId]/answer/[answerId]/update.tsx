@@ -36,7 +36,7 @@ export default function AnswerUpdateScreen() {
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSubmit={handleSubmit} />
       <QnaInfo title={String(postTitle)} content={String(postContent)} />
-      <InputView content={content} onChangeContent={setContent}/>
+      <InputView content={content} onChangeContent={setContent} />
     </View>
   );
 }

@@ -43,12 +43,10 @@ export default function MessageItem({
 
     return (
         <View style={STYLE.ROW}>
-            <ProfileAvatar 
+            <ProfileAvatar
                 profileImage={message.author?.profileImage ?? null}
-                nickname={message.author?.nickname ?? null}
                 size={50}
                 borderRadius={10}
-                fontSize={20}
             />
 
             <View style={styles.MessageItem}>
@@ -62,9 +60,9 @@ export default function MessageItem({
 
                 {/* 좋아요수, 시간 */}
                 <View style={styles.infoContainer}>
-                    <Pressable style={styles.likeItem} onPress={() => onToggleLike(message)} disabled={isAuthor}>
-                        <IconSymbol 
-                            size={20} 
+                    <Pressable style={styles.likeItem} onPress={() => onToggleLike(message)}>
+                        <IconSymbol
+                            size={20}
                             name={message.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
                             color={message.liked ? 'tomato' : COLOR.TINT.GRAY_DARK} // 좋아요 여부에 따라 색상 변경
                         />
@@ -91,11 +89,11 @@ export default function MessageItem({
 const styles = StyleSheet.create({
     MessageItem: { flexShrink: 1, marginBottom: 4 },
     card: { ...STYLE.CARD, marginBottom: 0 },
-    author: { 
+    author: {
         paddingVertical: 4,
-        fontSize: 14, 
-        fontWeight: 600, 
-        color: COLOR.TEXT.GRAY_DARK 
+        fontSize: 14,
+        fontWeight: 600,
+        color: COLOR.TEXT.GRAY_DARK
     },
     content: { fontSize: 15, lineHeight: 22, color: COLOR.TEXT.GRAY_DARK },
     infoContainer: {

@@ -77,15 +77,15 @@ export default function AnswerItem({
 
             {/* 좋아요 정보, 더보기 버튼 */}
             <View style={styles.infoContainer}>
-                <Pressable style={styles.likeItem} onPress={() => onToggleLike(answer)} disabled={isAuthor}>
-                    <IconSymbol 
-                        size={20} 
+                <Pressable style={styles.likeItem} onPress={() => onToggleLike(answer)}>
+                    <IconSymbol
+                        size={20}
                         name={answer.liked ? "heart.fill" : "heart"} // 좋아요 여부에 따라 아이콘 변경
                         color={answer.liked ? 'tomato' : COLOR.TINT.GRAY_DARK} // 좋아요 여부에 따라 색상 변경
                     />
                     <Text style={styles.likeCount}>{answer.likeCount}</Text>
                 </Pressable>
-                {isAuthor && (
+                {isAuthor && !answer.liked && (
                     <Pressable ref={buttonRef} onPress={handleOpenMenu}>
                         <IconSymbol name="more.horizontal" size={20} color={COLOR.TINT.GRAY_DARK} />
                     </Pressable>
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 8,
-        backgroundColor: '#53C3A6',
+        backgroundColor: COLOR.BUTTON.MINT,
         padding: 6,
         gap: 4
     },
