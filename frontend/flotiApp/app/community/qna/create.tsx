@@ -1,8 +1,8 @@
 import { View } from 'react-native';
-import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState } from 'react';
 
 import { useNavigation } from '@/hooks/useNavigation';
+import useDraft from '@/hooks/useDraft';
 
 import { createQnaPost } from '@/api/community/qnaApi';
 
@@ -18,46 +18,24 @@ export default function QnaCreateScreen() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
-  const STORAGE_KEY = '@qna_save';
-
-  /* 사이드 이펙트 */
-  useEffect(() => {
-    loadDraft();
-  }, []);
+  const { saveDraft, clearDraft } = useDraft({
+    storageKey: '@qna_save',
+    onLoad: (data) => {
+      setTitle(data.title!);
+      setContent(data.content);
+    },
+  });
 
   /* API 호출 */
-  const loadDraft = async () => {
-    try {
-      const saved = await AsyncStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const { title: savedTitle, content: savedContent } = JSON.parse(saved);
-        setTitle(savedTitle);
-        setContent(savedContent);
-      }
-    } catch (error) {
-      showToast('임시저장 불러오기 실패', 'error');
-    }
-  };
-
   const callCreateQnaPost = () => createQnaPost({ title, content });
 
   /* 이벤트 핸들러 */
-  const handleSave = async () => {
-    try {
-      await AsyncStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ title, content })
-      );
-      showToast('임시저장 성공');
-    } catch (error) {
-      showToast('임시저장 실패', 'error');
-    }
-  };
+  const handleSave = () => saveDraft({ title, content });
 
   const handleSubmit = async () => {
     try {
       const response = await callCreateQnaPost();
-      await AsyncStorage.removeItem(STORAGE_KEY); // 등록 성공 시 임시저장 삭제
+      await clearDraft(); // 등록 성공 시 임시저장 삭제
       navigateTo(`/community/qna/${response.data.id}`)
     } catch (error) {
       showToast('등록 실패', 'error');

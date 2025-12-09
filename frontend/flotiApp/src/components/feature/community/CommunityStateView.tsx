@@ -13,9 +13,7 @@ export function LoadingView() {
 }
 
 // 빈 화면
-export function EmptyView({ text = '게시글이 없습니다.' }: {
-  text?: string;
-}) {
+export function EmptyView({ text = '게시글이 없습니다.' }: { text?: string }) {
   return (
     <View style={[STYLE.CONTENT_CONTAINER, STYLE.CENTER]}>
       <Text style={STYLE.EMPTY_TEXT}>{text}</Text>

@@ -33,7 +33,6 @@ export default function QnaDetailScreen() {
   const [answers, setAnswers] = useState<AnswerReponse[]>([]);
 
   const userContext = useContext(UserContext);  // 사용자 상태
-  const isAuthor = (post?.author.username === userContext?.username);
 
   /* 사이드 이펙트 */
   useEffect(() => {
@@ -148,7 +147,7 @@ export default function QnaDetailScreen() {
   }
 
   const handleToggleLike = async ({ id, liked, author }: AnswerReponse) => {
-    if (isAuthor) {
+    if (author?.username === userContext?.username) {
       openModal('likeError');
       return;
     }

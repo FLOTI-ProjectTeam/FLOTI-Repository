@@ -66,14 +66,16 @@ export default function DiscussionDetailScreen() {
 
   const callDeleteDiscussionRoom = () => deleteDiscussionRoom(room!.id);
 
+  if (!room) return;
+
   /* 이벤트 핸들러 */
   const handleGoToUpdate = () => {
     navigateWithParams('/community/discussion/update/[roomId]', {
-      roomId: room!.id,
-      initialTitle: room!.title,
-      initialContent: room!.content,
-      initialMaxParticipantCount: room!.maxParticipantCount,
-      initialParticipantCount: room!.participantCount
+      roomId: room.id,
+      initialTitle: room.title,
+      initialContent: room.content,
+      initialMaxParticipantCount: room.maxParticipantCount,
+      initialParticipantCount: room.participantCount
     });
     setMenuVisible(false);
   };
@@ -85,7 +87,7 @@ export default function DiscussionDetailScreen() {
       // 테스트용
       const tempMessage: MessageResponse = {
         id: Date.now(),
-        roomId: room!.id,
+        roomId: room.id,
         author: { username: 'alice', nickname: '앨리스', profileImage: null },
         content,
         likeCount: 0,
@@ -93,7 +95,7 @@ export default function DiscussionDetailScreen() {
         createdAt: new Date().toISOString(),
       };
 
-      createMessage(room!.id, { content }); // 서버로 메시지 전송
+      createMessage(room.id, { content }); // 서버로 메시지 전송
       setMessages(prev => [...prev, tempMessage]);  // 메시지 추가
       setContent('');
     } catch (error) {
@@ -124,7 +126,7 @@ export default function DiscussionDetailScreen() {
   const handleMessageDelete = async () => {
     try {
       if (!targetMessageId) return;
-      deleteMessage(room!.id, targetMessageId); // 서버로 메시지 삭제 요청
+      deleteMessage(room.id, targetMessageId); // 서버로 메시지 삭제 요청
       setMessages(prev => prev.filter(message => message.id !== targetMessageId)); // 메시지 삭제
     } catch (error) {
       showToast('삭제 실패', 'error');
@@ -141,7 +143,7 @@ export default function DiscussionDetailScreen() {
     }
 
     try {
-      toggleLikeMessage(room!.id, id);
+      toggleLikeMessage(room.id, id);
 
       // 좋아요 갱신
       setMessages(prev =>
@@ -177,7 +179,6 @@ export default function DiscussionDetailScreen() {
   };
 
   if (loading) return <LoadingView />;
-  if (!room) return;
 
   return (
     <View style={STYLE.CONTENT_CONTAINER}>

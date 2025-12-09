@@ -1,13 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native';
+
 import COLOR from '@/constants/colors';
 
-type StatusType = 'JOINED' | 'FULL' | 'ACCEPTED';
-
-interface StatusLabelProps {
-    type: StatusType;
-}
-
-export default function StatusLabel({ type }: StatusLabelProps) {
+export default function StatusLabel({ type }: { type: 'JOINED' | 'FULL' | 'ACCEPTED' }) {
     let label = '';
     let backgroundColor = '';
 
