@@ -4,7 +4,7 @@ import COLOR from '@/constants/colors';
 
 const COMMON = {
     CENTER: { justifyContent: 'center', alignItems: 'center' } as ViewStyle,
-    CARD: { 
+    CARD: {
         padding: 12,
         marginBottom: 12,
         borderRadius: 10,
@@ -37,7 +37,7 @@ export const STYLE = StyleSheet.create({
     BUTTON: {
         ...COMMON.CENTER,
         flexDirection: 'row',
-        paddingVertical: 10,
+        paddingVertical: 14,
         borderRadius: 12,
         backgroundColor: COLOR.BUTTON.NAVY
     },

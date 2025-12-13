@@ -110,7 +110,7 @@ export default function TipListScreen() {
 
 const styles = StyleSheet.create({
   info: { flex: 1, justifyContent: 'space-between', gap: 4 },
-  title: { fontSize: 16, fontWeight: 700, color: 'black' },
+  title: { fontSize: 16, fontWeight: 700 },
   authorInfo: { marginBottom: 2, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   stats: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   statItem: { flexDirection: 'row', alignItems: 'center' },

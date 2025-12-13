@@ -3,40 +3,25 @@ import { View, Text, StyleSheet } from 'react-native';
 import COLOR from '@/constants/colors';
 
 export default function StatusLabel({ type }: { type: 'JOINED' | 'FULL' | 'ACCEPTED' }) {
-    let label = '';
-    let backgroundColor = '';
+    let label = '채택';
+    let backgroundColor = COLOR.BUTTON.MINT;
 
-    switch (type) {
-        case 'JOINED':
-            label = '참여 중';
-            backgroundColor = COLOR.BUTTON.SLATE_DARK;
-            break;
-        case 'FULL':
-            label = '참여 불가';
-            backgroundColor = COLOR.BUTTON.RED;
-            break;
-        case 'ACCEPTED':
-            label = '채택';
-            backgroundColor = COLOR.BUTTON.MINT;
-            break;
+    if (type === 'JOINED') {
+        label = '참여 중';
+        backgroundColor = COLOR.BUTTON.SLATE_DARK;
+    } else if (type === 'FULL') {
+        label = '참여 불가';
+        backgroundColor = COLOR.BUTTON.RED;
     }
 
+    const styles = StyleSheet.create({
+        container: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor },
+        text: { fontSize: 10, fontWeight: 'bold', color: 'white' }
+    });
+
     return (
-        <View style={[styles.container, { backgroundColor }]}>
+        <View style={styles.container}>
             <Text style={styles.text}>{label}</Text>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 4,
-    },
-    text: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: 'white'
-    },
-});

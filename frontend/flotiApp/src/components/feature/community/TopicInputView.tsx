@@ -43,8 +43,7 @@ export function DiscussionInputView({
 
             <View style={STYLE.CARD_OUTLINE}>
                 <Text style={styles.label}>👥 참여 가능 인원</Text>
-                <ParticipantDropdown value={maxParticipantCount} onChange={onChangeMaxParticipantCount}
-                />
+                <ParticipantDropdown value={maxParticipantCount} onChange={onChangeMaxParticipantCount} />
             </View>
         </View>
     );
@@ -52,7 +51,7 @@ export function DiscussionInputView({
 
 const styles = StyleSheet.create({
     cardContainer: { ...STYLE.WRAPPER, paddingVertical: 20, gap: 8 },
-    label: { fontSize: 16, fontWeight: 700, color: COLOR.TEXT.GRAY_DARK },
+    label: { fontSize: 16, fontWeight: 600, color: COLOR.TEXT.GRAY_DARK },
     input: {
         flex: 1,
         marginHorizontal: 8,

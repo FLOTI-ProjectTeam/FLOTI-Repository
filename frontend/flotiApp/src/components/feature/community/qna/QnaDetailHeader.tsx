@@ -32,12 +32,7 @@ export default function QnaDetailHeader({ post }: { post: QnaPostResponse }) {
 }
 
 const styles = StyleSheet.create({
-    title: {
-        marginBottom: 8,
-        fontSize: 20,
-        fontWeight: 700,
-        color: 'black'
-    },
+    title: { marginBottom: 8, fontSize: 20, fontWeight: 700 },
     author: { fontSize: 14, fontWeight: 600, color: COLOR.TEXT.GRAY_DARK },
     time: { fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
     contentContainer: {

@@ -20,11 +20,7 @@ export default function ConfirmModal({
                             <Text style={styles.buttonText}>{onAction ? '아니요' : '확인'}</Text>
                         </TouchableOpacity>
                         {onAction && (
-                            <TouchableOpacity
-                                activeOpacity={0.5}
-                                style={styles.modalButton}
-                                onPress={onAction}
-                            >
+                            <TouchableOpacity activeOpacity={0.5} style={styles.modalButton} onPress={onAction}>
                                 <Text style={[styles.buttonText, styles.actionText]}>예</Text>
                             </TouchableOpacity>
                         )}
@@ -54,7 +50,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        fontWeight: 600,
+        fontWeight: 500,
         paddingVertical: 14,
         borderRadius: 12
     },

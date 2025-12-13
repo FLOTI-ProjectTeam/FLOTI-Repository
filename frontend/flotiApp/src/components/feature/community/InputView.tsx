@@ -2,8 +2,8 @@ import { TextInput, StyleSheet } from 'react-native';
 
 import COLOR from '@/constants/colors';
 
-export default function InputView({ 
-    title, content, file, onChangeTitle, onChangeContent, onChangeFile 
+export default function InputView({
+    title, content, file, onChangeTitle, onChangeContent, onChangeFile
 }: {
     title?: string;
     content: string;
@@ -32,7 +32,7 @@ export default function InputView({
                 textAlignVertical='top'
                 multiline
             />
-      </>
+        </>
     );
 }
 
@@ -44,5 +44,5 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         backgroundColor: 'white'
     },
-    textArea: { flex: 1, fontSize: 15, fontWeight: '400' }
+    textArea: { flex: 1, fontSize: 15, fontWeight: 400 }
 });

@@ -202,7 +202,7 @@ export default function QnaDetailScreen() {
         style={STYLE.WRAPPER}
         contentContainerStyle={{
           flexGrow: 1, // ScrollView가 화면 전체 높이 차지
-          paddingBottom: post.accepted ? 0 : 60
+          paddingBottom: post.accepted ? 0 : 70
         }}
         ListHeaderComponent={<QnaDetailHeader post={post} />}
         ListEmptyComponent={

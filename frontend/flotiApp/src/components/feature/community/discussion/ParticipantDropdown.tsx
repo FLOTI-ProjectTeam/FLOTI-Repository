@@ -13,57 +13,62 @@ export default function ParticipantDropdown({
     const [popupVisible, setPopupVisible] = useState(false);
     const options = [2, 3, 4, 5];
     const currentLabel = `${value}명`;
-  
+
     return (
-      <>
-        {/* 버튼 */}
-        <TouchableOpacity activeOpacity={0.7} style={styles.participantButton} onPress={() => setPopupVisible(true)}>
-            <Text style={styles.optionText}>{currentLabel}</Text>
-            <IconSymbol name="chevron.down" size={16} color={COLOR.TEXT.NAVY} />
-        </TouchableOpacity>
-  
-        {/* 팝업 */}
-        <Modal transparent visible={popupVisible} animationType='fade' onRequestClose={() => setPopupVisible(false)}>
-            <Pressable style={styles.overlay} onPress={() => setPopupVisible(false)}>
-            <View style={styles.modalContent}>
-                {options.map((option) => (
-                    <TouchableOpacity
-                        key={option}
-                        style={styles.option}
-                        onPress={() => {
-                            onChange(option);
-                            setPopupVisible(false);
-                        }}
-                    >
-                    <Text style={[
-                        styles.optionText, 
-                        value === option && styles.optionTextActive // 선택 여부에 따라 스타일 추가
-                    ]}>
-                        {option}명
-                    </Text>
-                    {value === option && <IconSymbol name="check" size={18} color={COLOR.TINT.SLATE} />}
-                    </TouchableOpacity>
-                ))}
-            </View>
-          </Pressable>
-        </Modal>
-      </>
+        <>
+            {/* 버튼 */}
+            <TouchableOpacity activeOpacity={0.7} style={styles.participantButton} onPress={() => setPopupVisible(true)}>
+                <Text style={styles.optionText}>{currentLabel}</Text>
+                <IconSymbol name="chevron.down" size={16} color={COLOR.TEXT.NAVY} />
+            </TouchableOpacity>
+
+            {/* 팝업 */}
+            <Modal transparent visible={popupVisible} animationType='fade' onRequestClose={() => setPopupVisible(false)}>
+                <Pressable style={styles.overlay} onPress={() => setPopupVisible(false)}>
+                    <View style={styles.modalContent}>
+                        {options.map((option) => (
+                            <TouchableOpacity
+                                key={option}
+                                style={styles.option}
+                                onPress={() => {
+                                    onChange(option);
+                                    setPopupVisible(false);
+                                }}
+                            >
+                                <Text style={[
+                                    styles.optionText,
+                                    value === option && styles.optionTextActive // 선택 여부에 따라 스타일 추가
+                                ]}>
+                                    {option}명
+                                </Text>
+                                {value === option && <IconSymbol name="check" size={18} color={COLOR.TINT.SLATE} />}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </Pressable>
+            </Modal>
+        </>
     );
 }
-  
+
 const styles = StyleSheet.create({
     participantButton: {
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         marginHorizontal: 12,
         paddingVertical: 12, paddingHorizontal: 16,
         width: 100,
-        borderWidth: 1, 
-        borderColor: COLOR.TINT.SLATE_SOFT, 
+        borderWidth: 1,
+        borderColor: COLOR.TINT.SLATE_SOFT,
         borderRadius: 12
     },
-    overlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLOR.OVERLAY },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLOR.OVERLAY
+    },
     modalContent: {
         position: 'relative',
         backgroundColor: 'white',

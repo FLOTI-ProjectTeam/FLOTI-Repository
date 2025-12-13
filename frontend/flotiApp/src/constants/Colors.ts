@@ -18,6 +18,7 @@ const COLOR = {
     GRAY: '#DDDDDD',
     GRAY_LIGHT: '#F3F5F7',
     RED: '#FF5356',
+    RED_LIGHT: '#FFF0F0',
     NAVY: '#153257',
     SLATE_DARK: '#7D98C9',
     SLATE: '#B0C4DE',

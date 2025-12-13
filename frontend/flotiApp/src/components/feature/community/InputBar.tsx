@@ -11,7 +11,7 @@ export type ReplyTo = {
   nickname: string
 };
 
-export default function InputBar({ 
+export default function InputBar({
   content, onChangeText, onSubmit, placeholder, replyTo, onCancelReply
 }: {
   content: string;
@@ -32,7 +32,7 @@ export default function InputBar({
             <Text style={styles.replyText}> 님에 대한 답글</Text>
           </View>
           <TouchableOpacity activeOpacity={0.7} onPress={onCancelReply} style={styles.replyCancelButton}>
-            <IconSymbol name="x" size={20} color={COLOR.TINT.GRAY_DARK}/>
+            <IconSymbol name="x" size={20} color={COLOR.TINT.GRAY_DARK} />
           </TouchableOpacity>
         </View>
       )}
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12
   },
   replyText: { color: COLOR.TEXT.GRAY_CHARCOAL },
-  replyToText: { fontWeight: 600 },
+  replyToText: { fontWeight: 500 },
   replyCancelButton: { paddingVertical: 8 },
   replyTextRow: { flex: 1, flexDirection: 'row' },
   inputContainer: {

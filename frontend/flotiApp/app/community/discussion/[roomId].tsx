@@ -8,7 +8,7 @@ import { useModal } from '@/hooks/useModal';
 import { useNavigation } from '@/hooks/useNavigation';
 
 import { dummyRoomDetails } from '@/__mocks__/discussion';
-import { deleteDiscussionRoom, getDiscussionRoom } from '@/api/community/discussionApi';
+import { deleteDiscussionRoom, getDiscussionRoom, toggleJoinDiscussion } from '@/api/community/discussionApi';
 import { createMessage, deleteMessage, toggleLikeMessage } from '@/api/community/discussionSocket';
 import { DiscussionRoomResponse, MessageResponse } from '@/types/community/discussion';
 import { UserResponse } from '@/types/community/common';
@@ -30,7 +30,7 @@ export default function DiscussionDetailScreen() {
   const { goBackSafely, navigateWithParams } = useNavigation();
   const { roomId } = useLocalSearchParams();  // URL에서 토론방 ID 가져오기
   const { target: targetMessageId, ...messageTools } = useMenuInteraction(); // 선택 메시지 처리
-  const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'messageDelete' | 'likeError'>();
+  const { modalVisible, type, openModal, closeModal } = useModal<'roomDelete' | 'roomLeave' | 'messageDelete' | 'likeError'>();
 
   const [loading, setLoading] = useState(true);
   const [room, setRoom] = useState<DiscussionRoomResponse>();
@@ -66,6 +66,8 @@ export default function DiscussionDetailScreen() {
 
   const callDeleteDiscussionRoom = () => deleteDiscussionRoom(room!.id);
 
+  const callToggleJoinDiscussion = () => toggleJoinDiscussion(room!.id);
+
   if (!room) return;
 
   /* 이벤트 핸들러 */
@@ -77,7 +79,6 @@ export default function DiscussionDetailScreen() {
       initialMaxParticipantCount: room.maxParticipantCount,
       initialParticipantCount: room.participantCount
     });
-    setMenuVisible(false);
   };
 
   const handleSubmit = () => {
@@ -103,11 +104,6 @@ export default function DiscussionDetailScreen() {
     }
   };
 
-  const handleShowDeleteConfirm = () => {
-    openModal('roomDelete');
-    setMenuVisible(false);
-  };
-
   const handleShowMessageDeleteConfirm = (targetId: number) => {
     messageTools.selectTarget(targetId);
     openModal('messageDelete');
@@ -120,6 +116,16 @@ export default function DiscussionDetailScreen() {
       goBackSafely();
     } catch (error) {
       showToast('삭제 실패', 'error');
+    }
+  };
+
+  const handleLeave = async () => {
+    try {
+      closeModal();
+      await callToggleJoinDiscussion();
+      goBackSafely();
+    } catch (error) {
+      showToast('나가기 실패', 'error');
     }
   };
 
@@ -168,12 +174,14 @@ export default function DiscussionDetailScreen() {
   /* 모달 정보 */
   const modalTitle = {
     roomDelete: '토론방을 삭제하시겠습니까?',
+    roomLeave: '토론방을 나가시겠습니까?',
     messageDelete: '메시지를 삭제하시겠습니까?',
     likeError: '내 메시지는 좋아요 할 수 없습니다.'
   };
 
   const modalAction = {
     roomDelete: handleDelete,
+    roomLeave: handleLeave,
     messageDelete: handleMessageDelete,
     likeError: undefined
   };
@@ -245,7 +253,8 @@ export default function DiscussionDetailScreen() {
         room={room}
         participants={participants}
         onUpdate={handleGoToUpdate}
-        onDelete={handleShowDeleteConfirm}
+        onDelete={() => openModal('roomDelete')}
+        onLeave={() => openModal('roomLeave')}
       />
     </View>
   );
@@ -257,7 +266,7 @@ const styles = StyleSheet.create({
   dateLabelText: {
     marginHorizontal: 10,
     fontSize: 12,
-    fontWeight: 700,
+    fontWeight: 500,
     color: COLOR.TEXT.GRAY_CHARCOAL
   }
 })

@@ -10,7 +10,7 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
         content: "AI와 함께 글쓰기를 어떻게 발전시킬 수 있을지 이야기해봐요.",
         maxParticipantCount: 5,
         participantCount: 4,
-        joined: true,
+        joined: false,
         createdAt: "2025-01-10T10:00:00",
         recentActivityAt: "2025-01-10T10:20:00",
         participants: [

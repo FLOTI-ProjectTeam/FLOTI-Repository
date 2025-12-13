@@ -115,5 +115,5 @@ const styles = StyleSheet.create({
     borderColor: COLOR.TINT.GRAY,
     borderRadius: 14
   },
-  answerCount: { fontSize: 12, fontWeight: 700, color: COLOR.TEXT.NAVY }
+  answerCount: { fontSize: 12, fontWeight: 600, color: COLOR.TEXT.NAVY }
 });

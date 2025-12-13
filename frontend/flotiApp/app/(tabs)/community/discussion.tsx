@@ -86,7 +86,7 @@ export default function DiscussionListScreen() {
     openModal();
   };
 
-  const handleToggleJoin = async () => {
+  const handleJoin = async () => {
     try {
       if (!targetRoom || cannotJoin) return;
       closeModal();
@@ -154,7 +154,7 @@ export default function DiscussionListScreen() {
         visible={modalVisible}
         title={modalTitle}
         onClose={closeModal}
-        onAction={cannotJoin ? undefined : handleToggleJoin}
+        onAction={cannotJoin ? undefined : handleJoin}
       />
     </View>
   );
@@ -163,7 +163,7 @@ export default function DiscussionListScreen() {
 const styles = StyleSheet.create({
   info: { flex: 1, justifyContent: 'space-between', gap: 4 },
   titleContainer: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  title: { flex: 1, fontSize: 16, fontWeight: 700, color: 'black' },
+  title: { flex: 1, fontSize: 16, fontWeight: 700 },
   content: { marginBottom: 2, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   metaItem: { flexDirection: 'row', alignItems: 'center' },

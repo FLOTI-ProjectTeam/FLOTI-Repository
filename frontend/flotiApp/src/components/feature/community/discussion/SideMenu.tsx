@@ -1,6 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, ScrollView, Dimensions, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, Pressable, Animated, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 
 import { UserContext } from '@/contexts/UserContext';
 
@@ -8,17 +7,18 @@ import { UserResponse } from '@/types/community/common';
 import { DiscussionRoomResponse } from '@/types/community/discussion';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import BreakAllText from '@/components/ui/BreakAllText';
 import ProfileAvatar from '@/components/feature/community/ProfileAvatar';
 
 import { formatDetailTime, formatSmartTime } from '@/utils/time';
 import COLOR from '@/constants/colors';
-import BreakAllText from '@/components/ui/BreakAllText';
+import { STYLE } from '@/constants/styles';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.8, 320); // Max 320px or 80%
+const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.8, 320);   // 최대 320px 또는 80% 
 
 export function SideMenu({
-    visible, onClose, room, participants, onUpdate, onDelete
+    visible, onClose, room, participants, onUpdate, onDelete, onLeave
 }: {
     visible: boolean;
     onClose: () => void;
@@ -26,15 +26,16 @@ export function SideMenu({
     participants: UserResponse[];
     onUpdate: () => void;
     onDelete: () => void;
+    onLeave: () => void;
 }) {
     const [shouldRender, setShouldRender] = useState(visible);
-    const insets = useSafeAreaInsets();
 
-    const slideAnim = useRef(new Animated.Value(MENU_WIDTH)).current;
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const userContext = useContext(UserContext);
-    const isAuthor = (room.author.username === userContext?.username);
+    const slideAnim = useRef(new Animated.Value(MENU_WIDTH)).current; // slide 애니메이션
+    const fadeAnim = useRef(new Animated.Value(0)).current; // fade 애니메이션
+    const username = useContext(UserContext)?.username ?? '';
+    const isAuthor = (room.author.username === username);
 
+    /* 사이드 이펙트 */
     useEffect(() => {
         if (visible) {
             setShouldRender(true);
@@ -42,12 +43,12 @@ export function SideMenu({
                 Animated.timing(slideAnim, {
                     toValue: 0,
                     duration: 250,
-                    useNativeDriver: true,
+                    useNativeDriver: true
                 }),
                 Animated.timing(fadeAnim, {
                     toValue: 1,
                     duration: 250,
-                    useNativeDriver: true,
+                    useNativeDriver: true
                 })
             ]).start();
         } else {
@@ -55,12 +56,12 @@ export function SideMenu({
                 Animated.timing(slideAnim, {
                     toValue: MENU_WIDTH,
                     duration: 200,
-                    useNativeDriver: true,
+                    useNativeDriver: true
                 }),
                 Animated.timing(fadeAnim, {
                     toValue: 0,
                     duration: 200,
-                    useNativeDriver: true,
+                    useNativeDriver: true
                 })
             ]).start(() => setShouldRender(false));
         }
@@ -69,45 +70,27 @@ export function SideMenu({
     if (!shouldRender) return null;
 
     return (
-        <View style={styles.overlayContainer}>
+        <View style={StyleSheet.absoluteFillObject}>
             <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
-                <Pressable style={{ flex: 1 }} onPress={onClose} />
+                <Pressable style={STYLE.FLEX} onPress={onClose} />
             </Animated.View>
 
-            <Animated.View
-                style={[
-                    styles.menuPanel,
-                    {
-                        transform: [{ translateX: slideAnim }],
-                        paddingTop: insets.top + 20,
-                        paddingBottom: insets.bottom + 20
-                    }
-                ]}
-            >
-                <Text style={styles.roomTitle}>{room.title}</Text>
+            <Animated.View style={[styles.menuPanel, { transform: [{ translateX: slideAnim }] }]}>
+                <Text style={styles.title}>{room.title}</Text>
 
-                <View style={styles.metaInfoRow}>
-                    <IconSymbol name="time" size={14} color={COLOR.TEXT.GRAY_MEDIUM} />
-                    <Text style={styles.metaText}>
-                        개설일  {formatDetailTime(room.createdAt)}
-                    </Text>
-                </View>
-                <View style={styles.metaInfoRow}>
-                    <IconSymbol name="report" size={14} color={COLOR.TEXT.GRAY_MEDIUM} />
-                    <Text style={styles.metaText}>
-                        활동일  {formatSmartTime(room.recentActivityAt, 'detail')}
-                    </Text>
+                <View style={styles.metaInfoContainer}>
+                    <Text style={styles.metaText}>개설일  {formatDetailTime(room.createdAt)}</Text>
+                    <Text style={styles.metaText}>활동일  {formatSmartTime(room.recentActivityAt, 'detail')}</Text>
                 </View>
 
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 20 }} showsVerticalScrollIndicator={false}>
-
-                    {/* 1. Room Info Card */}
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {/* 토론 정보 */}
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>토론 내용</Text>
                     </View>
 
-                    <View style={styles.roomContentContainer}>
-                        <BreakAllText style={styles.roomContent}>{room.content}</BreakAllText>
+                    <View style={styles.contentContainer}>
+                        <BreakAllText style={styles.content}>{room.content}</BreakAllText>
                     </View>
 
                     <View style={styles.sectionHeader}>
@@ -119,69 +102,29 @@ export function SideMenu({
                         </View>
                     </View>
 
-                    {/* 2. Participants List */}
-                    <View style={styles.participantsList}>
-                        {/* Author */}
-                        <View style={styles.participantItem}>
-                            <ProfileAvatar profileImage={room.author.profileImage} />
-                            <View style={styles.nameRow}>
-                                <Text style={styles.nickname}>{room.author.nickname}</Text>
-                                <View style={styles.crownBadge}>
-                                    <IconSymbol name="crown" size={12} color="#FFF" />
-                                </View>
-                            </View>
-                        </View>
-
-                        {/* Other Participants */}
-                        {participants.map((user) => (
-                            <View key={user.username} style={styles.participantItem}>
-                                <ProfileAvatar profileImage={user.profileImage} />
-                                <Text style={styles.nickname}>{user.nickname}</Text>
-                            </View>
-                        ))}
-                    </View>
+                    {/* 참여자 목록 */}
+                    <ParticipantItem user={room.author} username={username} isAuthor />
+                    {participants.map((user) => <ParticipantItem user={user} username={username} />)}
                 </ScrollView>
 
-                {/* 3. Footer Actions */}
-                <View style={[styles.footerActions, { paddingBottom: 0 }]}>
+                {/* 하단 버튼 */}
+                <View style={styles.footerActions}>
                     {isAuthor ? (
                         <>
-                            <Pressable
-                                style={({ pressed }) => [
-                                    styles.actionButton,
-                                    styles.updateButton,
-                                    pressed && styles.pressedButton
-                                ]}
-                                onPress={onUpdate}
-                            >
+                            <TouchableOpacity activeOpacity={0.7} style={styles.updateButton} onPress={onUpdate}>
                                 <IconSymbol name="plus.pen" size={18} color={COLOR.TEXT.NAVY} />
-                                <Text style={[styles.actionButtonText, { color: COLOR.TEXT.NAVY }]}>정보 수정</Text>
-                            </Pressable>
+                                <Text style={[styles.buttonText, { color: COLOR.TEXT.NAVY }]}>수정하기</Text>
+                            </TouchableOpacity>
 
-                            <Pressable
-                                style={({ pressed }) => [
-                                    styles.actionButton,
-                                    styles.deleteButton,
-                                    pressed && styles.pressedButton
-                                ]}
-                                onPress={onDelete}
-                            >
+                            <TouchableOpacity activeOpacity={0.7} style={styles.leaveOrDeleteButton} onPress={onDelete}>
                                 <IconSymbol name="trash" size={18} color={COLOR.BUTTON.RED} />
-                                <Text style={[styles.actionButtonText, { color: COLOR.BUTTON.RED }]}>삭제하기</Text>
-                            </Pressable>
+                            </TouchableOpacity>
                         </>
                     ) : (
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.actionButton,
-                                styles.deleteButton,
-                                pressed && styles.pressedButton
-                            ]}
-                            onPress={onDelete}
-                        >
+                        <TouchableOpacity activeOpacity={0.7} style={styles.leaveOrDeleteButton} onPress={onLeave}>
                             <IconSymbol name="exit" size={18} color={COLOR.BUTTON.RED} />
-                            <Text style={[styles.actionButtonText, { color: COLOR.BUTTON.RED }]}>나가기</Text>
-                        </Pressable>
+                            <Text style={[styles.buttonText, { color: COLOR.BUTTON.RED }]}>나가기</Text>
+                        </TouchableOpacity>
                     )}
                 </View>
             </Animated.View>
@@ -189,154 +132,84 @@ export function SideMenu({
     );
 }
 
+function ParticipantItem({
+    user, username, isAuthor
+}: {
+    user: UserResponse;
+    username: string;
+    isAuthor?: boolean;
+}) {
+    return (
+        <View key={user.username} style={styles.participantItem}>
+            <ProfileAvatar profileImage={user.profileImage} />
+            <View style={styles.nameRow}>
+                {user.username === username && (
+                    <View style={styles.meBadge}>
+                        <Text style={styles.meBadgeText}>나</Text>
+                    </View>
+                )}
+                <Text style={styles.nickname}>{user.nickname}</Text>
+                {isAuthor && (
+                    <View style={styles.crownBadge}>
+                        <IconSymbol name="crown" size={12} color='white' />
+                    </View>
+                )}
+            </View>
+        </View>
+    );
+}
+
 const styles = StyleSheet.create({
-    overlayContainer: {
-        ...StyleSheet.absoluteFillObject,
-        zIndex: 1000
-    },
-    backdrop: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.5)'
-    },
+    backdrop: { flex: 1, backgroundColor: COLOR.OVERLAY },
     menuPanel: {
         position: 'absolute',
         right: 0,
         height: '100%',
         width: MENU_WIDTH,
-        backgroundColor: '#FFFFFF',
-        paddingHorizontal: 20,
-        ...Platform.select({
-            ios: {
-                shadowColor: "#000",
-                shadowOffset: { width: -4, height: 0 },
-                shadowOpacity: 0.1,
-                shadowRadius: 10,
-            },
-            android: {
-                elevation: 10,
-            }
-        })
+        backgroundColor: 'white',
+        paddingVertical: 30, paddingHorizontal: 20
     },
-    roomTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: COLOR.TEXT.GRAY_DARK,
-        marginBottom: 24
-    },
-    /* Card Style for Room Info */
-    metaInfoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 6,
-        gap: 6,
-    },
-    metaText: {
-        fontSize: 13,
-        color: COLOR.TEXT.GRAY_MEDIUM,
-        fontWeight: '500',
-    },
-    roomContentContainer: {
-        padding: 12,
-        borderRadius: 12,
-        marginBottom: 30,
-        borderWidth: 1,
-        backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
-        borderColor: COLOR.TINT.SLATE,
-    },
-    roomContent: {
-        fontSize: 15,
-        color: COLOR.TEXT.GRAY_CHARCOAL,
-        lineHeight: 22
-    },
-
-    /* Headers */
+    title: { fontSize: 18, fontWeight: 700, marginBottom: 20 },
+    metaInfoContainer: { marginBottom: 20, gap: 6 },
+    metaText: { fontSize: 13, color: COLOR.TEXT.GRAY_MEDIUM, fontWeight: 500 },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 16
     },
-    sectionTitle: {
-        fontSize: 17,
-        fontWeight: '700',
-        color: COLOR.TEXT.GRAY_DARK
-    },
+    sectionTitle: { fontSize: 17, fontWeight: 600, color: COLOR.TEXT.GRAY_DARK },
+    contentContainer: { padding: 12, marginBottom: 30, backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT },
+    content: { fontSize: 15, color: COLOR.TEXT.GRAY_CHARCOAL, lineHeight: 22 },
     participantBadge: {
         backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 12,
+        paddingVertical: 4, paddingHorizontal: 10,
+        borderRadius: 12
     },
-    participantCount: {
-        fontSize: 13,
-        color: COLOR.TEXT.NAVY,
-        fontWeight: '600'
-    },
-
-    /* Participant List */
-    participantsList: { marginBottom: 20 },
+    participantCount: { fontSize: 13, color: COLOR.TEXT.NAVY, fontWeight: 600 },
     participantItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 12,
-        backgroundColor: '#F9FAFB',
-        borderRadius: 12,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#F0F0F0',
+        paddingHorizontal: 8,
+        marginBottom: 16
     },
-    nameRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    nickname: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: COLOR.TEXT.GRAY_DARK,
-    },
-    roleText: {
-        fontSize: 12,
-        color: COLOR.TEXT.GRAY_MEDIUM,
-        marginTop: 2,
-    },
+    nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+    nickname: { fontSize: 15, fontWeight: 600, color: COLOR.TEXT.GRAY_DARK },
     crownBadge: {
-        backgroundColor: '#FFD700',
+        backgroundColor: 'orange',
         borderRadius: 10,
-        width: 18,
-        height: 18,
+        width: 18, height: 18,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     },
-
-    /* Footer Buttons */
-    footerActions: {
-        marginTop: 10,
-        gap: 12,
-    },
-    actionButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 14,
-        borderRadius: 12,
-        gap: 8,
-        borderWidth: 1,
-    },
-    updateButton: {
+    footerActions: { flexDirection: 'row', marginTop: 20, gap: 8 },
+    updateButton: { ...STYLE.BUTTON, width: '80%', backgroundColor: COLOR.BUTTON.GRAY_LIGHT },
+    leaveOrDeleteButton: { ...STYLE.BUTTON, flex: 1, backgroundColor: COLOR.BUTTON.RED_LIGHT },
+    buttonText: { marginLeft: 4, fontSize: 15, fontWeight: 600 },
+    meBadge: {
         backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT,
-        borderColor: 'transparent',
+        paddingVertical: 2, paddingHorizontal: 6,
+        borderRadius: 4
     },
-    deleteButton: {
-        backgroundColor: '#FFF0F0',
-        borderColor: 'transparent',
-    },
-    pressedButton: {
-        opacity: 0.7,
-        transform: [{ scale: 0.98 }]
-    },
-    actionButtonText: {
-        fontSize: 15,
-        fontWeight: '600',
-    },
+    meBadgeText: { fontSize: 11, color: COLOR.TEXT.NAVY, fontWeight: 500 },
 });

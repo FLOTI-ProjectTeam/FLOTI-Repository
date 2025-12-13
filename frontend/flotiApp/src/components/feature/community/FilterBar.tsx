@@ -24,7 +24,7 @@ type CheckProps = {
   onChange: (value: boolean) => void;
 }
 
-export default function FilterBar({ 
+export default function FilterBar({
   sort, check
 }: {
   sort: SortProps;
@@ -32,17 +32,17 @@ export default function FilterBar({
 }) {
   return (
     <View style={[
-      styles.filterContainer, 
+      styles.filterContainer,
       !check && styles.sortJustify  // 정렬 박스만 있는 경우
     ]}>
-      {check && <CheckBox label={check.label} value={check.value} onChange={check.onChange} /> }
+      {check && <CheckBox label={check.label} value={check.value} onChange={check.onChange} />}
       <SortDropdown options={sort.options} value={sort.value} onChange={sort.onChange} />
     </View>
   );
 };
 
 function CheckBox({ label, value, onChange }: CheckProps) {
-  return(
+  return (
     <>
       <Pressable style={styles.checkButton} onPress={() => onChange(!value)}>
         <IconSymbol
@@ -89,7 +89,7 @@ function SortDropdown({ options, value, onChange }: SortProps) {
                 ]}>
                   {option.label}
                 </Text>
-                {value === option.value && 
+                {value === option.value &&
                   <IconSymbol name="check" size={18} color={COLOR.TINT.SLATE} />  // 선택 정렬에 아이콘 추가
                 }
               </TouchableOpacity>
@@ -102,9 +102,9 @@ function SortDropdown({ options, value, onChange }: SortProps) {
 }
 
 const styles = StyleSheet.create({
-  filterContainer: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     padding: 16,
     backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT
   },
