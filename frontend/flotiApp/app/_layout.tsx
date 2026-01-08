@@ -64,9 +64,9 @@ export default function RootLayout() {
         />
 
         {/* 내비게이션 바 배경 */}
-        {Platform.OS === 'android' && insets.bottom > 0 && (
+        {Platform.OS === 'android' && insets.bottom > 0 &&
           <View style={[styles.safeAreaBottom, { height: insets.bottom }]} />
-        )}
+        }
       </UserProvider>
     </SafeAreaProvider>
   );

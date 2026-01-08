@@ -7,18 +7,18 @@ import { useNavigation } from '@/hooks/useNavigation';
 import { updateTipPost } from '@/api/community/tipApi';
 
 import { EditorHeader } from '@/components/ui/Header';
-import InputView from '@/components/feature/community/InputView';
+import { TipInputView } from '@/components/feature/community/InputView';
 
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
 
 export default function TipUpdateScreen() {
   const { goBackSafely } = useNavigation();
-  const { postId, initialTitle, initialContent } = useLocalSearchParams();  // URL에서 게시글 정보 가져오기
+  const { postId, initialTitle, initialContent, thumbnail } = useLocalSearchParams(); // URL에서 게시글 정보 가져오기
 
   const [title, setTitle] = useState(String(initialTitle || ''));
   const [content, setContent] = useState(String(initialContent || ''));
-  const [file, setFile] = useState<File | undefined>(undefined);
+  const [file, setFile] = useState<any>(undefined);
   const [isDeleted, setIsDeleted] = useState(false);  // 섬네일 삭제 여부
 
   /* API 호출 */
@@ -37,11 +37,15 @@ export default function TipUpdateScreen() {
   return (
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSubmit={handleSubmit} />
-      <InputView
+      <TipInputView
         title={title}
         content={content}
+        file={file}
+        thumbnail={String(thumbnail) || null}
         onChangeTitle={setTitle}
         onChangeContent={setContent}
+        onChangeFile={setFile}
+        onDeleteThumbnail={() => setIsDeleted(true)}
       />
     </View>
   );

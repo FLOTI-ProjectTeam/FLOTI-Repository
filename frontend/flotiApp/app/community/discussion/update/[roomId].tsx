@@ -26,7 +26,8 @@ export default function DiscussionUpdateScreen() {
   const participantCount = Number(initialParticipantCount || 1);
 
   /* API 호출 */
-  const callUpdateDiscussionRoom = () => updateDiscussionRoom(Number(roomId), { title, content, maxParticipantCount });
+  const callUpdateDiscussionRoom = () =>
+    updateDiscussionRoom(Number(roomId), { title, content, maxParticipantCount });
 
   /* 이벤트 핸들러 */
   const handleSubmit = async () => {

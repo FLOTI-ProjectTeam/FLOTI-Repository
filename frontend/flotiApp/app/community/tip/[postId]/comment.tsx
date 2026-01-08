@@ -48,8 +48,7 @@ export default function CommentListScreen() {
     }
   }
 
-  const callCreateComment = () =>
-    createComment(Number(postId), { parentId: replyTo?.commentId ?? null, content });
+  const callCreateComment = () => createComment(Number(postId), { parentId: replyTo?.commentId ?? null, content });
 
   const callUpdateComment = (comment: CommentResponse) =>
     updateComment(Number(postId), comment.id, { parentId: comment.parentId, content: String(comment.content) });

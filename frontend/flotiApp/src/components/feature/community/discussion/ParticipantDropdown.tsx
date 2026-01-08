@@ -14,6 +14,11 @@ export default function ParticipantDropdown({
     const options = [2, 3, 4, 5];
     const currentLabel = `${value}명`;
 
+    const handleChangeValue = (value: number) => {
+        onChange(value);
+        setPopupVisible(false);
+    };
+
     return (
         <>
             {/* 버튼 */}
@@ -27,14 +32,7 @@ export default function ParticipantDropdown({
                 <Pressable style={styles.overlay} onPress={() => setPopupVisible(false)}>
                     <View style={styles.modalContent}>
                         {options.map((option) => (
-                            <TouchableOpacity
-                                key={option}
-                                style={styles.option}
-                                onPress={() => {
-                                    onChange(option);
-                                    setPopupVisible(false);
-                                }}
-                            >
+                            <TouchableOpacity key={option} style={styles.option} onPress={() => handleChangeValue(option)}>
                                 <Text style={[
                                     styles.optionText,
                                     value === option && styles.optionTextActive // 선택 여부에 따라 스타일 추가

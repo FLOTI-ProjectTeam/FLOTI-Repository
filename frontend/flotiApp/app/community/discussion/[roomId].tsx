@@ -65,7 +65,6 @@ export default function DiscussionDetailScreen() {
   }
 
   const callDeleteDiscussionRoom = () => deleteDiscussionRoom(room!.id);
-
   const callToggleJoinDiscussion = () => toggleJoinDiscussion(room!.id);
 
   if (!room) return;
@@ -249,9 +248,9 @@ export default function DiscussionDetailScreen() {
 
       <SideMenu
         visible={menuVisible}
-        onClose={() => setMenuVisible(false)}
         room={room}
         participants={participants}
+        onClose={() => setMenuVisible(false)}
         onUpdate={handleGoToUpdate}
         onDelete={() => openModal('roomDelete')}
         onLeave={() => openModal('roomLeave')}

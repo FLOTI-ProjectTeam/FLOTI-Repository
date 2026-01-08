@@ -67,11 +67,9 @@ export default function CommentItem({
       <View style={styles.itemRowHeader}>
         <View style={styles.authorInfo}>
           <Text style={styles.author}>{comment.author?.nickname ?? '탈퇴한 사용자'}</Text>
-          {!comment.deleted && 
-            <Text style={styles.time}>{formatSmartTime(String(comment.createdAt))}</Text>
-          }
+          {comment.createdAt && <Text style={styles.time}>{formatSmartTime(comment.createdAt)}</Text>}
         </View>
-        {!comment.deleted && isAuthor && (
+        {isAuthor && (
           <Pressable ref={buttonRef} onPress={handleOpenMenu}>
             <IconSymbol name="more.horizontal" size={20} color={COLOR.TINT.GRAY_DARK} />
           </Pressable>
@@ -101,7 +99,7 @@ export default function CommentItem({
           {comment.deleted ? '삭제된 댓글입니다.' : comment.content}
         </BreakAllText>
       )}
-      
+
       {/* 답글 버튼 */}
       {!comment.deleted && onReply && !editing && (
         <Pressable onPress={() => onReply(comment)}>
@@ -114,9 +112,9 @@ export default function CommentItem({
         <FlatList
           data={comment.replies}
           keyExtractor={(reply) => reply.id.toString()}
-          renderItem={({ item: reply }) => (
+          renderItem={({ item }) => (
             <CommentItem
-              comment={reply}
+              comment={item}
               menuId={menuId}
               onChangeMenuId={onChangeMenuId}
               onUpdate={onUpdate}
@@ -125,7 +123,7 @@ export default function CommentItem({
           )}
         />
       )}
-      
+
       {/* 더보기 팝업 */}
       {menuId === comment.id && !editing && (
         <Modal transparent visible animationType='fade' onRequestClose={() => onChangeMenuId(null)}>
@@ -152,16 +150,16 @@ const styles = StyleSheet.create({
   },
   replyItem: { paddingTop: 12, paddingLeft: 18 },
   itemRowHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  authorInfo: { 
-    flexDirection: 'row', 
-    alignItems: 'flex-end', 
-    marginBottom: 4, 
+  authorInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 4,
     gap: 6
   },
   author: { fontSize: 14, color: COLOR.TEXT.GRAY_DARK, fontWeight: 600 },
   time: { fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   content: { fontSize: 15 },
-  replyButton: { marginTop: 4 , fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
+  replyButton: { marginTop: 4, fontSize: 12, color: COLOR.TEXT.GRAY_MEDIUM },
   editInput: {
     borderWidth: 1,
     borderColor: COLOR.TINT.GRAY_LIGHT,

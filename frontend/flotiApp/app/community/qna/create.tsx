@@ -7,7 +7,7 @@ import useDraft from '@/hooks/useDraft';
 import { createQnaPost } from '@/api/community/qnaApi';
 
 import { EditorHeader } from '@/components/ui/Header';
-import InputView from '@/components/feature/community/InputView';
+import { QnaInputView } from '@/components/feature/community/InputView';
 
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
@@ -45,7 +45,7 @@ export default function QnaCreateScreen() {
   return (
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSave={handleSave} onSubmit={handleSubmit} />
-      <InputView title={title} content={content} onChangeTitle={setTitle} onChangeContent={setContent} />
+      <QnaInputView title={title} content={content} onChangeTitle={setTitle} onChangeContent={setContent} />
     </View>
   );
 }

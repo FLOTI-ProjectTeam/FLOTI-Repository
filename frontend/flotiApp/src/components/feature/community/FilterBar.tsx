@@ -30,39 +30,34 @@ export default function FilterBar({
   sort: SortProps;
   check?: CheckProps;
 }) {
+  const [popupVisible, setPopupVisible] = useState(false);
+
+  const currentLabel = sort.options.find(option => option.value === sort.value)?.label || sort.options[0].label;
+
+  /* 이벤트 핸들러 */
+  const handleChangeValue = (value: SortType) => {
+    sort.onChange(value);
+    setPopupVisible(false);
+  };
+
   return (
     <View style={[
       styles.filterContainer,
       !check && styles.sortJustify  // 정렬 박스만 있는 경우
     ]}>
-      {check && <CheckBox label={check.label} value={check.value} onChange={check.onChange} />}
-      <SortDropdown options={sort.options} value={sort.value} onChange={sort.onChange} />
-    </View>
-  );
-};
+      {check && (
+        <>
+          <Pressable style={styles.checkButton} onPress={() => check.onChange(!check.value)}>
+            <IconSymbol
+              name="check.bold"
+              size={18}
+              color={check.value ? 'skyblue' : COLOR.TINT.SLATE}  // 체크 여부에 따라 아이콘 색상 변경
+            />
+            <Text style={styles.checkLabel}>{check.label}</Text>
+          </Pressable>
+        </>
+      )}
 
-function CheckBox({ label, value, onChange }: CheckProps) {
-  return (
-    <>
-      <Pressable style={styles.checkButton} onPress={() => onChange(!value)}>
-        <IconSymbol
-          name="check.bold"
-          size={18}
-          color={value ? 'skyblue' : COLOR.TINT.SLATE}  // 체크 여부에 따라 아이콘 색상 변경
-        />
-        <Text style={styles.checkLabel}>{label}</Text>
-      </Pressable>
-    </>
-  )
-}
-
-function SortDropdown({ options, value, onChange }: SortProps) {
-  const [popupVisible, setPopupVisible] = useState(false);
-
-  const currentLabel = options.find(option => option.value === value)?.label || options[0].label;
-
-  return (
-    <>
       {/* 버튼 */}
       <Pressable style={styles.sortButton} onPress={() => setPopupVisible(true)}>
         <Text style={styles.optionText}>{currentLabel}</Text>
@@ -73,23 +68,20 @@ function SortDropdown({ options, value, onChange }: SortProps) {
       <Modal transparent visible={popupVisible} onRequestClose={() => setPopupVisible(false)}>
         <Pressable style={styles.overlay} onPress={() => setPopupVisible(false)}>
           <View style={styles.modalContent}>
-            {options.map((option) => (
+            {sort.options.map((option) => (
               <TouchableOpacity
                 activeOpacity={0.5}
                 key={option.value}
                 style={styles.option}
-                onPress={() => {
-                  onChange(option.value);
-                  setPopupVisible(false);
-                }}
+                onPress={() => handleChangeValue(option.value)}
               >
                 <Text style={[
                   styles.optionText,
-                  value === option.value && styles.optionTextActive  // 선택 여부에 따라 스타일 추가
+                  sort.value === option.value && styles.optionTextActive  // 선택 여부에 따라 스타일 추가
                 ]}>
                   {option.label}
                 </Text>
-                {value === option.value &&
+                {sort.value === option.value &&
                   <IconSymbol name="check" size={18} color={COLOR.TINT.SLATE} />  // 선택 정렬에 아이콘 추가
                 }
               </TouchableOpacity>
@@ -97,9 +89,9 @@ function SortDropdown({ options, value, onChange }: SortProps) {
           </View>
         </Pressable>
       </Modal>
-    </>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   filterContainer: {

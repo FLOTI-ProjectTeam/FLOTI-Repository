@@ -38,7 +38,8 @@ export default function BottomBar({
     navigateWithParams('/community/tip/update/[postId]', {
       postId: post.id,
       initialTitle: post.title,
-      initialContent: post.content
+      initialContent: post.content,
+      thumbnail: post.thumbnail || ''
     });
     setMenuVisible(false);
   };

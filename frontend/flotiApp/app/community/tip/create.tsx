@@ -7,7 +7,7 @@ import useDraft from '@/hooks/useDraft';
 import { createTipPost } from '@/api/community/tipApi';
 
 import { EditorHeader } from '@/components/ui/Header';
-import InputView from '@/components/feature/community/InputView';
+import { TipInputView } from '@/components/feature/community/InputView';
 
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
@@ -17,13 +17,14 @@ export default function TipCreateScreen() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [file, setFile] = useState<File | undefined>(undefined);
+  const [file, setFile] = useState<any>(undefined);
 
   const { saveDraft, clearDraft } = useDraft({
     storageKey: '@tip_save',
     onLoad: (data) => {
       setTitle(data.title!);
       setContent(data.content);
+      if (data.file) setFile(data.file);
     },
   });
 
@@ -31,7 +32,7 @@ export default function TipCreateScreen() {
   const callCreateTipPost = () => createTipPost({ title, content }, file);
 
   /* 이벤트 핸들러 */
-  const handleSave = () => saveDraft({ title, content });
+  const handleSave = () => saveDraft({ title, content, file });
 
   const handleSubmit = async () => {
     try {
@@ -46,11 +47,13 @@ export default function TipCreateScreen() {
   return (
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSave={handleSave} onSubmit={handleSubmit} />
-      <InputView
+      <TipInputView
         title={title}
         content={content}
+        file={file}
         onChangeTitle={setTitle}
         onChangeContent={setContent}
+        onChangeFile={setFile}
       />
     </View>
   );

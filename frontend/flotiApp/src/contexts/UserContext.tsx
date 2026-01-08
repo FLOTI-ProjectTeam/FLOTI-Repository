@@ -9,7 +9,7 @@ export const UserContext = createContext<UserContextType | null>(null);
 
 // Provider 컴포넌트 생성: 하위 화면에 로그인 상태 공유
 export const UserProvider = ({ children }: ProviderProps) => {
-  const [username, setUsername] = useState<string | null>('curiousdev'); // 테스트용
+  const [username, setUsername] = useState<string | null>('bob'); // 테스트용
 
   useEffect(() => {
     userStorage.getUser().then(user => {

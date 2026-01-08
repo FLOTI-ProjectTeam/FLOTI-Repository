@@ -8,7 +8,7 @@ import useDraft from '@/hooks/useDraft';
 import { createAnswer } from '@/api/community/qnaApi';
 
 import { EditorHeader } from '@/components/ui/Header';
-import InputView from '@/components/feature/community/InputView';
+import { QnaInputView } from '@/components/feature/community/InputView';
 import QnaInfo from '@/components/feature/community/qna/QnaInfo';
 
 import { showToast } from '@/utils/toast';
@@ -47,7 +47,7 @@ export default function AnswerCreateScreen() {
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSave={handleSave} onSubmit={handleSubmit} />
       <QnaInfo title={String(postTitle)} content={String(postContent)} />
-      <InputView content={content} onChangeContent={setContent} />
+      <QnaInputView content={content} onChangeContent={setContent} />
     </View>
   );
 }

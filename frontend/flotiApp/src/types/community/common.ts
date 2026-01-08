@@ -8,6 +8,13 @@ export interface Page<T> {
     last: boolean;
     empty: boolean;
 }
+
+export interface ImageFile {
+    uri: string;
+    name: string;
+    type: string;
+}
+
 export interface UserResponse {
     username: string;
     nickname: string;

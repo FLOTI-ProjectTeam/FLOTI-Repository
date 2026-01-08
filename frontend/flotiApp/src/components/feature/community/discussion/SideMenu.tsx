@@ -18,12 +18,12 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.8, 320);   // 최대 320px 또는 80% 
 
 export function SideMenu({
-    visible, onClose, room, participants, onUpdate, onDelete, onLeave
+    visible, room, participants, onClose, onUpdate, onDelete, onLeave
 }: {
     visible: boolean;
-    onClose: () => void;
     room: DiscussionRoomResponse;
     participants: UserResponse[];
+    onClose: () => void;
     onUpdate: () => void;
     onDelete: () => void;
     onLeave: () => void;

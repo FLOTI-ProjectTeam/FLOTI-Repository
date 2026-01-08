@@ -13,15 +13,15 @@ import { OpaqueColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native'
 const MAPPING = {
   // See MaterialIcons here: https://icons.expo.fyi
   // See SF Symbols in the SF Symbols app on Mac.
-  
-  // 하단바
+
+  /* 하단바 */
   'community': { lib: 'FontAwesome', name: 'wechat' },
   'mindMap': { lib: 'FontAwesome6', name: 'brain' },
   'home': { lib: 'FontAwesome6', name: 'house' },
   'report': { lib: 'MaterialIcons', name: 'analytics' },
   'mypage': { lib: 'Ionicons', name: 'happy' },
 
-  // 커뮤니티
+  /* 커뮤니티 */
   'heart': { lib: 'Ionicons', name: 'heart-outline' },
   'heart.fill': { lib: 'Ionicons', name: 'heart-sharp' },
   'comment': { lib: 'Ionicons', name: 'chatbox-ellipses-outline' },
@@ -33,7 +33,7 @@ const MAPPING = {
   'crown': { lib: 'MaterialCommunityIcons', name: 'crown' },
   'exit': { lib: 'Ionicons', name: 'exit-outline' },
 
-  // 공통
+  /* 공통 */
   'chevron.left': { lib: 'Feather', name: 'chevron-left' },
   'chevron.right': { lib: 'Feather', name: 'chevron-right' },
   'chevron.up': { lib: 'Feather', name: 'chevron-up' },
@@ -41,8 +41,8 @@ const MAPPING = {
   'x': { lib: 'Feather', name: 'x' },
   'check': { lib: 'Feather', name: 'check' },
   'check.bold': { lib: 'FontAwesome', name: 'check' },
-  'pen' : {lib: 'MaterialCommunityIcons', name: 'pencil' },
-  'plus.pen' : {lib: 'MaterialCommunityIcons', name: 'pencil-plus' },
+  'pen': { lib: 'MaterialCommunityIcons', name: 'pencil' },
+  'plus.pen': { lib: 'MaterialCommunityIcons', name: 'pencil-plus' },
   'more.horizontal': { lib: 'MaterialIcons', name: 'more-horiz' },
   'menu': { lib: 'Feather', name: 'menu' },
 } as const
@@ -65,7 +65,7 @@ export function IconSymbol({
   weight?: SymbolWeight;
 }) {
   const mapping = MAPPING[name];
-  const styleProp =  style as StyleProp<TextStyle>;
+  const styleProp = style as StyleProp<TextStyle>;
   if (!mapping) return null;
 
   switch (mapping.lib) {

@@ -30,9 +30,6 @@ export default function TipDetailScreen() {
   const userContext = useContext(UserContext);  // 사용자 상태
   const isAuthor = (post?.author.username === userContext?.username);
 
-  /* API 호출 */
-  const callToggleLikeTipPost = () => toggleLikeTipPost(post!.id);
-
   /* 사이드 이펙트 */
   useEffect(() => {
     loadPost();
@@ -51,6 +48,8 @@ export default function TipDetailScreen() {
       setLoading(false);
     }
   }
+
+  const callToggleLikeTipPost = () => toggleLikeTipPost(post!.id);
 
   if (!post) return;
 

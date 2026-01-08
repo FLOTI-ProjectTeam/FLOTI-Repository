@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { showToast } from '@/utils/toast';
+import { ImageFile } from '@/types/community/common';
 
 type DraftData = {
     title?: string;
     content: string;
+    file?: ImageFile;
     maxParticipantCount?: number;
 }
 

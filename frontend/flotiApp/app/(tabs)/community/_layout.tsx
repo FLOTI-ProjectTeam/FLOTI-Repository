@@ -17,7 +17,6 @@ export default function CommunityLayout() {
   const segments = useSegments(); // ['(tabs)', 'community', 'tip']
   const currentTab = segments[2] || 'tip';
 
-
   return (
     <CommunitySearchProvider>
       <View style={STYLE.BASE_CONTAINER}>

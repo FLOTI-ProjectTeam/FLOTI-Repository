@@ -7,7 +7,7 @@ import { useNavigation } from '@/hooks/useNavigation';
 import { updateQnaPost } from '@/api/community/qnaApi';
 
 import { EditorHeader } from '@/components/ui/Header';
-import InputView from '@/components/feature/community/InputView';
+import { QnaInputView } from '@/components/feature/community/InputView';
 
 import { showToast } from '@/utils/toast';
 import { STYLE } from '@/constants/styles';
@@ -35,7 +35,7 @@ export default function QnaUpdateScreen() {
   return (
     <View style={STYLE.BASE_CONTAINER}>
       <EditorHeader onSubmit={handleSubmit} />
-      <InputView title={title} content={content} onChangeTitle={setTitle} onChangeContent={setContent} />
+      <QnaInputView title={title} content={content} onChangeTitle={setTitle} onChangeContent={setContent} />
     </View>
   );
 }

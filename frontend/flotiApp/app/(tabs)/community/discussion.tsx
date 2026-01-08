@@ -126,7 +126,9 @@ export default function DiscussionListScreen() {
                 <View style={styles.titleContainer}>
                   {item.joined
                     ? <StatusLabel type='JOINED' />
-                    : (item.participantCount >= item.maxParticipantCount ? <StatusLabel type='FULL' /> : null)}
+                    : item.participantCount >= item.maxParticipantCount
+                      ? <StatusLabel type='FULL' />
+                      : null}
                   <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
                 </View>
 
