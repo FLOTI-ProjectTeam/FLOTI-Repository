@@ -22,8 +22,9 @@ public class ChallengeSummaryResponse {
     private final LocalDateTime endDate;
     private final boolean isCompleted;
     private final LocalDateTime createdAt;
+    private final double progress;
 
-    public ChallengeSummaryResponse(ChallengePosts post) {
+    public ChallengeSummaryResponse(ChallengePosts post, double progress) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.intro = post.getIntro();
@@ -34,5 +35,10 @@ public class ChallengeSummaryResponse {
         this.endDate = post.getEndDate();
         this.isCompleted = post.isCompleted();
         this.createdAt = post.getCreatedAt();
+        this.progress = progress;
+    }
+
+    public ChallengeSummaryResponse(ChallengePosts post) {
+        this(post, 0.0);
     }
 }

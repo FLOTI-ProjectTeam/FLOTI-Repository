@@ -11,6 +11,7 @@ export interface ChallengeSummaryResponse {
     maxParticipants: number;
     isCompleted: boolean; // Changed from status
     createdAt: string;
+    progress: number;
 }
 
 export interface ParticipantResponse {

@@ -29,9 +29,19 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
     /**
      * 사용자가 이미 챌린지에 참여했는지 여부를 확인한다.
      *
-     * @param challengeId 챌린지 ID
+     * @param challengeId   챌린지 ID
      * @param participantId 사용자 ID
      * @return true이면 이미 참가한 경우
      */
     boolean existsByChallengeIdAndParticipantId(Long challengeId, Long participantId);
+
+    /**
+     * 여러 챌린지의 진행률 평균을 통계로 조회한다. (Bulk Query)
+     * 
+     * @param challengeIds 챌린지 ID 목록
+     * @return [챌린지ID, 평균진행률] 배열 목록
+     */
+    @org.springframework.data.jpa.repository.Query("SELECT cp.challenge.id, AVG(cp.progress) FROM ChallengeParticipants cp WHERE cp.challenge.id IN :challengeIds GROUP BY cp.challenge.id")
+    List<Object[]> findProgressStatsByChallengeIds(
+            @org.springframework.data.repository.query.Param("challengeIds") List<Long> challengeIds);
 }

@@ -267,3 +267,31 @@ INSERT INTO challenge_posts (author_id, title, intro, content, max_participants,
 VALUES (2, '1일 1커밋 챌린지', '매일매일 깃허브에 잔디를 심어봐요!', '개발자의 기본은 꾸준함! 하루에 한 번 커밋하기.', 5, 1, '2025-12-01 00:00:00', '2026-01-01 00:00:00', 0);
 INSERT INTO post_tags (board_type, post_id, tag_id) VALUES (2, 4, (SELECT tag_id FROM tags WHERE tag_name = '공부'));
 INSERT INTO challenge_participants (challenge_id, participant_id, progress, contribution) VALUES (4, 2, 0, 0);
+
+-- 대량 더미 데이터 생성 (성능 테스트용 100개)
+DELIMITER $$
+CREATE PROCEDURE generate_dummy_challenges()
+BEGIN
+    DECLARE i INT DEFAULT 5; -- 4번까지는 수동 데이터
+    WHILE i <= 104 DO
+        -- 챌린지 생성
+        INSERT INTO challenge_posts (author_id, title, intro, content, max_participants, current_participants, start_date, end_date, is_completed)
+        VALUES (1, CONCAT('성능 테스트 챌린지 #', i), '성능 테스트를 위한 더미 데이터입니다.', '내용 없음', 10, 1, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), 0);
+        
+        -- 작성자 참여
+        INSERT INTO challenge_participants (challenge_id, participant_id, progress, contribution)
+        VALUES (i, 1, FLOOR(RAND() * 100), 0);
+
+        -- 추가 참가자 (랜덤)
+        IF i % 2 = 0 THEN
+             INSERT INTO challenge_participants (challenge_id, participant_id, progress, contribution)
+             VALUES (i, 2, FLOOR(RAND() * 100), 0);
+             UPDATE challenge_posts SET current_participants = current_participants + 1 WHERE post_id = i;
+        END IF;
+
+        SET i = i + 1;
+    END WHILE;
+END$$
+DELIMITER ;
+
+CALL generate_dummy_challenges();

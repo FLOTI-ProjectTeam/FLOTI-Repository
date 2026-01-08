@@ -8,25 +8,13 @@ import { formatDay } from '@/utils/time';
 import { getChallengeProgress } from '@/api/community/challengeApi';
 
 export default function ChallengeItem({
-    item, onPress, showProgress = true
+    item, onPress
 }: {
     item: ChallengeSummaryResponse;
     onPress: () => void;
-    showProgress?: boolean;
 }) {
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        if (showProgress) {
-            getChallengeProgress(item.id)
-                .then(res => {
-                    setProgress(res.data.progress || 0);
-                })
-                .catch(err => {
-                    console.error('Progress fetch failed:', err);
-                });
-        }
-    }, [item.id, showProgress]);
+    // N+1 문제 해결: 개별 API 호출 제거하고 리스트 API에서 받은 값 사용
+    const progress = item.progress || 0;
 
     // 진행 상태 계산: 날짜 지났으면 종료 처리
     const now = new Date();

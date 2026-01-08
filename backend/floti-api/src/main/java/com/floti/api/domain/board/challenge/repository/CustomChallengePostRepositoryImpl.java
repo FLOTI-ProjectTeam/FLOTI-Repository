@@ -40,6 +40,7 @@ public class CustomChallengePostRepositoryImpl implements CustomChallengePostRep
 
         List<ChallengePosts> content = queryFactory
                 .selectFrom(post)
+                // .leftJoin(post.author).fetchJoin() // TODO: QClass issue - fix later
                 .where(condition)
                 .orderBy(orderSpecifiers)
                 .offset(pageable.getOffset())
@@ -75,6 +76,7 @@ public class CustomChallengePostRepositoryImpl implements CustomChallengePostRep
                 .distinct()
                 .from(post)
                 .join(participant).on(participant.challenge.id.eq(post.id))
+                // .leftJoin(post.author).fetchJoin() // TODO: QClass issue - fix later
                 .where(condition)
                 .orderBy(orderSpecifiers)
                 .offset(pageable.getOffset())
@@ -102,11 +104,12 @@ public class CustomChallengePostRepositoryImpl implements CustomChallengePostRep
      * latest는 최신 등록일 내림차순을 의미한다.
      */
     private OrderSpecifier<?>[] createSortSpecifiers(QChallengePosts post, String sort) {
-        if (sort == null) sort = "";
+        if (sort == null)
+            sort = "";
         return switch (sort.toLowerCase()) {
-            case "participants" -> new OrderSpecifier[]{post.currentParticipants.desc(), post.id.desc()};
-            case "started" -> new OrderSpecifier[]{post.startDate.asc(), post.id.desc()};
-            default -> new OrderSpecifier[]{post.createdAt.desc(), post.id.desc()};
+            case "participants" -> new OrderSpecifier[] { post.currentParticipants.desc(), post.id.desc() };
+            case "started" -> new OrderSpecifier[] { post.startDate.asc(), post.id.desc() };
+            default -> new OrderSpecifier[] { post.createdAt.desc(), post.id.desc() };
         };
     }
 }
