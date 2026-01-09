@@ -61,7 +61,7 @@ export default function FilterBar({
       {/* 버튼 */}
       <Pressable style={styles.sortButton} onPress={() => setPopupVisible(true)}>
         <Text style={styles.optionText}>{currentLabel}</Text>
-        <IconSymbol name="chevron.down" size={16} color={COLOR.TEXT.NAVY} />
+        <IconSymbol name={popupVisible ? "chevron.up" : "chevron.down"} size={16} color={COLOR.TEXT.NAVY} />
       </Pressable>
 
       {/* 팝업 */}

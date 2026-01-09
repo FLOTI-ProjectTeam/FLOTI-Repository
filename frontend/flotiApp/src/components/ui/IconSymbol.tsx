@@ -32,6 +32,7 @@ const MAPPING = {
   'trash': { lib: 'FontAwesome', name: 'trash' },
   'crown': { lib: 'MaterialCommunityIcons', name: 'crown' },
   'exit': { lib: 'Ionicons', name: 'exit-outline' },
+  'camera': { lib: 'Ionicons', name: 'camera-outline' },
 
   /* 공통 */
   'chevron.left': { lib: 'Feather', name: 'chevron-left' },
@@ -39,6 +40,7 @@ const MAPPING = {
   'chevron.up': { lib: 'Feather', name: 'chevron-up' },
   'chevron.down': { lib: 'Feather', name: 'chevron-down' },
   'x': { lib: 'Feather', name: 'x' },
+  'close': { lib: 'Ionicons', name: 'close-circle' },
   'check': { lib: 'Feather', name: 'check' },
   'check.bold': { lib: 'FontAwesome', name: 'check' },
   'pen': { lib: 'MaterialCommunityIcons', name: 'pencil' },

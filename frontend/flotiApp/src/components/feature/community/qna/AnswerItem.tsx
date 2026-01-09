@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 8,
-        backgroundColor: COLOR.BUTTON.MINT,
+        backgroundColor: COLOR.TINT.MINT,
         padding: 6,
         gap: 4
     },
