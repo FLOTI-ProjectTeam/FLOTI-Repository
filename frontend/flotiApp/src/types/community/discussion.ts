@@ -14,7 +14,7 @@ export interface DiscussionRoomResponse {
     maxParticipantCount: number;
     participantCount: number;
     joined: boolean;
-    createdAt: string;
+    createdAt: string; // 백엔드는 DiscussionRoomDetailResponse에서 제공
     recentActivityAt: string;
 }
 

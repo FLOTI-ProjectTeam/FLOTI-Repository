@@ -14,6 +14,7 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
         createdAt: "2025-01-10T10:00:00",
         recentActivityAt: "2025-01-10T10:20:00",
         participants: [
+            { username: "booklover", nickname: "booklover", profileImage: null },
             { username: "writer92", nickname: "writer92", profileImage: URL },
             { username: "inkwell", nickname: "inkwell", profileImage: URL },
             { username: "midnightowl", nickname: "midnightowl", profileImage: URL },
@@ -59,6 +60,7 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
         createdAt: "2025-01-12T08:00:00",
         recentActivityAt: "2025-01-12T08:45:00",
         participants: [
+            { username: "curiousdev", nickname: "curiousdev", profileImage: URL },
             { username: "typescriptFan", nickname: "typescriptFan", profileImage: URL },
         ],
         messages: [
@@ -94,6 +96,7 @@ export const dummyRoomDetails: DiscussionRoomDetailResponse[] = [
         recentActivityAt: "2025-01-12T08:45:00",
         participants: [
             { username: "peter", nickname: "peter", profileImage: URL },
+            { username: "curiousdev", nickname: "curiousdev", profileImage: URL },
         ],
         messages: [
             {

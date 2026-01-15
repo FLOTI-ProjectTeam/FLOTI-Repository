@@ -35,6 +35,12 @@ export function SideMenu({
     const username = useContext(UserContext)?.username ?? '';
     const isAuthor = (room.author.username === username);
 
+    const sortedParticipants = [...participants].sort((a, b) => {
+        if (a.username === room.author.username) return -1;
+        if (b.username === room.author.username) return 1;
+        return 0;
+    }); // 작성자 우선 정렬
+
     /* 사이드 이펙트 */
     useEffect(() => {
         if (visible) {
@@ -103,10 +109,15 @@ export function SideMenu({
                     </View>
 
                     {/* 참여자 목록 */}
-                    <ParticipantItem user={room.author} username={username} isAuthor />
-                    {participants.map((user) => <ParticipantItem user={user} username={username} />)}
+                    {sortedParticipants.map((participant) => (
+                        <ParticipantItem
+                            key={participant.username}
+                            participant={participant}
+                            username={username}
+                            isAuthor={participant.username === room.author.username}
+                        />
+                    ))}
                 </ScrollView>
-
                 {/* 하단 버튼 */}
                 <View style={styles.footerActions}>
                     {isAuthor ? (
@@ -133,22 +144,22 @@ export function SideMenu({
 }
 
 function ParticipantItem({
-    user, username, isAuthor
+    participant, username, isAuthor
 }: {
-    user: UserResponse;
+    participant: UserResponse;
     username: string;
     isAuthor?: boolean;
 }) {
     return (
-        <View key={user.username} style={styles.participantItem}>
-            <ProfileAvatar profileImage={user.profileImage} />
+        <View key={participant.username} style={styles.participantItem}>
+            <ProfileAvatar profileImage={participant.profileImage} />
             <View style={styles.nameRow}>
-                {user.username === username && (
+                {participant.username === username && (
                     <View style={styles.meBadge}>
                         <Text style={styles.meBadgeText}>나</Text>
                     </View>
                 )}
-                <Text style={styles.nickname}>{user.nickname}</Text>
+                <Text style={styles.nickname}>{participant.nickname}</Text>
                 {isAuthor && (
                     <View style={styles.crownBadge}>
                         <IconSymbol name="crown" size={12} color='white' />
