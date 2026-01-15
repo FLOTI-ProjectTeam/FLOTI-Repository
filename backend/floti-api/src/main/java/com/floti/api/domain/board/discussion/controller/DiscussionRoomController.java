@@ -26,13 +26,15 @@ public class DiscussionRoomController {
 
     /* 1. 조회 & 검색 */
     @GetMapping
-    public Page<DiscussionRoomResponse> getDiscussionRooms(@RequestParam(required = false) String search,
+    public Page<DiscussionRoomResponse> getDiscussionRooms(@AuthenticationPrincipal UserDetails userDetails,
+                                                           @RequestParam(required = false) String search,
                                                            @RequestParam(defaultValue = "recentActivity") String sort,
                                                            @RequestParam(defaultValue = "0") int page) {
+        Long userId = authUtil.resolveUserId(userDetails);
         sort = sort.trim();
         if (search == null || search.isBlank())
-            return discussionRoomService.getDiscussionRooms(sort, page);
-        return discussionRoomService.searchDiscussionRooms(search.trim(), sort, page);
+            return discussionRoomService.getDiscussionRooms(userId, sort, page);
+        return discussionRoomService.searchDiscussionRooms(userId, search.trim(), sort, page);
     }
 
     /* 2. 상세 조회 */

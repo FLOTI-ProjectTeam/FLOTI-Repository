@@ -11,4 +11,7 @@ import java.util.List;
 public interface DiscussionParticipantRepository  extends JpaRepository<DiscussionParticipants, RoomParticipantId> {
     @Query("SELECT dp FROM DiscussionParticipants dp JOIN FETCH dp.participant WHERE dp.roomId = :roomId")
     List<DiscussionParticipants> findByRoomId(@Param("roomId") Long roomId);
+
+    @Query("SELECT dp.discussionRoom.id FROM DiscussionParticipants dp WHERE dp.participant.id = :userId")
+    List<Long> findJoinedRoomIdsByUserId(Long userId);
 }

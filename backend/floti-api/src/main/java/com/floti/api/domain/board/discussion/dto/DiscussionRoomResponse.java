@@ -15,17 +15,23 @@ public class DiscussionRoomResponse {
     private final String content;
     private final int maxParticipantCount;
     private final int participantCount;
+    private final boolean joined;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime recentActivityAt;
 
     public DiscussionRoomResponse(DiscussionRooms discussionRoom) {
+        this(discussionRoom, false);
+    }
+
+    public DiscussionRoomResponse(DiscussionRooms discussionRoom, boolean joined) {
         this.id = discussionRoom.getId();
         this.author = new AuthorResponse(discussionRoom.getAuthor());
         this.title = discussionRoom.getTitle();
         this.content = discussionRoom.getContent();
         this.maxParticipantCount = discussionRoom.getMaxParticipantCount();
         this.participantCount = discussionRoom.getParticipantCount();
+        this.joined = joined;
         this.recentActivityAt = discussionRoom.getRecentActivityAt();
     }
 }

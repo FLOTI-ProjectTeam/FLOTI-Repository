@@ -26,9 +26,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +42,14 @@ public class DiscussionRoomService {
 
     private static final int PAGE_SIZE = 20;
 
+    /* 사용자의 참여 여부 포함 */
+    private Page<DiscussionRoomResponse> mapWithJoined(Page<DiscussionRooms> roomPage, Long userId) {
+        Set<Long> joinedRoomIds = new HashSet<>(discussionParticipantRepository.findJoinedRoomIdsByUserId(userId));
+        return roomPage.map(room -> new DiscussionRoomResponse(room, joinedRoomIds.contains(room.getId())));
+    }
+
     /* 1-1. 조회 */
-    public Page<DiscussionRoomResponse> getDiscussionRooms(String sort, int page) {
+    public Page<DiscussionRoomResponse> getDiscussionRooms(Long userId, String sort, int page) {
         Sort.Order baseOrder = Sort.Order.desc("id");
         Sort sortOrder = switch (sort.toLowerCase()) {
             case "latest" -> Sort.by(baseOrder);
@@ -51,14 +59,14 @@ public class DiscussionRoomService {
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, sortOrder);
         Page<DiscussionRooms> discussionRoomPage = discussionRoomRepository.findAll(pageable);
-        return discussionRoomPage.map(DiscussionRoomResponse::new);
+        return mapWithJoined(discussionRoomPage, userId);
     }
 
     /* 1-2. 검색 */
-    public Page<DiscussionRoomResponse> searchDiscussionRooms(String search, String sort, int page) {
+    public Page<DiscussionRoomResponse> searchDiscussionRooms(Long userId, String search, String sort, int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<DiscussionRooms> discussionRoomPage = discussionRoomRepository.searchDiscussionRooms(search, sort, pageable);
-        return discussionRoomPage.map(DiscussionRoomResponse::new);
+        return mapWithJoined(discussionRoomPage, userId);
     }
 
     /* 2. 상세 조회 */
@@ -90,13 +98,16 @@ public class DiscussionRoomService {
     /* 3. 등록 */
     @Transactional
     public DiscussionRoomResponse createDiscussionRoom(User user, DiscussionRoomRequest request) {
-        DiscussionRooms DiscussionRoom = DiscussionRooms.builder()
+        DiscussionRooms discussionRoom = DiscussionRooms.builder()
                 .author(user)
                 .title(request.getTitle())
                 .content(request.getContent())
                 .build();
 
-        return new DiscussionRoomResponse(discussionRoomRepository.save(DiscussionRoom));
+        discussionRoomRepository.save(discussionRoom);
+        discussionParticipantRepository.save(new DiscussionParticipants(discussionRoom, user));
+
+        return new DiscussionRoomResponse(discussionRoom);
     }
 
     /* 4. 수정 */
