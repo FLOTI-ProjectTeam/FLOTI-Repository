@@ -2,6 +2,7 @@ package com.floti.api.domain.board.tip.service;
 
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
+import com.floti.api.domain.board.common.processor.PostContentProcessor;
 import com.floti.api.domain.board.tip.dto.TipPostResponse;
 import com.floti.api.domain.board.tip.entity.TipPosts;
 import com.floti.api.domain.board.tip.repository.TipPostRepository;
@@ -20,6 +21,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.floti.api.domain.board.common.processor.PostContentProcessor.*;
+
 @Service
 @RequiredArgsConstructor
 public class TipPostService {
@@ -27,6 +30,7 @@ public class TipPostService {
     private String baseUrl;
 
     private final TipPostRepository tipPostRepository;
+    private final PostContentProcessor postContentProcessor;
     private final LikeTipPostRepository likeTipPostRepository;
     private final ImageService imageService;
 
@@ -65,10 +69,12 @@ public class TipPostService {
     /* 3. 등록 */
     @Transactional
     public TipPostResponse createTipPost(User user, PostRequest request, MultipartFile file) {
+        PostContent postContent = postContentProcessor.process(request.getContent());
         TipPosts tipPost = TipPosts.builder()
                 .author(user)
                 .title(request.getTitle())
-                .content(request.getContent())
+                .content(postContent.content())
+                .contentPlain(postContent.contentPlain())
                 .build();
 
         if (file != null && !file.isEmpty()) {
@@ -88,7 +94,8 @@ public class TipPostService {
         if (!user.getId().equals(tipPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        tipPost.update(request.getTitle(), request.getContent());
+        PostContent postContent = postContentProcessor.process(request.getContent());
+        tipPost.update(request.getTitle(), postContent.content(), postContent.contentPlain());
 
         if (file != null && !file.isEmpty()) {
             String newPath = imageService.saveImage(file, THUMBNAIL_DIR);

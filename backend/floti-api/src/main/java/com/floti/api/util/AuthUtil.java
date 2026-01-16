@@ -13,7 +13,7 @@ import static org.springframework.security.core.userdetails.User.*;
 
 @Component
 @RequiredArgsConstructor
-public class AuthUtil {
+public final class AuthUtil {
     private final UserRepository userRepository;
 
     public User resolveUser(UserDetails userDetails) {

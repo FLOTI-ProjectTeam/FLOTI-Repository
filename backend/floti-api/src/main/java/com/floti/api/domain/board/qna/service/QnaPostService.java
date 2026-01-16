@@ -2,6 +2,7 @@ package com.floti.api.domain.board.qna.service;
 
 import com.floti.api.domain.auth.entity.User;
 import com.floti.api.domain.board.common.dto.PostRequest;
+import com.floti.api.domain.board.common.processor.PostContentProcessor;
 import com.floti.api.domain.board.qna.dto.AnswerResponse;
 import com.floti.api.domain.board.qna.dto.QnaPostDetailResponse;
 import com.floti.api.domain.board.qna.dto.QnaPostResponse;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QnaPostService {
     private final QnaPostRepository qnaPostRepository;
+    private final PostContentProcessor postContentProcessor;
     private final AnswerRepository answerRepository;
     private final LikeAnswerRepository likeAnswerRepository;
 
@@ -83,10 +85,12 @@ public class QnaPostService {
     /* 3. 등록 */
     @Transactional
     public QnaPostDetailResponse createQnaPost(User user, PostRequest request) {
+        PostContentProcessor.PostContent postContent = postContentProcessor.process(request.getContent());
         QnaPosts qnaPost = QnaPosts.builder()
                 .author(user)
                 .title(request.getTitle())
-                .content(request.getContent())
+                .content(postContent.content())
+                .contentPlain(postContent.contentPlain())
                 .build();
 
         return new QnaPostDetailResponse(qnaPostRepository.save(qnaPost), Collections.emptyList());
@@ -101,7 +105,9 @@ public class QnaPostService {
         if (!userId.equals(qnaPost.getAuthor().getId()))
             throw new AccessDeniedException(ExceptionMessage.UPDATE_DENIED);
 
-        qnaPost.update(request.getTitle(), request.getContent());
+        PostContentProcessor.PostContent postContent = postContentProcessor.process(request.getContent());
+        qnaPost.update(request.getTitle(), postContent.content(), postContent.contentPlain());
+
         return new QnaPostResponse(qnaPost);
     }
 

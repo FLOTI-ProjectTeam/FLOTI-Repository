@@ -29,6 +29,9 @@ public class QnaPosts {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String contentPlain; // 검색 최적화를 위해 마크다운을 제거한 content
+
     @Column(nullable = false)
     private int answerCount;
 
@@ -40,16 +43,18 @@ public class QnaPosts {
     private LocalDateTime createdAt;
 
     @Builder
-    public QnaPosts(User author, String title, String content, boolean accepted) {
+    public QnaPosts(User author, String title, String content, String contentPlain, boolean accepted) {
         this.author = author;
         this.title = title;
         this.content = content;
+        this.contentPlain = contentPlain;
         this.accepted = accepted; //테스트용
     }
 
-    public void update(String title, String content) {
+    public void update(String title, String content, String contentPlain) {
         this.title = title;
         this.content = content;
+        this.contentPlain = contentPlain;
     }
 
     public void accept(Answers answer) {

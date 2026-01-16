@@ -29,6 +29,9 @@ public class TipPosts implements LikeableEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String contentPlain; // 검색 최적화를 위해 마크다운을 제거한 content
+
     @Column(length = 65)
     private String thumbnail; //경로: tips/thumbnail/날짜_UUID.확장자
 
@@ -43,15 +46,17 @@ public class TipPosts implements LikeableEntity {
     private LocalDateTime createdAt;
 
     @Builder
-    public TipPosts(User author, String title, String content) {
+    public TipPosts(User author, String title, String content, String contentPlain) {
         this.author = author;
         this.title = title;
         this.content = content;
+        this.contentPlain = contentPlain;
     }
 
-    public void update(String title, String content) {
+    public void update(String title, String content, String contentPlain) {
         this.title = title;
         this.content = content;
+        this.contentPlain = contentPlain;
     }
 
     public void updateThumbnail(String thumbnail) {
