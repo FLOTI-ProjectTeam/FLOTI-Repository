@@ -7,7 +7,7 @@ export const dummyPosts: TipPostResponse[] = [
     id: 1,
     author: { username: "alice", nickname: "Alice", profileImage: null },
     title: "첫 번째 팁",
-    content: "이건 더미 내용입니다. 화면 레이아웃 확인용으로 작성했어요.",
+    content: "이건 더미 내용입니다. **화면 레이아웃 확인용**으로 작성했어요.",
     thumbnail: URL,
     commentCount: 3,
     likeCount: 5,
@@ -18,7 +18,7 @@ export const dummyPosts: TipPostResponse[] = [
     id: 2,
     author: { username: "bob", nickname: "Bob", profileImage: null },
     title: "두 번째 팁",
-    content: "API 연결 전 임시 데이터입니다.",
+    content: "API 연결 전 *임시 데이터*입니다.",
     thumbnail: null,
     commentCount: 0,
     likeCount: 2,
@@ -29,7 +29,9 @@ export const dummyPosts: TipPostResponse[] = [
     id: 3,
     author: { username: "carol", nickname: "Carol", profileImage: null },
     title: "세 번째 팁",
-    content: "UI 테스트용 더미 글입니다.",
+    content: `UI ~~테스트용~~ 더미 글입니다.
+> 인용
+- 리스트`,
     thumbnail: URL,
     commentCount: 1,
     likeCount: 0,

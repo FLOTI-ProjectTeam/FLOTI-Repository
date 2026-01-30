@@ -8,7 +8,7 @@ import { MessageResponse } from '@/types/community/discussion';
 
 import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import BreakAllText from '@/components/ui/BreakAllText';
+import { ContentText } from '@/components/ui/BreakAllText';
 import ProfileAvatar from '@/components/feature/community/ProfileAvatar';
 
 import { computePopupPosition } from '@/utils/position';
@@ -55,7 +55,7 @@ export default function MessageItem({
 
                 {/* 내용 */}
                 <Pressable style={styles.card} onLongPress={handleOpenMenu}>
-                    <BreakAllText style={styles.content}>{message.content}</BreakAllText>
+                    <ContentText style={styles.content}>{message.content}</ContentText>
                 </Pressable>
 
                 {/* 좋아요수, 시간 */}

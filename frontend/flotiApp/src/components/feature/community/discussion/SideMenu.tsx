@@ -7,7 +7,7 @@ import { UserResponse } from '@/types/community/common';
 import { DiscussionRoomResponse } from '@/types/community/discussion';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import BreakAllText from '@/components/ui/BreakAllText';
+import { ContentText } from '@/components/ui/BreakAllText';
 import ProfileAvatar from '@/components/feature/community/ProfileAvatar';
 
 import { formatDetailTime, formatSmartTime } from '@/utils/time';
@@ -96,7 +96,7 @@ export function SideMenu({
                     </View>
 
                     <View style={styles.contentContainer}>
-                        <BreakAllText style={styles.content}>{room.content}</BreakAllText>
+                        <ContentText style={styles.content}>{room.content}</ContentText>
                     </View>
 
                     <View style={styles.sectionHeader}>

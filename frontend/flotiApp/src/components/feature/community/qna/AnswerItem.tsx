@@ -7,7 +7,7 @@ import { AnswerReponse } from '@/types/community/qna';
 
 import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import BreakAllText from '@/components/ui/BreakAllText';
+import { MarkdownText } from '@/components/ui/BreakAllText';
 
 import { formatDetailTime } from '@/utils/time';
 import COLOR from '@/constants/colors';
@@ -73,7 +73,7 @@ export default function AnswerItem({
             </View>
 
             {/* 내용 */}
-            <BreakAllText style={styles.content}>{answer.content}</BreakAllText>
+            <MarkdownText content={answer.content} />
 
             {/* 좋아요 정보, 더보기 버튼 */}
             <View style={styles.infoContainer}>
@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
     },
     acceptedText: { fontSize: 14, fontWeight: 600, color: 'white' },
     likeItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-    content: { fontSize: 15, lineHeight: 22, color: COLOR.TEXT.GRAY_DARK },
     infoContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',

@@ -1,5 +1,5 @@
 import { View, TextInput, StyleSheet, Image, TouchableOpacity, Text, ScrollView } from 'react-native';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
@@ -7,6 +7,7 @@ import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 import { ImageFile } from '@/types/community/common';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import MarkdownToolbar from '@/components/feature/community/MarkdownToolbar';
 
 import COLOR from '@/constants/colors';
 import { STYLE } from '@/constants/styles';
@@ -34,6 +35,8 @@ function TextInputSection({
                     placeholderTextColor={COLOR.TEXT.GRAY_MEDIUM}
                 />
             )}
+
+            <MarkdownToolbar content={content} onChangeContent={onChangeContent} />
 
             <ScrollView
                 style={[STYLE.BASE_CONTAINER, { marginBottom }]}
@@ -145,12 +148,14 @@ export function QnaInputView({
     title, content, onChangeTitle, onChangeContent
 }: TextInputProps) {
     return (
-        <TextInputSection
-            title={title}
-            content={content}
-            onChangeTitle={onChangeTitle}
-            onChangeContent={onChangeContent}
-        />
+        <>
+            <TextInputSection
+                title={title}
+                content={content}
+                onChangeTitle={onChangeTitle}
+                onChangeContent={onChangeContent}
+            />
+        </>
     );
 }
 
@@ -175,8 +180,7 @@ const styles = StyleSheet.create({
         borderRadius: 20
     },
     titleInput: {
-        paddingVertical: 12,
-        paddingHorizontal: 24,
+        paddingVertical: 12, paddingHorizontal: 24,
         fontSize: 22,
         fontWeight: '700',
         color: COLOR.TEXT.GRAY_DARK

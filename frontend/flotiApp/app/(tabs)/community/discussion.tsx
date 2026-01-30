@@ -10,7 +10,7 @@ import { getDiscussionRooms, toggleJoinDiscussion } from '@/api/community/discus
 import { DiscussionRoomResponse } from '@/types/community/discussion';
 
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import BreakAllText from '@/components/ui/BreakAllText';
+import { ContentText } from '@/components/ui/BreakAllText';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import FilterBar, { SortType, SortOption } from '@/components/feature/community/FilterBar';
 import { LoadingView, EmptyView } from '@/components/feature/community/CommunityStateView';
@@ -133,7 +133,7 @@ export default function DiscussionListScreen() {
                 </View>
 
                 {/* 토론 내용 */}
-                <BreakAllText style={styles.content}>{item.content}</BreakAllText>
+                <ContentText style={styles.content}>{item.content}</ContentText>
 
                 {/* 활동일, 인원 */}
                 <View style={styles.meta}>

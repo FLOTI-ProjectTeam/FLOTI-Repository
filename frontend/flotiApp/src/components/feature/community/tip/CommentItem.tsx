@@ -7,7 +7,7 @@ import { CommentResponse } from '@/types/community/tip';
 
 import MorePopup from '@/components/MorePopup';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import BreakAllText from '@/components/ui/BreakAllText';
+import { ContentText } from '@/components/ui/BreakAllText';
 
 import { formatSmartTime } from '@/utils/time';
 import { showToast } from '@/utils/toast';
@@ -95,9 +95,9 @@ export default function CommentItem({
           </View>
         </View>
       ) : (
-        <BreakAllText style={styles.content}>
+        <ContentText style={styles.content}>
           {comment.deleted ? '삭제된 댓글입니다.' : comment.content}
-        </BreakAllText>
+        </ContentText>
       )}
 
       {/* 답글 버튼 */}

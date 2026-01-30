@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 import { QnaPostResponse } from '@/types/community/qna';
 
-import BreakAllText from '@/components/ui/BreakAllText';
+import { ContentText, MarkdownText } from '@/components/ui/BreakAllText';
 
 import { formatDetailTime } from '@/utils/time';
 import COLOR from '@/constants/colors';
@@ -11,7 +11,7 @@ export default function QnaDetailHeader({ post }: { post: QnaPostResponse }) {
     return (
         <>
             {/* 제목 */}
-            <BreakAllText style={styles.title}>{post.title}</BreakAllText>
+            <ContentText style={styles.title}>{post.title}</ContentText>
 
             {/* 작성자, 작성일 */}
             <Text style={styles.author}>{post.author.nickname}</Text>
@@ -19,7 +19,7 @@ export default function QnaDetailHeader({ post }: { post: QnaPostResponse }) {
 
             {/* 본문 */}
             <View style={styles.contentContainer}>
-                <BreakAllText style={styles.content}>{post.content}</BreakAllText>
+                <MarkdownText content={post.content} />
             </View>
 
             {/* 답변수 */}
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT
     },
-    content: { fontSize: 15, lineHeight: 22, color: COLOR.TEXT.GRAY_DARK },
     answerHeader: {
         flexDirection: 'row',
         alignItems: 'center',

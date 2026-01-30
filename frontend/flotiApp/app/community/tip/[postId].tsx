@@ -9,7 +9,7 @@ import { dummyPosts } from '@/__mocks__/tip';
 import { getTipPost, toggleLikeTipPost } from '@/api/community/tipApi';
 import { TipPostResponse } from '@/types/community/tip';
 
-import BreakAllText from '@/components/ui/BreakAllText';
+import { ContentText, MarkdownText } from '@/components/ui/BreakAllText';
 import { Header } from '@/components/ui/Header';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import BottomBar from '@/components/feature/community/tip/BottomBar';
@@ -93,7 +93,7 @@ export default function TipDetailScreen() {
         }}
       >
         {/* 제목 */}
-        <BreakAllText style={styles.title}>{post.title}</BreakAllText>
+        <ContentText style={styles.title}>{post.title}</ContentText>
 
         {/* 작성자, 작성일 */}
         <Text style={styles.author}>{post.author.nickname}</Text>
@@ -101,7 +101,7 @@ export default function TipDetailScreen() {
 
         {/* 본문 */}
         <View style={styles.contentContainer}>
-          <BreakAllText style={styles.content}>{post.content}</BreakAllText>
+          <MarkdownText content={post.content} />
         </View>
       </ScrollView>
 
@@ -126,6 +126,5 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     backgroundColor: COLOR.BACKGROUND.SLATE_LIGHT
-  },
-  content: { fontSize: 15, lineHeight: 22, color: COLOR.TEXT.GRAY_DARK }
+  }
 });

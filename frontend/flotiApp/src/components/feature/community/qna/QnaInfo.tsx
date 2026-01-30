@@ -1,7 +1,7 @@
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { useState } from 'react';
 
-import BreakAllText from '@/components/ui/BreakAllText';
+import { ContentText, MarkdownText } from '@/components/ui/BreakAllText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 
 import COLOR from '@/constants/colors';
@@ -16,8 +16,8 @@ export default function QnaInfo({
 
     return (
         <View style={styles.postContainer}>
-            <BreakAllText style={styles.title}>{title}</BreakAllText>
-            {expanded && <BreakAllText style={styles.content}>{content}</BreakAllText>}
+            <ContentText style={styles.title}>{title}</ContentText>
+            {expanded && <MarkdownText content={content} />}
 
             <TouchableOpacity activeOpacity={0.7} style={styles.iconContainer} onPress={() => setExpanded(prev => !prev)}>
                 <View style={styles.iconWrapper}>
@@ -41,12 +41,11 @@ const styles = StyleSheet.create({
         gap: 8
     },
     title: { fontSize: 18, fontWeight: 700, color: COLOR.TEXT.GRAY_DARK },
-    content: { fontSize: 15, lineHeight: 22, color: COLOR.TEXT.GRAY_DARK },
-    iconContainer: { 
-        position: 'absolute', 
-        bottom: -16, 
-        left: 0, right: 0, 
-        alignItems: 'center' 
+    iconContainer: {
+        position: 'absolute',
+        bottom: -16,
+        left: 0, right: 0,
+        alignItems: 'center'
     },
     iconWrapper: {
         width: 32, height: 32,
