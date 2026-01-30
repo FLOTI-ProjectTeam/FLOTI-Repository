@@ -76,4 +76,20 @@ public class ChallengeParticipants {
     public void updateContribution(int contribution) {
         this.contribution = contribution;
     }
+
+    /**
+     * 공헌도를 1 증가시킨다.
+     */
+    public void incrementContribution() {
+        this.contribution++;
+    }
+
+    /**
+     * 공헌도를 1 감소시킨다. 음수가 되지 않도록 한다.
+     */
+    public void decrementContribution() {
+        if (this.contribution > 0) {
+            this.contribution--;
+        }
+    }
 }

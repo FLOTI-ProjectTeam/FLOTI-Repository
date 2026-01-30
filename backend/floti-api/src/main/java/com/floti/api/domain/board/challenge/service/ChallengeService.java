@@ -308,12 +308,16 @@ public class ChallengeService {
         if (!challengeParticipantRepository.existsByChallengeIdAndParticipantId(challengeId, user.getId())) {
             throw new AccessDeniedException(ExceptionMessage.NOT_PARTICIPANT);
         }
-        ChallengeFeed feed = ChallengeFeed.builder()
+        ChallengeFeed seed = ChallengeFeed.builder()
                 .challenge(post)
                 .author(user)
                 .content(request.getContent())
                 .build();
-        ChallengeFeed saved = challengeFeedRepository.save(feed);
+        ChallengeFeed saved = challengeFeedRepository.save(seed);
+
+        // 공헌도 및 진행률 업데이트
+        updateParticipantProgress(challengeId, user.getId(), post, true);
+
         return new FeedResponse(saved);
     }
 
@@ -360,5 +364,30 @@ public class ChallengeService {
             throw new AccessDeniedException(ExceptionMessage.DELETE_DENIED);
         }
         challengeFeedRepository.delete(feed);
+
+        // 공헌도 및 진행률 업데이트 (감소)
+        ChallengePosts post = feed.getChallenge();
+        updateParticipantProgress(post.getId(), userId, post, false);
+    }
+
+    private void updateParticipantProgress(Long challengeId, Long userId, ChallengePosts post, boolean isIncrement) {
+        ChallengeParticipantId pid = new ChallengeParticipantId(challengeId, userId);
+        ChallengeParticipants participant = challengeParticipantRepository.findById(pid)
+                .orElseThrow(() -> new AccessDeniedException(ExceptionMessage.NOT_PARTICIPANT));
+
+        if (isIncrement) {
+            participant.incrementContribution();
+        } else {
+            participant.decrementContribution();
+        }
+
+        long totalDays = java.time.temporal.ChronoUnit.DAYS.between(post.getStartDate(), post.getEndDate()) + 1;
+        if (totalDays <= 0)
+            totalDays = 1; // 방어 로직
+
+        int progress = (int) Math.min(100, (participant.getContribution() * 100.0 / totalDays));
+        participant.updateProgress(progress);
+
+        challengeParticipantRepository.save(participant);
     }
 }

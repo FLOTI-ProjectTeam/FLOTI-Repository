@@ -153,11 +153,27 @@ export default function ChallengeDetailScreen() {
                     <Text style={styles.sectionTitle}>📊 나의 진행률</Text>
                     <View style={styles.myProgressRow}>
                         <View style={styles.avatarPlaceholder} />
-                        <Text style={styles.nickname}>-</Text>
+                        <Text style={styles.nickname} numberOfLines={1}>
+                            {user?.username || '-'}
+                        </Text>
                         <View style={styles.progressBarContainer}>
-                            <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
-                            <Text style={styles.progressLabel}>{progress}%</Text>
-                            <Text style={styles.contributionLabel}>공헌도 0</Text>
+                            {/* 참여자 목록에서 내 정보 찾기 */}
+                            {(() => {
+                                const myInfo = safeChallenge.participants?.find((p) =>
+                                    // 닉네임 비교 (UserContext의 username이 닉네임 역할을 함)
+                                    user?.username && p.nickname === user.username
+                                );
+                                const myRealProgress = myInfo?.progress ?? 0;
+                                const myContribution = myInfo?.contribution ?? 0;
+
+                                return (
+                                    <>
+                                        <View style={[styles.progressBarFill, { width: `${myRealProgress}%` }]} />
+                                        <Text style={styles.progressLabel}>{myRealProgress}%</Text>
+                                        <Text style={styles.contributionLabel}>공헌도 {myContribution}</Text>
+                                    </>
+                                );
+                            })()}
                         </View>
                     </View>
                 </View>
