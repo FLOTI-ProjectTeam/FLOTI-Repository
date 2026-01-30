@@ -31,7 +31,8 @@ export const dummyPosts: TipPostResponse[] = [
     title: "세 번째 팁",
     content: `UI ~~테스트용~~ 더미 글입니다.
 > 인용
-- 리스트`,
+- 리스트
+[링크](https://www.google.com)`,
     thumbnail: URL,
     commentCount: 1,
     likeCount: 0,

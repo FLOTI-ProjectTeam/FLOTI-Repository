@@ -1,15 +1,15 @@
-import { Text, TextStyle, ViewStyle } from 'react-native';
+import { Linking, Text, TextStyle, ViewStyle } from 'react-native';
 import { useMemo } from 'react';
 import Markdown from 'react-native-markdown-display';
 
-import { withZeroWidthSpace } from '@/utils/markdown';
+import { withZeroWidthSpace, cleanMarkdownUrl } from '@/utils/markdown';
 
 import COLOR from '@/constants/colors';
 
 export function ContentText({
     children, style
 }: {
-    children: string | null;   // React 태그 내부 문자열
+    children: string | null;
     style?: TextStyle;
 }) {
     const text = children ?? '';
@@ -22,7 +22,21 @@ export function MarkdownText({ content }: { content: string }) {
         [content]
     );
 
-    return <Markdown style={markdownStyles}>{renderContent}</Markdown>;
+    return (
+        <Markdown
+            style={markdownStyles}
+            onLinkPress={(url: string) => {
+                const safeUrl = cleanMarkdownUrl(url);
+                Linking.canOpenURL(safeUrl).then((supported) => {
+                    if (supported) Linking.openURL(safeUrl);
+                    else console.warn('Cannot open URL:', safeUrl);
+                });
+                return false;
+            }}
+        >
+            {renderContent}
+        </Markdown>
+    );
 }
 
 const markdownStyles: {
