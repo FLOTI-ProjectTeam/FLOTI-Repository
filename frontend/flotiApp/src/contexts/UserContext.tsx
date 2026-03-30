@@ -21,12 +21,12 @@ export const UserProvider = ({ children }: ProviderProps) => {
 
           setUsername(user.username);
         } else {
-          // [개발용] 자동 로그인 처리 (user1/password)
-          console.log('[Dev] Trying auto-login...');
-          const { login } = require('@/api/authApi'); // 순환 참조 방지 위해 dynamic import or direct import if safe
-          const res = await login({ username: 'user1', password: '1234' });
-          if (res.username) setUsername(res.username);
-          console.log('[Dev] Auto-login success:', res.username);
+          // [개발용] 자동 로그인 처리 (user1/password) - 제거됨 (실제 로그인 화면 사용)
+          // console.log('[Dev] Trying auto-login...');
+          // const { login } = require('@/api/authApi'); 
+          // const res = await login({ username: 'user1', password: '1234' });
+          // if (res.username) setUsername(res.username);
+          console.log('[Auth] User not logged in. Waiting for manual login.');
         }
       } catch (e) {
         console.error('[Dev] Auto-login failed:', e);

@@ -41,7 +41,7 @@ dependencies {
 	// QueryDSL
 	implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta' 
 	// H2 (인메모리 DB)
-	testImplementation 'com.h2database:h2' 
+	runtimeOnly 'com.h2database:h2' 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'

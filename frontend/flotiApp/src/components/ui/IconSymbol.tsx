@@ -31,6 +31,8 @@ const MAPPING = {
   'search': { lib: 'Feather', name: 'search' },
   'trash': { lib: 'FontAwesome', name: 'trash' },
   'crown': { lib: 'MaterialCommunityIcons', name: 'crown' },
+  'leaf': { lib: 'Ionicons', name: 'leaf-outline' },
+  'leaf.fill': { lib: 'Ionicons', name: 'leaf' },
 
   // 공통
   'chevron.left': { lib: 'Feather', name: 'chevron-left' },
